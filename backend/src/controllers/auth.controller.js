@@ -1,9 +1,7 @@
 import User from "../models/user.model.js";
-import {
-  loginService,
-  registerService,
-} from "../services/auth.service.js";
-
+import { loginService, registerService } from "../services/auth.service.js";
+import { generateRefreshToken } from "../utils/generateToken.js";
+import jwt from "jsonwebtoken";
 export const register = async (req, res) => {
   const result = await registerService(req.body);
   try {
@@ -34,9 +32,6 @@ export const logout = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
-    user.refresh_token = "";
-    user.exp_refresh_token = ""
-    await user.save();
     res.status(200).json({ message: "Logout success" });
   } catch (error) {
     console.log(error.message);
@@ -46,10 +41,15 @@ export const logout = async (req, res) => {
 
 export const refreshToken = async (req, res) => {
   try {
-    const result = await refreshTokenService(req.body);
-    res.status(200).json(result.message);
+    const token = req.body.token;
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    const refreshToken = generateRefreshToken(
+      decoded.id,
+      process.env.REFRESH_SECRET
+    );
+    res.status(200).json({message: "Token refreshed", token: refreshToken});
   } catch (error) {
     console.log(error.message);
-    res.status(500).json(error.message);
+    res.status(500).json({message: error.message});
   }
 };
