@@ -1,9 +1,12 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
 import ChatMessage from "../components/ChatMessage";
+import jwtDecode from "jwt-decode";
+import { baseURL } from "../api/baseURL";
+import { useDispatch, useSelector } from "react-redux";
 
 const chats = [
   {
@@ -21,6 +24,33 @@ const chats = [
 ];
 
 export default function HomeScreen({ navigation }) {
+  // const token = useSelector((state) => state.token);
+  // const dispatch = useDispatch();
+  // const refreshToken = async (token) => {
+  //   try {
+  //     const res = await baseURL.post("/auth/refreshToken", { token: token });
+  //     const newToken = res.data.token;
+  //     dispatch(setToken(newToken));
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   const checkToken = async () => {
+  //     try {
+  //       const decoded = jwtDecode(token);
+  //       console.log(decoded);
+  //       if (decoded.exp * 1000 < Date.now()) {
+  //         await refreshToken(token);
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   checkToken();
+  // },[]);
+
   const handleLogout = async () => {
     axios.post("http://localhost:5000/api/auth/logout");
     await AsyncStorage.removeItem("token");

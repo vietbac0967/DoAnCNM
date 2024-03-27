@@ -16,7 +16,11 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/", userRoutes);
 
+// const date = new Date();
+/// create a new variable to hold the current date plus 15 days
+// const datePlus15Days = new Date(date.setDate(date.getDate() + 15));
 app.listen(PORT, () => {
+  // console.log(datePlus15Days);  
   connectToMongo();
   console.log(`Server is running on port ${PORT}`);
 });

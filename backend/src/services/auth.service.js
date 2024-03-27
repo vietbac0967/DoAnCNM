@@ -9,6 +9,7 @@ import {
   validatePhoneNumber,
 } from "../utils/validate.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 const hashPassword = async (password) => {
   const salt = await bcrypt.genSalt(10);
   return await bcrypt.hash(password, salt);
@@ -97,33 +98,18 @@ export const loginService = async (data) => {
     if (!validPassword) {
       return { message: "Invalid password" };
     }
+    const date = new Date();
+
     const token = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
     user.refresh_token = refreshToken;
-    user.exp_refresh_token = new Date(Date.now() + 180 * 24 * 60 * 60 * 1000);
+    const expired = new Date(date.setDate(date.getDate() + 15));
+    user.exp_refresh_token = expired; 
     await user.save();
-    return { message: "Login success", token, refreshToken };
+    return { message: "Login success", token, refreshToken,expired };
   } catch (error) {
     return { message: error.message };
   }
 };
 
-export const refreshTokenService = async (data) => {
-  try {
-    const { userId, refreshToken } = data;
-    const user = await User.findById(userId).exec();
-    if (!user) {
-      return { message: "User not found" };
-    }
-    if (refreshToken !== user.refresh_token) {
-      return { message: "Invalid refresh token" };
-    }
-    if (new Date() > user.exp_refresh_token) {
-      return { message: "Refresh token expired" };
-    }
-    const token = generateAccessToken(user._id);
-    return { message: "Refresh token success", token };
-  } catch (error) {
-    return { message: error.message };
-  }
-};
+

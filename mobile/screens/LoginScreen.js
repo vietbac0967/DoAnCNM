@@ -18,18 +18,20 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function LoginScreenV1({ navigation }) {
   const [passwordShow, setPasswordShow] = useState(true);
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState(""); 
   const dispatch = useDispatch();
-
   const token = useSelector((state) => state.token);
-
   useEffect(() => {
-    if (token) {
-      navigation.navigate("Main");
-    }
+    const checkToken = async () => {
+      const token = await AsyncStorage.getItem("token");
+      if (token) {
+        navigation.navigate("Main");
+      }
+    };
+    checkToken();
   }, []);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (username === "" || password === "") {
       alert("Please fill in all fields");
       return;
