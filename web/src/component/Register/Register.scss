@@ -31,7 +31,7 @@
         .box-input {
             margin-top: 20px;
             width: 100%;
-            height: 360px;
+            height: 400px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -43,7 +43,12 @@
                 padding: 0 10px;
             }
 
-
+            .filled-weight-helper-text {
+                margin-top: 3px;
+                color: red;
+                font-size: 15px;
+                font-weight: 500;
+            }
         }
 
         .box-button {
@@ -70,7 +75,7 @@
         }
 
         .box-option {
-            margin-top: 80px;
+            margin-top: 50px;
 
             .text-notaccout {
                 font-size: 20px;
