@@ -8,6 +8,8 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import IconButton from '@mui/material/IconButton';
 import { Stack } from '@mui/material';
 import styled from '@emotion/styled';
+
+
 function SideBar() {
     const isSelected = useState(false);
     const handleChatButtonClick = () => {
@@ -31,7 +33,7 @@ function SideBar() {
         <Stack
             height={'100%'}
             flex={1}
-            justifyContent={'space-between'}
+            justifyContent={'start'}
             bgcolor={''}>
             <CustomIconButton size="large" onClick={handleChatButtonClick} aria-label="delete">
                 <ChatIcon />

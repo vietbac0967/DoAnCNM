@@ -5,6 +5,13 @@ import avatar from '../../assets/Ellipse_191.png'
 import SearchIcon from '@mui/icons-material/Search';
 import PhoneEnabledIcon from '@mui/icons-material/PhoneEnabled';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import Input from '@mui/material/Input';
+import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
+import SendIcon from '@mui/icons-material/Send';
+
+
+
 function Chat() {
     const handleSearchIconClick = () => {
 
@@ -16,11 +23,15 @@ function Chat() {
     const handleMoreIconClick = () => {
 
     }
+    const attachfileClick = () => {
+
+    }
+    const handleSendIcon = () => { }
     return (
         <Box
             flex={8}
             bgcolor={''}>
-            <Stack flexDirection={'column'} justifyContent={'space-around'}>
+            <Stack height={'100%'} flexDirection={'column'} justifyContent={'space-between'}>
                 <Stack flexDirection={'row'} justifyContent={'space-between'}>
                     <Stack flexDirection={'row'}>
                         <Avatar alt="viet bac" src={avatar} />
@@ -49,11 +60,22 @@ function Chat() {
                         </IconButton>
                     </Stack>
                 </Stack>
-                <Stack>
+                <Stack sx={{ backgroundColor: '#F1EEDC', height: '100%' }}>
 
                 </Stack>
-                <Stack>
-
+                <Stack flexDirection={'row'} justifyContent={'space-between'}>
+                    <IconButton onClick={attachfileClick}>
+                        <AttachFileIcon />
+                    </IconButton>
+                    <Input sx={{ width: '80%' }} placeholder="Enter your text" />
+                    <Stack flexDirection={'row'}>
+                        <IconButton>
+                            <SentimentSatisfiedAltIcon />
+                        </IconButton>
+                        <IconButton onClick={handleSendIcon}>
+                            <SendIcon />
+                        </IconButton>
+                    </Stack>
                 </Stack>
             </Stack>
         </Box>

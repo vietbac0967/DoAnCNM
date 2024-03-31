@@ -6,7 +6,11 @@ import React from 'react'
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import avatar from '../../assets/Ellipse_191.png'
 import Typography from '@mui/material/Typography';
+
+
+
 function UserList() {
+    const handleAddUserClick = () => { }
     return (
         <Box
             bgcolor={''}
@@ -23,7 +27,7 @@ function UserList() {
                             ),
                         }}
                     />
-                    <IconButton onClick={''} aria-label="delete">
+                    <IconButton onClick={handleAddUserClick} aria-label="delete">
                         <PersonAddAltIcon fontSize="small" />
                     </IconButton>
                 </Stack>
