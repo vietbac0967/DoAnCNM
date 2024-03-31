@@ -16,6 +16,8 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
+      required: true,
+      enum:["Nam","Nữ"]
     },
     password: {
       type: String,
@@ -25,14 +27,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "0",
     },
-    otp: {
-      type: String,
+    verify: {
+      type: Boolean,
+      default: false,
     },
-    refresh_token: {
+    avatar: {
       type: String,
-    },
-    exp_refresh_token: {
-      type: Date,
     },
   },
   { timestamps: true }

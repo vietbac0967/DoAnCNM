@@ -15,10 +15,11 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { setToken } from "../app/tokenSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { validateField } from "../utils/validate";
 export default function LoginScreenV1({ navigation }) {
   const [passwordShow, setPasswordShow] = useState(true);
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState(""); 
+  const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
   useEffect(() => {
@@ -32,23 +33,26 @@ export default function LoginScreenV1({ navigation }) {
   }, []);
 
   const handleLogin = async () => {
-    if (username === "" || password === "") {
-      alert("Please fill in all fields");
+    if (username.trim() === "" || password.trim() === "") {
+      alert("Hãy nhập đầy đủ thông tin");
       return;
     }
-    baseURL.post("/auth/login", { username, password }).then((response) => {
-      const data = response.data;
-      console.log("data is", data);
-      if (data.message === "Login success" && data.token) {
-        setPassword("");
-        setUsername("");
-        dispatch(setToken(data.token));
-        AsyncStorage.setItem("token", data.token);
-        navigation.navigate("Main");
-      } else {
-        alert("Username or password incorrect", data.message);
-      }
-    });
+    const response = await baseURL.post("/auth/login", { username, password });
+    const { EM, EC, DT } = response.data;
+    console.log("data is", response.data);
+    if (EM === "User not verified" && EC === 0) {
+      alert("Hãy xác thực email của bạn");
+      return;
+    }
+    if (EM === "Success" && EC === 0 && DT) {
+      setPassword("");
+      setUsername("");
+      dispatch(setToken(DT));
+      await AsyncStorage.setItem("token", DT);
+      navigation.navigate("Main");
+    } else {
+      alert("Username or password incorrect", EM);
+    }
   };
 
   return (

@@ -5,74 +5,155 @@ import {
 } from "../utils/generateToken.js";
 import {
   validateEmail,
+  validateField,
   validatePassword,
   validatePhoneNumber,
 } from "../utils/validate.js";
+import { insertOTP, validateOTP } from "../services/otp.service.js";
+import otpGenerator from "otp-generator";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-const hashPassword = async (password) => {
-  const salt = await bcrypt.genSalt(10);
-  return await bcrypt.hash(password, salt);
+import OTP from "../models/otp.model.js";
+import { sendOTPForUser } from "./sendMail.service.js";
+
+export const verifyOTPService = async ({ email, otp }) => {
+  try {
+    const otpHolder = await OTP.find({ email });
+    if (otpHolder.length === 0)
+      return {
+        EC: 1,
+        EM: "OTP expired",
+        DT: "",
+      };
+    // get last otp
+    const lastOTP = otpHolder[otpHolder.length - 1];
+    const isValid = await validateOTP({ otp, hashOTP: lastOTP.otp });
+    if (!isValid) return { EC: 1, EM: "Invalid OTP", DT: "" };
+    if (isValid && email === lastOTP.email) {
+      // update user verify
+      const user = await User.findOne({ email });
+      user.verify = true;
+      await user.save();
+      return {
+        EC: 0,
+        EM: "Success",
+        DT: user.verify,
+      };
+    }
+  } catch (err) {
+    return {
+      EC: 1,
+      EM: err.message,
+      DT: "",
+    };
+  }
 };
-// Register service function
+
+/*
+  - Check if any required data is missing
+  - Validate email, phone number, and password
+  - Check if passwords match
+  - Check if the user already exists
+  - Hash the password
+  - Create a new user object
+  - Save the new user to the database
+  - create OTP for user
+  - send mail to user
+  - insert OTP to database
+  - Return success message and the newly created user object
+*/
 export const registerService = async (data) => {
   try {
     const { name, phoneNumber, email, password, gender, confirmPassword } =
       data;
-    console.log(data);
-    // Check if any required data is missing
+
     if (
-      name === null ||
-      phoneNumber === null ||
-      email === null ||
-      password === null ||
-      confirmPassword == null ||
-      gender === null
+      !validateField(name) ||
+      !validateField(phoneNumber) ||
+      !validateField(email) ||
+      !validateField(password) ||
+      !validateField(gender) ||
+      !validateField(confirmPassword)
     ) {
-      return { message: "Data is empty" };
+      return {
+        EC: 1,
+        EM: "Data is empty",
+        DT: "",
+      };
     }
 
-    // Validate email, phone number, and password
     if (
       !validateEmail(email) ||
       !validatePhoneNumber(phoneNumber) ||
       !validatePassword(password)
     ) {
-      return { message: "Invalid data" };
+      return {
+        EC: 1,
+        EM: "Invalid data",
+        DT: "",
+      };
     }
 
-    // Check if passwords match
     if (password !== confirmPassword) {
-      return { message: "Password does not match" };
+      return {
+        EC: 1,
+        EM: "Password does not match",
+        DT: "",
+      };
     }
 
-    // Check if the user already exists
     const existingUser = await User.findOne({
       $or: [{ email }, { phoneNumber }],
-    }).exec();
+    }).lean();
+    // console.log("ExistingUser::::", existingUser);
     if (existingUser) {
-      return { message: "User already exists" };
+      return {
+        EC: 1,
+        EM: "User already exists",
+        DT: "",
+      };
     }
 
-    // Hash the password
-    const hashedPassword = await hashPassword(password);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create a new user object
+    console.log("HashPassword::::", hashedPassword);
+
+    const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${name}`;
+    const girlProfilePic = `https://avatar.iran.liara.run/public/girl?username=${name}`;
     const newUser = new User({
       name,
       phoneNumber,
       email,
       password: hashedPassword,
-      gender
+      gender,
+      avatar: gender === "Nam" ? boyProfilePic : girlProfilePic,
+      verify: false,
     });
-
-    // Save the new user to the database
     await newUser.save();
 
-    // Return success message and the newly created user object
-    return { message: "Register success", user: newUser };
-  } catch (error) {
-    return { message: error.message };
+    const otp = otpGenerator.generate(6, {
+      digits: true,
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
+    const { EC, EM, DT } = await sendOTPForUser(otp, email);
+    if (EC === 0 && EM === "Success") {
+      await insertOTP(otp, email);
+      return {
+        EC: 0,
+        EM: "Success",
+        DT,
+      };
+    } else {
+      return {
+        EC: 1,
+        EM: "Failed",
+        DT: "",
+      };
+    }
+  } catch (err) {
+    return { EC: 1, EM: err.message, DT: "" };
   }
 };
 
@@ -80,36 +161,51 @@ export const registerService = async (data) => {
 export const loginService = async (data) => {
   try {
     const { username, password } = data;
-    if (
-      username === null ||
-      username === "" ||
-      password === null ||
-      password === ""
-    ) {
-      return { message: "Data is empty" };
+    if (username.trim() === "" || password.trim() === "") {
+      return {
+        EC: 1,
+        EM: "Username or password is empty",
+        DT: "",
+      };
     }
     const user = await User.findOne({
       $or: [{ phoneNumber: username }, { email: username }],
-    }).exec();
+    }).lean();
+
     if (!user) {
-      return { message: "User not found" };
+      return {
+        EC: 1,
+        EM: "User not found",
+        DT: "",
+      };
     }
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
-      return { message: "Invalid password" };
+      return {
+        EC: 1,
+        EM: "Invalid password",
+        DT: "",
+      };
     }
-    const date = new Date();
-
+    if (!user.verify) {
+      return {
+        EC: 1,
+        EM: "User not verified",
+        DT: "",
+      };
+    }
     const token = generateAccessToken(user._id);
-    const refreshToken = generateRefreshToken(user._id);
-    user.refresh_token = refreshToken;
-    const expired = new Date(date.setDate(date.getDate() + 15));
-    user.exp_refresh_token = expired; 
-    await user.save();
-    return { message: "Login success", token, refreshToken,expired };
-  } catch (error) {
-    return { message: error.message };
+
+    return {
+      EC: 0,
+      EM: "Success",
+      DT: token,
+    };
+  } catch (err) {
+    return {
+      EC: 1,
+      EM: err.message,
+      DT: "",
+    };
   }
 };
-
-
