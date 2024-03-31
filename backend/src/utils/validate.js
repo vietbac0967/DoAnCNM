@@ -13,3 +13,10 @@ export const validatePassword = (password) => {
   let re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(\W|_)).{5,}$/;
   return re.test(password);
 };
+
+export const validateField = (field) => {
+  if (!field || field.trim() === "") {
+    return false;
+  }
+  return true;
+};

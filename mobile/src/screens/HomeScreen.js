@@ -4,7 +4,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
 import ChatMessage from "../components/ChatMessage";
-import jwtDecode from "jwt-decode";
 import { baseURL } from "../api/baseURL";
 import { useDispatch, useSelector } from "react-redux";
 

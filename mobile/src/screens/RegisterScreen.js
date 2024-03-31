@@ -25,35 +25,23 @@ export default function RegisterScreenV1({ navigation }) {
     confirmPassword: "",
   });
 
-  const handleSubmit = async () => {
+  const handleRegisterSubmit = async () => {
     try {
-      if (
-        !validateRegister(
-          user.name,
-          user.phoneNumber,
-          user.email,
-          user.password,
-          user.confirmPassword,
-          user.gender
-        )
-      ) {
+      if (!validateRegister(user)) {
         return;
       }
-      setUser({
-        name: "",
-        phoneNumber: "",
-        email: "",
-        gender: "Nam", // Assuming "Nam" is the default gender
-        password: "",
-        confirmPassword: "",
-      });
+
+      // }
       const response = await baseURL.post("/auth/register", user);
-      const data = response.data;
-      console.log("data is", data);
-      if (data === "Register success") {
-        navigation.navigate("Login");
-      } else {
-        alert("Register failed in Login", data.message);
+      const { EC, EM, DT } = response.data;
+      console.log("response:::", response.data);
+      // console.log(response.data);
+      if (EM === "Success" && EC === 0) {
+        // alert("Đăng ký thành công")
+        navigation.navigate("VerifyOTP", { email: user.email });
+      }
+      if (EC === 1 && EM === "User already exists") {
+        alert("Email hoặc số điện thoại đã được sử dụng");
       }
     } catch (error) {
       alert("Register failed with Error", error.message);
@@ -196,7 +184,7 @@ export default function RegisterScreenV1({ navigation }) {
           </View>
 
           <Pressable
-            onPress={handleSubmit}
+            onPress={handleRegisterSubmit}
             style={{
               borderRadius: 81,
               paddingHorizontal: 80,

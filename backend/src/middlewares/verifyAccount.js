@@ -1,27 +1,21 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import { generateRefreshToken } from "../utils/generateToken.js";
+import { Types } from "mongoose";
 
 export const verifyAccount = async (req, res, next) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-    } catch (error) {
-      try {
-        decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-      } catch (error) {
-        return res.status(401).json({ message: "Invalid token" });
-      }
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    if (!decoded) {
+      return res.status(400).json({ message: "Invalid token" });
     }
-    const user = await User.findById(decoded.id);
+    if(decoded.exp < Date.now().valueOf() / 1000) {
+      return res.status(400).json({message: "Token expired"});
+    }
+    const user = await User.findById(decoded.id)
     if (!user) {
-      res.status(400).json({ message: "User not found" });
-    }
-    if (decoded.type === "refresh") {
-      const newAccessToken = generateRefreshToken(decoded.id,process.env.JWT_REFRESH_SECRET);
-      res.setHeader("Authorization", `Bearer ${newAccessToken}`);
+      return res.status(400).json({ message: "User not found" });
     }
     req.user = user;
     next();
