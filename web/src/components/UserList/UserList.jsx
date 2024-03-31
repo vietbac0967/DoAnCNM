@@ -6,6 +6,7 @@ import React from 'react'
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import avatar from '../../assets/Ellipse_191.png'
 import Typography from '@mui/material/Typography';
+import FindComponent from '../FindComponent/FindComponent';
 
 
 
@@ -17,19 +18,7 @@ function UserList() {
             flex={3}>
             <Stack flexDirection={'column'}>
                 <Stack flexDirection={'row'} justifyContent={'space-around'}>
-                    <TextField
-                        variant="outlined"
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon />
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-                    <IconButton onClick={handleAddUserClick} aria-label="delete">
-                        <PersonAddAltIcon fontSize="small" />
-                    </IconButton>
+                    <FindComponent handleAddUserClick={handleAddUserClick} />
                 </Stack>
                 <Stack flexDirection={'row'} justifyContent={'space-around'} alignItems={'center'}>
                     <Avatar alt="viet bac" src={avatar}>

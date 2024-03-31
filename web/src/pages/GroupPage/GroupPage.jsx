@@ -1,6 +1,8 @@
 import { Box, Stack } from '@mui/material'
 import React from 'react'
 import SideBar from '../../components/SideBar/SideBar'
+import GroupSideBar from '../../components/GroupSideBar/GroupSideBar'
+import RightNavBar from '../../components/RightNavBar/RightNavBar'
 
 function GroupPage() {
     return (
@@ -10,7 +12,8 @@ function GroupPage() {
             justifyContent={'space-between'}
             direction={'row'}>
             <SideBar />
-
+            <GroupSideBar />
+            <RightNavBar />
         </Stack>
     )
 }
