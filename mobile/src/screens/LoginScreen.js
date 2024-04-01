@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   ImageBackground,
   Pressable,
@@ -16,7 +17,8 @@ import { useDispatch } from "react-redux";
 import { setToken } from "../app/tokenSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { validateField } from "../utils/validate";
-export default function LoginScreenV1({ navigation }) {
+import axios from "axios";
+export default function LoginScreen({ navigation }) {
   const [passwordShow, setPasswordShow] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -33,25 +35,32 @@ export default function LoginScreenV1({ navigation }) {
   }, []);
 
   const handleLogin = async () => {
-    if (username.trim() === "" || password.trim() === "") {
-      alert("Hãy nhập đầy đủ thông tin");
-      return;
-    }
-    const response = await baseURL.post("/auth/login", { username, password });
-    const { EM, EC, DT } = response.data;
-    console.log("data is", response.data);
-    if (EM === "User not verified" && EC === 0) {
-      alert("Hãy xác thực email của bạn");
-      return;
-    }
-    if (EM === "Success" && EC === 0 && DT) {
-      setPassword("");
-      setUsername("");
-      dispatch(setToken(DT));
-      await AsyncStorage.setItem("token", DT);
-      navigation.navigate("Main");
-    } else {
-      alert("Username or password incorrect", EM);
+    try {
+      if (username.trim() === "" || password.trim() === "") {
+        Alert.alert("Cảnh báo", "Hãy nhập đầy đủ thông tin");
+        return;
+      }
+      const response = await baseURL.post("/auth/login", {
+        username,
+        password,
+      });
+      const { EM, EC, DT } = response.data;
+      console.log("data is", response.data);
+      if (EM === "User not verified" && EC === 0) {
+        alert("Hãy xác thực email của bạn");
+        return;
+      }
+      if (EM === "Success" && EC === 0 && DT) {
+        setPassword("");
+        setUsername("");
+        dispatch(setToken(DT));
+        await AsyncStorage.setItem("token", DT);
+        navigation.navigate("Main");
+      } else {
+        Alert.alert("Cảnh báo", "Tên đăng nhập hoặc mật khẩu không đúng", EM);
+      }
+    } catch (error) {
+      console.log("error", error);
     }
   };
 
@@ -79,7 +88,7 @@ export default function LoginScreenV1({ navigation }) {
           <View style={[styles.eclipse, { padding: 10 }]}>
             <Image
               resizeMode="cover"
-              style={{ width: "100%", height: 150, borderRadius: "50%" }}
+              style={{ width: "100%", height: 150, borderRadius: 50 }}
               source={require("../assets/girl.png")}
             ></Image>
           </View>
@@ -101,7 +110,7 @@ export default function LoginScreenV1({ navigation }) {
           </View>
           <View style={[styles.eclipse, { padding: 10 }]}>
             <Image
-              style={{ width: "100%", height: 150, borderRadius: "50%" }}
+              style={{ width: "100%", height: 150, borderRadius: 50 / 2 }}
               resizeMode="cover"
               source={require("../assets/senior.png")}
             ></Image>
@@ -115,7 +124,7 @@ export default function LoginScreenV1({ navigation }) {
               onChangeText={setUsername}
               style={{
                 flex: 1,
-                outlineStyle: "none",
+
                 marginLeft: 8,
               }}
               placeholder="Email hoặc số điện thoại"
@@ -127,7 +136,6 @@ export default function LoginScreenV1({ navigation }) {
               onChangeText={setPassword}
               style={{
                 flex: 1,
-                outlineStyle: "none",
                 marginLeft: 8,
               }}
               placeholder="Mật khẩu"
@@ -206,7 +214,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#00ACEE",
   },
   avatar: {
-    borderRadius: "50%",
+    borderRadius: 167 / 2,
     width: 167,
     height: 165,
   },

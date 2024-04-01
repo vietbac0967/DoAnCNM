@@ -12,7 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { RadioButton } from "react-native-paper";
 import { baseURL } from "../api/baseURL";
 import { validateRegister } from "../utils/validate";
-export default function RegisterScreenV1({ navigation }) {
+export default function RegisterScreen({ navigation }) {
   const [checked, setChecked] = useState("Nam");
   const [showPassword, setShowPassword] = useState(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState(true);
@@ -31,20 +31,23 @@ export default function RegisterScreenV1({ navigation }) {
         return;
       }
 
-      // }
       const response = await baseURL.post("/auth/register", user);
       const { EC, EM, DT } = response.data;
-      console.log("response:::", response.data);
-      // console.log(response.data);
-      if (EM === "Success" && EC === 0) {
-        // alert("Đăng ký thành công")
-        navigation.navigate("VerifyOTP", { email: user.email });
-      }
       if (EC === 1 && EM === "User already exists") {
-        alert("Email hoặc số điện thoại đã được sử dụng");
+        Alert.alert("Thông báo", "Số điện thoại hoặc email đã được đăng ký");
+        return;
+      }
+      if (EC === 0 && EM === "Success") {
+        Alert.alert("Thông báo", "Đăng ký thành công", [
+          {
+            text: "OK",
+            onPress: () =>
+              navigation.navigate("VerifyOTP", { email: user.email }),
+          },
+        ]);
       }
     } catch (error) {
-      alert("Register failed with Error", error.message);
+      Alert.alert("Thông báo", "Đăng ký thất bại", error.message);
       console.log(error);
     }
   };
@@ -86,7 +89,6 @@ export default function RegisterScreenV1({ navigation }) {
               value={user.name}
               onChangeText={(text) => setUser({ ...user, name: text })}
               placeholderTextColor={"gray"}
-              style={{ outlineStyle: "none" }}
               placeholder="Nhập họ và tên"
             ></TextInput>
           </View>
@@ -97,7 +99,6 @@ export default function RegisterScreenV1({ navigation }) {
               value={user.phoneNumber}
               onChangeText={(text) => setUser({ ...user, phoneNumber: text })}
               placeholderTextColor={"gray"}
-              style={{ outlineStyle: "none" }}
               placeholder="Nhập số điện thoại"
             ></TextInput>
           </View>
@@ -108,44 +109,51 @@ export default function RegisterScreenV1({ navigation }) {
               value={user.email}
               onChangeText={(text) => setUser({ ...user, email: text })}
               placeholderTextColor={"gray"}
-              style={{ outlineStyle: "none" }}
               placeholder="Nhập email"
             ></TextInput>
           </View>
 
           <View style={styles.input}>
-            <Text style={{ width: 120, marginRight: 5, paddingTop: 5 }}>
-              Giới tính:{" "}
-            </Text>
-
-            <RadioButton
-              value="Nam"
-              status={checked === "Nam" ? "checked" : "unchecked"}
-              onPress={() => {
-                setChecked("Nam");
-                setUser({ ...user, gender: "Nam" });
+            <Text style={{ paddingTop: 8 }}>Giới tính:</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-around",
+                marginLeft: 60,
               }}
-            ></RadioButton>
-            <Text style={{ paddingTop: 5 }}>Nam</Text>
+            >
+              <RadioButton
+                value="Nam"
+                status={checked === "Nam" ? "checked" : "unchecked"}
+                onPress={() => {
+                  setChecked("Nam");
+                  setUser({ ...user, gender: "Nam" });
+                }}
+              ></RadioButton>
+              <Text style={{ paddingTop: 8 }}>Nam</Text>
+            </View>
 
-            <RadioButton
-              value="Nữ"
-              status={checked === "Nữ" ? "checked" : "unchecked"}
-              onPress={() => {
-                setChecked("Nữ");
-                setUser({ ...user, gender: "Nữ" });
-              }}
-            ></RadioButton>
-            <Text style={{ paddingTop: 5 }}>Nữ</Text>
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-around" }}
+            >
+              <RadioButton
+                value="Nữ"
+                status={checked === "Nữ" ? "checked" : "unchecked"}
+                onPress={() => {
+                  setChecked("Nữ");
+                  setUser({ ...user, gender: "Nữ" });
+                }}
+              ></RadioButton>
+              <Text style={{ paddingTop: 8 }}>Nữ</Text>
+            </View>
           </View>
 
-          <View style={styles.input}>
+          <View style={[styles.input, { justifyContent: "space-between" }]}>
             <Text style={{ width: 120, marginRight: 5 }}>Mật khẩu: </Text>
             <TextInput
               value={user.password}
               onChangeText={(text) => setUser({ ...user, password: text })}
               placeholderTextColor={"gray"}
-              style={{ outlineStyle: "none" }}
               placeholder="Nhập mật khẩu"
               secureTextEntry={showPassword}
             ></TextInput>
@@ -158,7 +166,7 @@ export default function RegisterScreenV1({ navigation }) {
             </Pressable>
           </View>
 
-          <View style={styles.input}>
+          <View style={[styles.input, { justifyContent: "space-between" }]}>
             <Text style={{ width: 120, marginRight: 5 }}>
               Nhập lại mật khẩu:{" "}
             </Text>
@@ -168,7 +176,6 @@ export default function RegisterScreenV1({ navigation }) {
                 setUser({ ...user, confirmPassword: text })
               }
               placeholderTextColor={"gray"}
-              style={{ outlineStyle: "none", paddingBottom: 5 }}
               placeholder="Nhập lại mật khẩu"
               secureTextEntry={showConfirmPassword}
             ></TextInput>
@@ -206,12 +213,20 @@ export default function RegisterScreenV1({ navigation }) {
             </Text>
           </Pressable>
 
-          <Text style={{ paddingTop: 10 }}>
-            Bạn đã có tài khoản ?
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-around",
+              paddingTop: 10,
+            }}
+          >
+            <Text>Bạn đã có tài khoản ?</Text>
             <Pressable onPress={() => navigation.navigate("Login")}>
-              <Text style={{ paddingLeft: 5 }}>Login</Text>
+              <Text style={{ paddingHorizontal: 10, fontWeight: "500" }}>
+                Login
+              </Text>
             </Pressable>
-          </Text>
+          </View>
         </View>
       </ImageBackground>
     </View>
@@ -241,7 +256,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#00ACEE",
-    width: 340,
+    width: "85%",
     marginVertical: 10,
     padding: 8,
   },

@@ -9,11 +9,10 @@ import {
   View,
 } from "react-native";
 import { useEffect, useState } from "react";
-import OTPInputView from "@twotalltotems/react-native-otp-input";
 import { baseURL } from "../api/baseURL";
+import { OtpInput } from "react-native-otp-entry";
 const VerifyOTPScreen = ({ route, navigation }) => {
   const { email } = route.params;
-  console.log(email);
   const [otp, setOtp] = useState("");
   const [minutes, setMinutes] = useState(1);
   const [seconds, setSeconds] = useState(59);
@@ -74,7 +73,6 @@ const VerifyOTPScreen = ({ route, navigation }) => {
   return (
     <View style={{ flex: 1, backgroundColor: "#f1f1f1" }}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "0"}
         style={{ height: "100%", width: "100%", backgroundColor: "white" }}
       >
         <View style={{ alignItems: "center" }}>
@@ -90,26 +88,12 @@ const VerifyOTPScreen = ({ route, navigation }) => {
         </View>
 
         <View style={{ paddingHorizontal: 15 }}>
-          <OTPInputView
-            style={{ width: "100%", height: 200, paddingHorizontal: 10 }}
-            pinCount={6}
-            autoFocusOnLoad
-            codeInputFieldStyle={{
-              width: 30,
-              height: 45,
-              color: "#f4a135",
-              borderWidth: 0,
-              borderBottomWidth: 3,
-              borderBottomColor: "#111",
-              fontSize: 36,
-            }}
-            codeInputHighlightStyle={{
-              borderColor: "#2ab12f",
-            }}
-            onCodeChanged={(code) => {
-              setOtp(code);
-            }}
-          ></OTPInputView>
+          <OtpInput
+            numberOfDigits={6}
+            focusColor="green"
+            focusStickBlinkingDuration={500}
+            onTextChange={(text) => setOtp(text)}
+          />
           {/* Verify OTP for user */}
           <Pressable
             onPress={handleSubmit}
@@ -181,5 +165,9 @@ const styles = StyleSheet.create({
     fontSize: 36,
     marginVertical: 45,
     color: "#111",
+  },
+  borderStyleBase: {
+    width: 30,
+    height: 45,
   },
 });

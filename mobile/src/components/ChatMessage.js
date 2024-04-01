@@ -15,10 +15,10 @@ export default function ChatMessage({ chat }) {
       <View style={{ flexDirection: "row" }}>
         <Image
           source={{ uri: "https://www.w3schools.com/w3images/avatar6.png" }}
-          style={{ width: 58, height: 50, borderRadius: "50%", marginTop: 5 }}
+          style={{ width: 58, height: 50, borderRadius: 58/2, marginTop: 5 }}
         ></Image>
         <View style={{ paddingLeft: 20, paddingVertical: 10 }}>
-          <Text style={{ fontSize: "14", fontWeight: "bold" }}>
+          <Text style={{ fontSize: 14, fontWeight: "bold" }}>
             {chat.name}
           </Text>
           <Text>{chat.content}</Text>
