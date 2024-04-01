@@ -10,7 +10,9 @@ const AppRoutes = () => {
     return (
         <Routes>
             <Route path='login' element={<LocalRoutes component={<Login />} />} />
-            <Route path='register' element={<LocalRoutes component={<Register />} />} />
+            {/* <Route path='register' element={<LocalRoutes component={<Register />} />} /> */}
+            <Route path='register' element={<Register />} />
+
 
             <Route path='/' element={<PrivateRoute component={<Home />} />} />
 

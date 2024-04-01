@@ -20,17 +20,17 @@ const Login = () => {
     const navigate = useNavigate();
 
     const defaultInput = {
-        emailorSDT: "",
+        username: "",
         password: ""
     }
 
     const statusfield = {
-        emailorSDT: false,
+        username: false,
         password: false
     }
 
     const senderror = {
-        emailorSDT: "",
+        username: "",
         password: ""
     }
 
@@ -48,14 +48,14 @@ const Login = () => {
         let check = true;
         setinfostatus(statusfield);
         setinfosenderror(senderror);
-        if (!infologin.emailorSDT) {
-            setinfostatus(prevState => ({ ...prevState, emailorSDT: true }))
-            setinfosenderror(prevState => ({ ...prevState, emailorSDT: "Bạn cần nhập số điện thoại hoặc email" }))
+        if (!infologin.username) {
+            setinfostatus(prevState => ({ ...prevState, username: true }))
+            setinfosenderror(prevState => ({ ...prevState, username: "Bạn cần nhập số điện thoại hoặc email" }))
             check = false;
         } else {
-            if (!validateEmail(infologin.emailorSDT) && !validatePhoneNumber(infologin.emailorSDT)) {
-                setinfostatus(prevState => ({ ...prevState, emailorSDT: true }))
-                setinfosenderror(prevState => ({ ...prevState, emailorSDT: "số điện thoại cần là 10 số và bắt đầu là 0 , email cần theo dạng @gmail.com" }))
+            if (!validateEmail(infologin.username) && !validatePhoneNumber(infologin.username)) {
+                setinfostatus(prevState => ({ ...prevState, username: true }))
+                setinfosenderror(prevState => ({ ...prevState, username: "số điện thoại cần là 10 số và bắt đầu là 0 , email cần theo dạng @gmail.com" }))
                 check = false;
             }
         }
@@ -78,11 +78,12 @@ const Login = () => {
         let check = handleValid();
         if (check === true) {
             let res = await login(infologin);
-            if (res && res.EC === 0) {
-                navigate("/")
-            } else {
-                toast.error(res.EM)
-            }
+            console.log(res)
+            // if (res && res.EC === 0) {
+            //     navigate("/")
+            // } else {
+            //     toast.error(res.EM)
+            // }
         }
     }
 
@@ -113,14 +114,14 @@ const Login = () => {
                                     </InputAdornment>
                                 }
                                 size='medium'
-                                value={infologin.emailorSDT}
-                                onChange={(e) => handleOnChange(e, "emailorSDT")}
+                                value={infologin.username}
+                                onChange={(e) => handleOnChange(e, "username")}
                             />
                             {
-                                infostatus.emailorSDT
+                                infostatus.username
                                     ?
                                     <FormHelperText className="filled-weight-helper-text">
-                                        {infosenderror.emailorSDT}
+                                        {infosenderror.username}
                                     </FormHelperText>
                                     :
                                     <></>

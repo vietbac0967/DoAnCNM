@@ -21,28 +21,28 @@ const Register = () => {
     const mobile = useMediaQuery(theme.breakpoints.down("sm"))
 
     const defaultInput = {
-        fullName: "",
+        name: "",
         email: "",
         phoneNumber: "",
         gender: "Nam",
         password: "",
-        confirmpassword: ""
+        confirmPassword: ""
     }
 
     const statusfield = {
-        fullName: false,
+        name: false,
         email: false,
         phoneNumber: false,
         password: false,
-        confirmpassword: false
+        confirmPassword: false
     }
 
     const senderror = {
-        fullName: "",
+        name: "",
         email: "",
         phoneNumber: "",
         password: "",
-        confirmpassword: ""
+        confirmPassword: ""
     }
 
     const [inforegister, setinforegister] = useState(defaultInput);
@@ -53,9 +53,9 @@ const Register = () => {
         let check = true;
         setinfostatus(statusfield);
         setinfosenderror(senderror);
-        if (!inforegister.fullName) {
-            setinfostatus(prevState => ({ ...prevState, fullName: true }))
-            setinfosenderror(prevState => ({ ...prevState, fullName: "Bạn cần nhập họ tên" }))
+        if (!inforegister.name) {
+            setinfostatus(prevState => ({ ...prevState, name: true }))
+            setinfosenderror(prevState => ({ ...prevState, name: "Bạn cần nhập họ tên" }))
             check = false;
         }
         if (!inforegister.email) {
@@ -91,14 +91,14 @@ const Register = () => {
                 check = false;
             }
         }
-        if (!inforegister.confirmpassword) {
-            setinfostatus(prevState => ({ ...prevState, confirmpassword: true }))
-            setinfosenderror(prevState => ({ ...prevState, confirmpassword: "Bạn cần nhập lại mật khẩu" }))
+        if (!inforegister.confirmPassword) {
+            setinfostatus(prevState => ({ ...prevState, confirmPassword: true }))
+            setinfosenderror(prevState => ({ ...prevState, confirmPassword: "Bạn cần nhập lại mật khẩu" }))
             check = false;
         } else {
-            if (inforegister.confirmpassword !== inforegister.password) {
-                setinfostatus(prevState => ({ ...prevState, confirmpassword: true }))
-                setinfosenderror(prevState => ({ ...prevState, confirmpassword: "mật khẩu không khớp" }))
+            if (inforegister.confirmPassword !== inforegister.password) {
+                setinfostatus(prevState => ({ ...prevState, confirmPassword: true }))
+                setinfosenderror(prevState => ({ ...prevState, confirmPassword: "mật khẩu không khớp" }))
                 check = false;
             }
         }
@@ -116,12 +116,13 @@ const Register = () => {
         let check = handleValid()
         if (check === true) {
             let res = await register(inforegister);
-            if (res && res.EC === 0) {
-                toast.success(res.EM);
-                setinforegister(defaultInput)
-            } else {
-                toast.error(res.EM)
-            }
+            // if (res && res.EC === 0) {
+            //     toast.success(res.EM);
+            //     setinforegister(defaultInput)
+            // } else {
+            //     toast.error(res.EM)
+            // }
+            console.log(res)
         }
     }
 
@@ -147,14 +148,14 @@ const Register = () => {
                             <InputBase
                                 className='field-input'
                                 placeholder="Nhập họ tên"
-                                value={inforegister.fullName}
-                                onChange={(e) => handleOnChange(e, "fullName")}
+                                value={inforegister.name}
+                                onChange={(e) => handleOnChange(e, "name")}
                             />
                             {
-                                infostatus.fullName
+                                infostatus.name
                                     ?
                                     <FormHelperText className="filled-weight-helper-text">
-                                        {infosenderror.fullName}
+                                        {infosenderror.name}
                                     </FormHelperText>
                                     :
                                     <></>
@@ -237,16 +238,16 @@ const Register = () => {
                             <InputBase
                                 className='field-input'
                                 placeholder="Xác nhận mật khẩu"
-                                value={inforegister.confirmpassword}
-                                onChange={(e) => handleOnChange(e, "confirmpassword")}
+                                value={inforegister.confirmPassword}
+                                onChange={(e) => handleOnChange(e, "confirmPassword")}
                                 type='password'
 
                             />
                             {
-                                infostatus.confirmpassword
+                                infostatus.confirmPassword
                                     ?
                                     <FormHelperText className="filled-weight-helper-text">
-                                        {infosenderror.confirmpassword}
+                                        {infosenderror.confirmPassword}
                                     </FormHelperText>
                                     :
                                     <></>
