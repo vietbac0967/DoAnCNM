@@ -1,3 +1,5 @@
+import { Alert } from "react-native";
+
 const validateEmail = (email) => {
   let re =
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -30,25 +32,26 @@ export const validateRegister = (user) => {
     confirmPassword.trim() === "" ||
     gender.trim() === ""
   ) {
-    alert("Hãy nhập đầy đủ thông tin");
+    Alert.alert("Cảnh báo", "Hãy nhập đầy đủ thông tin");
     return false;
   }
   if (!validatePhoneNumber(phoneNumber)) {
-    alert("Số điện thoại không hợp lệ");
+    Alert.alert("Cảnh báo", "Số điện thoại không hợp lệ");
     return false;
   }
   if (!validateEmail(email)) {
-    alert("Email không hợp lệ");
+    Alert.alert("Cảnh báo", "Email không hợp lệ");
     return false;
   }
   if (!validatePassword(password)) {
-    alert(
+    Alert.alert(
+      "Cảnh báo",
       "Mật khẩu phải chứa ít nhất 5 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
     );
     return false;
   }
   if (password !== confirmPassword) {
-    alert("Mật khẩu không khớp");
+    Alert.alert("Cảnh báo","Mật khẩu không khớp");
     return false;
   }
   return true;

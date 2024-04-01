@@ -16,7 +16,9 @@ import { baseURL } from "../api/baseURL";
 export default function ProfileScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [username, setUsername] = useState("");
-  const [avatar, setAvatar] = useState("");
+  const [avatar, setAvatar] = useState(
+    "https://avatar.iran.liara.run/username"
+  );
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -26,7 +28,7 @@ export default function ProfileScreen({ navigation }) {
             Authorization: `Bearer ${token}`,
           },
         });
-        const {DT} = response.data;
+        const { DT } = response.data;
         console.log("User::::", DT);
         setAvatar(DT.avatar);
         setUsername(DT.name);
@@ -89,26 +91,32 @@ export default function ProfileScreen({ navigation }) {
             <Feather name="shield" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Tài khoản và bảo mật</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.bottomButton}>
             <Feather name="settings" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Quyền riêng tư</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.bottomButton}>
             <Feather name="bell" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Thông báo</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.bottomButton}>
             <Feather name="users" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Danh bạ</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.bottomButton}>
             <Feather name="bookmark" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Nhật ký</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.bottomButton}>
             <Feather name="archive" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Sao lưu và ngôn ngữ</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.bottomButton} onPress={handleLogout}>
             <Feather name="log-out" size={15} color="red" />
             <Text style={{ fontSize: 14, marginLeft: 10, color: "red" }}>
