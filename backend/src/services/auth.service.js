@@ -103,7 +103,7 @@ export const registerService = async (data) => {
 
     const existingUser = await User.findOne({
       $or: [{ email }, { phoneNumber }],
-    }).lean();
+    })
     // console.log("ExistingUser::::", existingUser);
     if (existingUser) {
       return {
