@@ -16,8 +16,6 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { setToken } from "../app/tokenSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { validateField } from "../utils/validate";
-import axios from "axios";
 export default function LoginScreen({ navigation }) {
   const [passwordShow, setPasswordShow] = useState(true);
   const [username, setUsername] = useState("");
@@ -56,8 +54,11 @@ export default function LoginScreen({ navigation }) {
         dispatch(setToken(DT));
         await AsyncStorage.setItem("token", DT);
         navigation.navigate("Main");
-      } else {
-        Alert.alert("Cảnh báo", "Tên đăng nhập hoặc mật khẩu không đúng", EM);
+        return;
+      }
+      if (EC == 1 && EM == "User not found") {
+        Alert.alert("Cảnh báo", "Tài khoản hoặc mật khẩu không đúng");
+        return;
       }
     } catch (error) {
       console.log("error", error);
@@ -121,6 +122,7 @@ export default function LoginScreen({ navigation }) {
           <View style={styles.input}>
             <Feather name="phone" size={24} color="black" />
             <TextInput
+              value={username}
               onChangeText={setUsername}
               style={{
                 flex: 1,
@@ -133,6 +135,7 @@ export default function LoginScreen({ navigation }) {
           <View style={styles.input}>
             <Feather name="lock" size={24} color="black" />
             <TextInput
+              value={password}
               onChangeText={setPassword}
               style={{
                 flex: 1,

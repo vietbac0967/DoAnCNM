@@ -8,6 +8,7 @@ import {
   Modal,
   TouchableOpacity,
   ImageBackground,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from "@expo/vector-icons";
@@ -28,10 +29,13 @@ export default function ProfileScreen({ navigation }) {
             Authorization: `Bearer ${token}`,
           },
         });
-        const { DT } = response.data;
-        console.log("User::::", DT);
-        setAvatar(DT.avatar);
-        setUsername(DT.name);
+        const { DT, EM, EC } = response.data;
+        if (EC === 0 && EM === "Success") {
+          setUsername(DT.name);
+          setAvatar(DT.avatar);
+        }else{
+          console.log("Error getting user:", EM);
+        }
       } catch (error) {
         console.log("Error getting user:", error);
       }
@@ -46,10 +50,26 @@ export default function ProfileScreen({ navigation }) {
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem("token");
-      navigation.navigate("Login");
+      const token = await AsyncStorage.getItem("token");
+      const response = await baseURL.post(
+        "/auth/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const { EC, EM } = response.data;
+      console.log("Logout:", response.data);
+      if (EC === 0) {
+        await AsyncStorage.removeItem("token");
+        navigation.navigate("Login");
+      } else {
+        Alert.alert("Error", EM);
+      }
     } catch (error) {
-      console.log("Error logging out:", error);
+      console.log("Error getting user:", error);
     }
   };
 
