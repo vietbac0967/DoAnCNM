@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 import './Register.scss'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import _ from 'lodash';
 import { validatePassword, validatePhoneNumber, validateEmail } from '../../validate/validate';
 import { register } from '../../service/UserService';
@@ -18,7 +18,9 @@ const Register = () => {
 
     const tablet = useMediaQuery(theme.breakpoints.down('md'))
 
-    const mobile = useMediaQuery(theme.breakpoints.down("sm"))
+    const mobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+    const navigate = useNavigate();
 
     const defaultInput = {
         name: "",
@@ -116,13 +118,11 @@ const Register = () => {
         let check = handleValid()
         if (check === true) {
             let res = await register(inforegister);
-            // if (res && res.EC === 0) {
-            //     toast.success(res.EM);
-            //     setinforegister(defaultInput)
-            // } else {
-            //     toast.error(res.EM)
-            // }
-            console.log(res)
+            if (res && res.EC === 0) {
+                navigate(`/otp/${inforegister.email}`)
+            } else {
+                toast.error(res.EM)
+            }
         }
     }
 

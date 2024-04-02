@@ -12,6 +12,14 @@ const accountUser = () => {
     return axios.get("/api/v1/account")
 }
 
+const verifyOTP = (data) => {
+    return axios.post("/api/auth/verifyOTP", data)
+}
+
+const resendEmail = (data) => {
+    return axios.post("/api/auth/reSendEmail", data)
+}
+
 export {
-    register, accountUser, login
+    register, accountUser, login, verifyOTP, resendEmail
 }

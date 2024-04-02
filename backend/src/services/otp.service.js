@@ -1,7 +1,18 @@
 import OTP from "../models/otp.model.js";
 import bcrypt from "bcrypt";
+// import moment from 'moment-timezone';
+
+// const dateVietNam = moment.tz(Date.now(), "Asia/Ho_Chi_Minh");
 const insertOTP = async (otp, email) => {
   try {
+    const otpofemail = await OTP.findOne({
+      email: email
+    })
+    if (otpofemail) {
+      await OTP.deleteOne({
+        email: email
+      })
+    }
     const salt = await bcrypt.genSalt(10);
     const hashOTP = await bcrypt.hash(otp, salt);
     const Otp = OTP.create({ email, otp: hashOTP });
@@ -19,4 +30,4 @@ const validateOTP = async ({ otp, hashOTP }) => {
     return { message: error.message };
   }
 };
-export { insertOTP ,validateOTP};
+export { insertOTP, validateOTP };

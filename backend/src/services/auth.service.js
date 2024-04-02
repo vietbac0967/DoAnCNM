@@ -21,7 +21,7 @@ export const verifyOTPService = async ({ email, otp }) => {
     if (otpHolder.length === 0)
       return {
         EC: 1,
-        EM: "OTP expired",
+        EM: "OTP expired or incorrect ",
         DT: "",
       };
     // get last otp
@@ -115,8 +115,6 @@ export const registerService = async (data) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-
-    console.log("HashPassword::::", hashedPassword);
 
     const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${name}`;
     const girlProfilePic = `https://avatar.iran.liara.run/public/girl?username=${name}`;

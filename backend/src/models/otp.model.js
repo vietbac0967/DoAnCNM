@@ -2,16 +2,17 @@ import mongoose from "mongoose";
 
 const otpModel = new mongoose.Schema({
   email: {
-    type: String, 
+    type: String,
     required: true,
   },
   otp: String,
   time: {
     type: Date,
     default: Date.now,
-    index: { expires: "120" },
-  },
+    expires: '2m'
+  }
 });
+
 
 const OTP = mongoose.model("OTP", otpModel);
 export default OTP;
