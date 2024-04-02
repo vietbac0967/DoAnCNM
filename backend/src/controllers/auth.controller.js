@@ -69,8 +69,10 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    const phone = req.body.phone;
-    const user = await User.findOne({ phoneNumber: phone }).lean();
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    const userId = decoded._id;
+    const user = await User.findOne({ userId }).lean();
     if (!user) {
       return res.status(400).json({ EC: 1, EM: "User not found", DT: "" });
     }
