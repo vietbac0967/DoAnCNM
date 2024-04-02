@@ -5,7 +5,9 @@ import Register from '../component/Register/Register'
 import Home from '../component/Home/Home'
 import PrivateRoute from './PrivateRoute';
 import LocalRoutes from './LocalRoutes';
-import OTP from '../component/OTP/OTP'
+import Otp from '../component/OTP/Otp';
+import MessagePage from '../pages/MessagePage/MessagePage';
+import GroupPage from '../pages/GroupPage/GroupPage';
 
 const AppRoutes = () => {
     return (
@@ -13,9 +15,9 @@ const AppRoutes = () => {
             <Route path='login' element={<LocalRoutes component={<Login />} />} />
             {/* <Route path='register' element={<LocalRoutes component={<Register />} />} /> */}
             <Route path='register' element={<Register />} />
-            <Route path='otp/:email' element={<OTP />} />
-
-
+            <Route path='/otp/:email' element={<Otp />} />
+            <Route path='message' element={<MessagePage />} />
+            <Route path='group' element={<GroupPage />} />
             <Route path='/' element={<PrivateRoute component={<Home />} />} />
 
             <Route path="*" element={<>404 not found</>} />
