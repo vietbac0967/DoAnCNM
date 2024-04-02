@@ -19,7 +19,7 @@ export const getUsers = async (req, res) => {
 };
 export const getUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).lean();
+    const user = req.user;
     res.status(200).json({
       EC: 0,
       EM: "Success",
