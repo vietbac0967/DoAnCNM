@@ -6,12 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "nodemon index.js",
-<<<<<<< HEAD
     "test": "jest"
-=======
-    "test": "echo \"Error: no test specified\" && exit 1"
-    
->>>>>>> 2fcc1b95eba85474039d5b3bd11d034f5bee8dbb
   },
   "keywords": [],
   "author": "",
@@ -35,16 +30,10 @@
   "devDependencies": {
     "@babel/core": "^7.24.3",
     "@babel/preset-env": "^7.24.3",
-<<<<<<< HEAD
     "@babel/preset-typescript": "^7.24.1",
     "babel-jest": "^29.7.0",
     "jest": "^29.7.0",
     "nodemon": "^3.1.0",
     "supertest": "^6.3.4"
-=======
-    "babel-jest": "^29.7.0",
-    "jest": "^29.7.0",
-    "nodemon": "^3.1.0"
->>>>>>> 2fcc1b95eba85474039d5b3bd11d034f5bee8dbb
   }
 }
