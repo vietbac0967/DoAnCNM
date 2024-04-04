@@ -52,7 +52,7 @@ export default function HomeScreen({ navigation }) {
   // },[]);
 
   const handleLogout = async () => {
-    axios.post("http://localhost:5000/api/auth/logout");
+    // baseURL.post("/auth/logout");
     await AsyncStorage.removeItem("token");
     navigation.replace("Login");
   };
@@ -70,7 +70,6 @@ export default function HomeScreen({ navigation }) {
         <TextInput
           placeholder="Tìm kiếm"
           placeholderTextColor={"#B1B1B1"}
-          style={{ outlineStyle: "none" }}
         ></TextInput>
         <Pressable>
           <Ionicons
@@ -99,6 +98,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f1f1f1",
   },
   search: {
+    marginTop:25,
     height: 40,
     flexDirection: "row",
     borderTopLeftRadius: 0,

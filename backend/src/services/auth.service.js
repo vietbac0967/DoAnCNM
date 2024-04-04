@@ -103,7 +103,7 @@ export const registerService = async (data) => {
 
     const existingUser = await User.findOne({
       $or: [{ email }, { phoneNumber }],
-    }).lean();
+    });
     // console.log("ExistingUser::::", existingUser);
     if (existingUser) {
       return {
@@ -170,7 +170,7 @@ export const loginService = async (data) => {
     }
     const user = await User.findOne({
       $or: [{ phoneNumber: username }, { email: username }],
-    }).lean();
+    });
 
     if (!user) {
       return {
@@ -183,7 +183,7 @@ export const loginService = async (data) => {
     if (!validPassword) {
       return {
         EC: 1,
-        EM: "Invalid password",
+        EM: "User not found",
         DT: "",
       };
     }

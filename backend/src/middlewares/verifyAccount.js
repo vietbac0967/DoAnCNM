@@ -1,20 +1,23 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
-import { generateRefreshToken } from "../utils/generateToken.js";
-import { Types } from "mongoose";
-
 export const verifyAccount = async (req, res, next) => {
   try {
-    const token = req.headers.authorization.split(" ")[1];
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ msg: "No token, authorization denied" });
+    }
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
     if (!decoded) {
       return res.status(400).json({ message: "Invalid token" });
     }
-    if(decoded.exp < Date.now().valueOf() / 1000) {
-      return res.status(400).json({message: "Token expired"});
+    if (decoded.exp < Date.now().valueOf() / 1000) {
+      return res.status(400).json({ message: "Token expired" });
     }
-    const user = await User.findById(decoded.id)
+    const user = await User.findById(decoded.id);
+    console.log(user); 
     if (!user) {
+      
       return res.status(400).json({ message: "User not found" });
     }
     req.user = user;

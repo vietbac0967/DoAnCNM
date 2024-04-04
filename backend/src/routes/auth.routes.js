@@ -14,6 +14,6 @@ router.post("/verifyOTP", verifyOTP);
 router.post("/reSendEmail", reSendEmail);
 router.post("/verifyAccount", verifyAccount);
 router.post("/login", login);
-router.post("/logout/:phone", logout);
+router.post("/logout",verifyAccount, logout);
 // router.post("/refreshToken", refreshToken);
 export default router;

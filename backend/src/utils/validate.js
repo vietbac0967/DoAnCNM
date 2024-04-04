@@ -20,3 +20,4 @@ export const validateField = (field) => {
   }
   return true;
 };
+

@@ -1,6 +1,9 @@
 import {
+  Alert,
   Image,
   ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -15,8 +18,7 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { setToken } from "../app/tokenSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { validateField } from "../utils/validate";
-export default function LoginScreenV1({ navigation }) {
+export default function LoginScreen({ navigation }) {
   const [passwordShow, setPasswordShow] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -33,25 +35,35 @@ export default function LoginScreenV1({ navigation }) {
   }, []);
 
   const handleLogin = async () => {
-    if (username.trim() === "" || password.trim() === "") {
-      alert("Hãy nhập đầy đủ thông tin");
-      return;
-    }
-    const response = await baseURL.post("/auth/login", { username, password });
-    const { EM, EC, DT } = response.data;
-    console.log("data is", response.data);
-    if (EM === "User not verified" && EC === 0) {
-      alert("Hãy xác thực email của bạn");
-      return;
-    }
-    if (EM === "Success" && EC === 0 && DT) {
-      setPassword("");
-      setUsername("");
-      dispatch(setToken(DT));
-      await AsyncStorage.setItem("token", DT);
-      navigation.navigate("Main");
-    } else {
-      alert("Username or password incorrect", EM);
+    try {
+      if (username.trim() === "" || password.trim() === "") {
+        Alert.alert("Cảnh báo", "Hãy nhập đầy đủ thông tin");
+        return;
+      }
+      const response = await baseURL.post("/auth/login", {
+        username,
+        password,
+      });
+      const { EM, EC, DT } = response.data;
+      console.log("data is", response.data);
+      if (EM === "User not verified" && EC === 0) {
+        alert("Hãy xác thực email của bạn");
+        return;
+      }
+      if (EM === "Success" && EC === 0 && DT) {
+        setPassword("");
+        setUsername("");
+        dispatch(setToken(DT));
+        await AsyncStorage.setItem("token", DT);
+        navigation.navigate("Main");
+        return;
+      }
+      if (EC == 1 && EM == "User not found") {
+        Alert.alert("Cảnh báo", "Tài khoản hoặc mật khẩu không đúng");
+        return;
+      }
+    } catch (error) {
+      console.log("error", error);
     }
   };
 
@@ -79,7 +91,7 @@ export default function LoginScreenV1({ navigation }) {
           <View style={[styles.eclipse, { padding: 10 }]}>
             <Image
               resizeMode="cover"
-              style={{ width: "100%", height: 150, borderRadius: "50%" }}
+              style={{ width: "100%", height: 150, borderRadius: 50 }}
               source={require("../assets/girl.png")}
             ></Image>
           </View>
@@ -101,21 +113,26 @@ export default function LoginScreenV1({ navigation }) {
           </View>
           <View style={[styles.eclipse, { padding: 10 }]}>
             <Image
-              style={{ width: "100%", height: 150, borderRadius: "50%" }}
+              style={{ width: "100%", height: 150, borderRadius: 50 / 2 }}
               resizeMode="cover"
               source={require("../assets/senior.png")}
             ></Image>
           </View>
         </View>
 
-        <View style={styles.panel}>
+        <KeyboardAvoidingView
+          style={styles.panel}
+          keyboardVerticalOffset={40}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
           <View style={styles.input}>
             <Feather name="phone" size={24} color="black" />
             <TextInput
+              value={username}
               onChangeText={setUsername}
               style={{
                 flex: 1,
-                outlineStyle: "none",
+
                 marginLeft: 8,
               }}
               placeholder="Email hoặc số điện thoại"
@@ -124,10 +141,10 @@ export default function LoginScreenV1({ navigation }) {
           <View style={styles.input}>
             <Feather name="lock" size={24} color="black" />
             <TextInput
+              value={password}
               onChangeText={setPassword}
               style={{
                 flex: 1,
-                outlineStyle: "none",
                 marginLeft: 8,
               }}
               placeholder="Mật khẩu"
@@ -188,7 +205,7 @@ export default function LoginScreenV1({ navigation }) {
               </Text>
             </Text>
           </Pressable>
-        </View>
+        </KeyboardAvoidingView>
       </ImageBackground>
     </View>
   );
@@ -206,7 +223,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#00ACEE",
   },
   avatar: {
-    borderRadius: "50%",
+    borderRadius: 167 / 2,
     width: 167,
     height: 165,
   },

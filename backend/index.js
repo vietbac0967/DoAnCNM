@@ -1,31 +1,16 @@
-import express from "express";
+import app from "./app.js";
+
 import dotenv from "dotenv";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import connectToMongo from "./src/config/connectDB.js";
-import authRoutes from "./src/routes/auth.routes.js";
-import userRoutes from "./src/routes/user.routes.js";
-import morgan from "morgan";
-import helmet from "helmet";
-import compression from "compression";
 dotenv.config();
-const app = express();
+import connectToMongo from "./src/config/connectDB.js";
+import moment from "moment-timezone";
 const PORT = process.env.PORT || 5000;
+const data = {
+  username: "vietbacnguyen2002@gmail.com",
+  password: "Vip@12345",
+};
 
-app.use(express.json());
-app.use(cors());
-app.use(cookieParser());
-app.use(morgan("dev"));
-app.use(helmet());
-app.use(compression());
-app.use("/api/auth", authRoutes);
-app.use("/api/", userRoutes);
-
-// const date = new Date();
-/// create a new variable to hold the current date plus 15 days
-// const datePlus15Days = new Date(date.setDate(date.getDate() + 15));
 app.listen(PORT, () => {
-  // console.log(datePlus15Days);  
   connectToMongo();
   console.log(`Server is running on port ${PORT}`);
 });

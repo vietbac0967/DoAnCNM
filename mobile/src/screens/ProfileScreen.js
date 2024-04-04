@@ -8,6 +8,7 @@ import {
   Modal,
   TouchableOpacity,
   ImageBackground,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from "@expo/vector-icons";
@@ -17,7 +18,9 @@ export default function ProfileScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-  const [avatar, setAvatar] = useState("");
+  const [avatar, setAvatar] = useState(
+    "https://avatar.iran.liara.run/username"
+  );
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -27,11 +30,13 @@ export default function ProfileScreen({ navigation }) {
             Authorization: `Bearer ${token}`,
           },
         });
-        const {DT} = response.data;
-        console.log("User::::", DT);
-        setAvatar(DT.avatar);
-        setUsername(DT.name);
-        setEmail(DT.email);
+        const { DT, EM, EC } = response.data;
+        if (EC === 0 && EM === "Success") {
+          setUsername(DT.name);
+          setAvatar(DT.avatar);
+        }else{
+          console.log("Error getting user:", EM);
+        }
       } catch (error) {
         console.log("Error getting user:", error);
       }
@@ -46,10 +51,26 @@ export default function ProfileScreen({ navigation }) {
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem("token");
-      navigation.navigate("Login");
+      const token = await AsyncStorage.getItem("token");
+      const response = await baseURL.post(
+        "/auth/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const { EC, EM } = response.data;
+      console.log("Logout:", response.data);
+      if (EC === 0) {
+        await AsyncStorage.removeItem("token");
+        navigation.navigate("Login");
+      } else {
+        Alert.alert("Error", EM);
+      }
     } catch (error) {
-      console.log("Error logging out:", error);
+      console.log("Error getting user:", error);
     }
   };
 
@@ -100,26 +121,32 @@ export default function ProfileScreen({ navigation }) {
             <Feather name="shield" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Tài khoản và bảo mật</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.bottomButton}>
             <Feather name="settings" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Quyền riêng tư</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.bottomButton}>
             <Feather name="bell" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Thông báo</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.bottomButton}>
             <Feather name="users" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Danh bạ</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.bottomButton}>
             <Feather name="bookmark" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Nhật ký</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.bottomButton}>
             <Feather name="archive" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Sao lưu và ngôn ngữ</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.bottomButton} onPress={handleLogout}>
             <Feather name="log-out" size={15} color="red" />
             <Text style={{ fontSize: 14, marginLeft: 10, color: "red" }}>

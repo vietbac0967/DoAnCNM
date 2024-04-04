@@ -23,6 +23,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.thanhthang2808.mobile"
+      "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
       "favicon": "./assets/favicon.png"

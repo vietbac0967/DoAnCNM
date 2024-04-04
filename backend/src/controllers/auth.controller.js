@@ -66,21 +66,30 @@ export const login = async (req, res) => {
     });
   }
 };
-
 export const logout = async (req, res) => {
   try {
-    const phone = req.body.phone;
-    const user = await User.findOne({ phoneNumber: phone }).lean();
+    const user = req.user._id;
     if (!user) {
-      return res.status(400).json({ EC: 1, EM: "User not found", DT: "" });
+      return res.status(404).json({
+        EC: 1,
+        EM: "User not found",
+        DT: "",
+      });
     }
-    res.status(200).json({ EC: 0, EM: "Success", DT: "" });
+    res.status(200).json({
+      EC: 0,
+      EM: "Success",
+      DT: "",
+    });
   } catch (error) {
     console.log(error.message);
-    res.status(500).json(error.message);
+    res.status(500).json({
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    });
   }
 };
-
 export const refreshToken = async (req, res) => {
   try {
     const token = req.body.token;
