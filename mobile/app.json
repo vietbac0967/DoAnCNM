@@ -22,7 +22,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.thanhthang2808.mobile"
+      "package": "com.thanhthang2808.mobile",
       "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
