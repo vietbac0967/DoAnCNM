@@ -9,7 +9,7 @@ const login = (data) => {
 }
 
 const accountUser = () => {
-    return axios.get("/api/v1/account")
+    return axios.get("/api/auth/verifyAccount")
 }
 
 const verifyOTP = (data) => {

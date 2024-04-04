@@ -13,8 +13,8 @@ const AppRoutes = () => {
     return (
         <Routes>
             <Route path='login' element={<LocalRoutes component={<Login />} />} />
-            {/* <Route path='register' element={<LocalRoutes component={<Register />} />} /> */}
-            <Route path='register' element={<Register />} />
+            <Route path='register' element={<LocalRoutes component={<Register />} />} />
+
             <Route path='/otp/:email' element={<Otp />} />
             <Route path='message' element={<MessagePage />} />
             <Route path='group' element={<GroupPage />} />

@@ -78,12 +78,11 @@ const Login = () => {
         let check = handleValid();
         if (check === true) {
             let res = await login(infologin);
-            console.log(res)
-            // if (res && res.EC === 0) {
-            //     navigate("/")
-            // } else {
-            //     toast.error(res.EM)
-            // }
+            if (res && res.EC === 0) {
+                navigate("/")
+            } else {
+                toast.error(res.EM)
+            }
         }
     }
 

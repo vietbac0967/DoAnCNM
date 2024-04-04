@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  account,
   login,
   logout,
   reSendEmail,
@@ -12,7 +13,7 @@ const router = express.Router();
 router.post("/register", register);
 router.post("/verifyOTP", verifyOTP);
 router.post("/reSendEmail", reSendEmail);
-router.post("/verifyAccount", verifyAccount);
+router.get("/verifyAccount", verifyAccount, account);
 router.post("/login", login);
 router.post("/logout/:phone", logout);
 // router.post("/refreshToken", refreshToken);

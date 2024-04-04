@@ -57,6 +57,12 @@ export const reSendEmail = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { EC, EM, DT } = await loginService(req.body);
+    if (DT) {
+      res.cookie('jwt',
+        DT,
+        { maxAge: 900000, httpOnly: true }
+      );
+    }
     res.status(200).json({ EC, EM, DT });
   } catch (error) {
     res.status(500).json({
@@ -95,3 +101,18 @@ export const refreshToken = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const account = (req, res) => {
+  try {
+    if (req.user) {
+      return res.status(200).json({
+        EC: 0,
+        EM: 'verify account success',
+        DT: req.user
+      })
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+}
