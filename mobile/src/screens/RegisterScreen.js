@@ -6,6 +6,7 @@ import {
   TextInput,
   Pressable,
   Alert,
+  KeyboardAvoidingView,
 } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -83,7 +84,7 @@ export default function RegisterScreen({ navigation }) {
             Hãy nhập đầy đủ thông tin bên dưới {"\n"} để đăng ký tài khoản
           </Text>
 
-          <View style={styles.input}>
+          <KeyboardAvoidingView style={styles.input}>
             <Text style={{ width: 120 }}>Họ và tên: </Text>
             <TextInput
               value={user.name}
@@ -91,9 +92,9 @@ export default function RegisterScreen({ navigation }) {
               placeholderTextColor={"gray"}
               placeholder="Nhập họ và tên"
             ></TextInput>
-          </View>
+          </KeyboardAvoidingView>
 
-          <View style={styles.input}>
+          <KeyboardAvoidingView style={styles.input}>
             <Text style={{ width: 120, marginRight: 5 }}>Số điện thoại: </Text>
             <TextInput
               value={user.phoneNumber}
@@ -101,9 +102,9 @@ export default function RegisterScreen({ navigation }) {
               placeholderTextColor={"gray"}
               placeholder="Nhập số điện thoại"
             ></TextInput>
-          </View>
+          </KeyboardAvoidingView>
 
-          <View style={styles.input}>
+          <KeyboardAvoidingView style={styles.input}>
             <Text style={{ width: 120, marginRight: 5 }}>Email: </Text>
             <TextInput
               value={user.email}
@@ -111,9 +112,9 @@ export default function RegisterScreen({ navigation }) {
               placeholderTextColor={"gray"}
               placeholder="Nhập email"
             ></TextInput>
-          </View>
+          </KeyboardAvoidingView>
 
-          <View style={styles.input}>
+          <KeyboardAvoidingView style={styles.input}>
             <Text style={{ paddingTop: 8 }}>Giới tính:</Text>
             <View
               style={{
@@ -133,7 +134,7 @@ export default function RegisterScreen({ navigation }) {
               <Text style={{ paddingTop: 8 }}>Nam</Text>
             </View>
 
-            <View
+            <KeyboardAvoidingView
               style={{ flexDirection: "row", justifyContent: "space-around" }}
             >
               <RadioButton
@@ -145,10 +146,10 @@ export default function RegisterScreen({ navigation }) {
                 }}
               ></RadioButton>
               <Text style={{ paddingTop: 8 }}>Nữ</Text>
-            </View>
-          </View>
+            </KeyboardAvoidingView>
+          </KeyboardAvoidingView>
 
-          <View style={[styles.input, { justifyContent: "space-between" }]}>
+          <KeyboardAvoidingView style={[styles.input, { justifyContent: "space-between" }]}>
             <Text style={{ width: 120, marginRight: 5 }}>Mật khẩu: </Text>
             <TextInput
               value={user.password}
@@ -164,9 +165,9 @@ export default function RegisterScreen({ navigation }) {
                 <Ionicons name="eye" size={24} color="black" />
               )}
             </Pressable>
-          </View>
+          </KeyboardAvoidingView>
 
-          <View style={[styles.input, { justifyContent: "space-between" }]}>
+          <KeyboardAvoidingView style={[styles.input, { justifyContent: "space-between" }]}>
             <Text style={{ width: 120, marginRight: 5 }}>
               Nhập lại mật khẩu:{" "}
             </Text>
@@ -188,7 +189,7 @@ export default function RegisterScreen({ navigation }) {
                 <Ionicons name="eye" size={24} color="black" />
               )}
             </Pressable>
-          </View>
+          </KeyboardAvoidingView>
 
           <Pressable
             onPress={handleRegisterSubmit}

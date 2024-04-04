@@ -1,8 +1,5 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
-import { generateRefreshToken } from "../utils/generateToken.js";
-import { Types } from "mongoose";
-
 export const verifyAccount = async (req, res, next) => {
   try {
     const authHeader = req.headers["authorization"];

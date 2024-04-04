@@ -2,6 +2,8 @@ import {
   Alert,
   Image,
   ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -118,7 +120,11 @@ export default function LoginScreen({ navigation }) {
           </View>
         </View>
 
-        <View style={styles.panel}>
+        <KeyboardAvoidingView
+          style={styles.panel}
+          keyboardVerticalOffset={40}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
           <View style={styles.input}>
             <Feather name="phone" size={24} color="black" />
             <TextInput
@@ -199,7 +205,7 @@ export default function LoginScreen({ navigation }) {
               </Text>
             </Text>
           </Pressable>
-        </View>
+        </KeyboardAvoidingView>
       </ImageBackground>
     </View>
   );
