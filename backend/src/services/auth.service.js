@@ -170,7 +170,7 @@ export const loginService = async (data) => {
     }
     const user = await User.findOne({
       $or: [{ phoneNumber: username }, { email: username }],
-    }).lean();
+    });
 
     if (!user) {
       return {
