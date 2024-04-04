@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import ChatMessage from "../components/ChatMessage";
 import { baseURL } from "../api/baseURL";
 import { useDispatch, useSelector } from "react-redux";
+import ChatScreen from "./ChatScreen";
 
 const chats = [
   {
@@ -83,7 +84,9 @@ export default function HomeScreen({ navigation }) {
 
       {/* Chat list */}
       <View style={{ marginTop: 50 }}>
-        <ChatMessage chat={chats[0]}></ChatMessage>
+        <Pressable onPress={() => navigation.navigate("ChatScreen")}>
+          <ChatMessage chat={chats[0]}></ChatMessage>
+        </Pressable>          
         <ChatMessage chat={chats[1]}></ChatMessage>
       </View>
     </View>

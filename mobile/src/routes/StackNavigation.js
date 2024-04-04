@@ -5,6 +5,7 @@ import RegisterScreen from "../screens/RegisterScreen";
 import LoginScreen from "../screens/LoginScreen";
 import BottomTab from "./BottomTab";
 import VerifyOTPScreen from "../screens/VerifyOTPScreen";
+import ChatScreen from "../screens/ChatScreen";
 
 const Stack = createNativeStackNavigator();
 const StackNavigation = () => {
@@ -24,6 +25,11 @@ const StackNavigation = () => {
         <Stack.Screen
           name="Register"
           component={RegisterScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ChatScreen"
+          component={ChatScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen

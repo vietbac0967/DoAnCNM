@@ -16,6 +16,7 @@ import { baseURL } from "../api/baseURL";
 export default function ProfileScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [avatar, setAvatar] = useState("");
   useEffect(() => {
     const getUser = async () => {
@@ -30,6 +31,7 @@ export default function ProfileScreen({ navigation }) {
         console.log("User::::", DT);
         setAvatar(DT.avatar);
         setUsername(DT.name);
+        setEmail(DT.email);
       } catch (error) {
         console.log("Error getting user:", error);
       }
@@ -51,6 +53,15 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
+  const extractUsername = (email) => {
+    const atIndex = email.indexOf('@'); // Tìm vị trí của kí tự '@'
+    if (atIndex !== -1) {
+      return email.substring(0, atIndex); // Trả về phần từ đầu đến '@'
+    } else {
+      return email; // Trả về toàn bộ email nếu không tìm thấy kí tự '@'
+    }
+  };
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -63,7 +74,7 @@ export default function ProfileScreen({ navigation }) {
             <Image style={styles.avatar} source={{ uri: avatar }} />
           </TouchableOpacity>
           <Text style={styles.username}>{username}</Text>
-          <Text style={styles.nickname}>@huydeptrai</Text>
+          <Text style={styles.email}>{email}</Text>
         </View>
         <Pressable style={styles.logoutButton}>
           <Feather name="edit" size={20} color="#444444" />
@@ -143,7 +154,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#404146",
   },
-  nickname: {
+  email: {
     marginTop: 5,
     fontSize: 12,
     color: "#777777",
