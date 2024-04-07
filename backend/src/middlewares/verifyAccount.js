@@ -2,8 +2,8 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 export const verifyAccount = async (req, res, next) => {
   try {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
+    // const authHeader = req.headers["authorization"];
+    const token = req.headers.authorization.split(" ")[1];
     if (!token) {
       return res.status(401).json({ msg: "No token, authorization denied" });
     }
@@ -15,7 +15,6 @@ export const verifyAccount = async (req, res, next) => {
       return res.status(400).json({ message: "Token expired" });
     }
     const user = await User.findById(decoded.id);
-    console.log(user); 
     if (!user) {
       
       return res.status(400).json({ message: "User not found" });
