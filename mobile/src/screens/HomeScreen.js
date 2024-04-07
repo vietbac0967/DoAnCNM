@@ -70,7 +70,7 @@ export default function HomeScreen({ navigation }) {
           placeholder="Tìm kiếm"
           placeholderTextColor={"#B1B1B1"}
         ></TextInput>
-        <Pressable>
+        <Pressable onPress={() => navigation.navigate("AddFriend")}>
           <Ionicons
             style={{ paddingTop: 5 }}
             name="person-add-outline"
