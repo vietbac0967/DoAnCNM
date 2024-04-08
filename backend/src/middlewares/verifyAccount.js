@@ -2,6 +2,10 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 export const verifyAccount = async (req, res, next) => {
   try {
+    if (!req.headers.authorization)
+      return res
+        .status(401)
+        .json({ message: "No token, authorization denied" });
     // const authHeader = req.headers["authorization"];
     const token = req.headers.authorization.split(" ")[1];
     if (!token) {
@@ -16,7 +20,6 @@ export const verifyAccount = async (req, res, next) => {
     }
     const user = await User.findById(decoded.id);
     if (!user) {
-      
       return res.status(400).json({ message: "User not found" });
     }
     req.user = user;
