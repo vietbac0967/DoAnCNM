@@ -6,7 +6,7 @@ const validateEmail = (email) => {
   return re.test(email);
 };
 
-const validatePhoneNumber = (phone) => {
+export const validatePhoneNumber = (phone) => {
   let re = /^0\d{9}$/;
   return re.test(phone);
 };

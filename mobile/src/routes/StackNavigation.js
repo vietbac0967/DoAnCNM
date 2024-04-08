@@ -5,6 +5,7 @@ import RegisterScreen from "../screens/RegisterScreen";
 import LoginScreen from "../screens/LoginScreen";
 import BottomTab from "./BottomTab";
 import VerifyOTPScreen from "../screens/VerifyOTPScreen";
+import AddFriendScreen from "../screens/AddFriendScreen";
 import ChatScreen from "../screens/ChatScreen";
 
 const Stack = createNativeStackNavigator();
@@ -36,6 +37,10 @@ const StackNavigation = () => {
           name="VerifyOTP"
           component={VerifyOTPScreen}
           options={{ headerShown: false }}
+        ></Stack.Screen>
+        <Stack.Screen
+          name="AddFriend"
+          component={AddFriendScreen}
         ></Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>

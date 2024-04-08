@@ -23,11 +23,11 @@ export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-  const token = useSelector((state) => state.token);
   useEffect(() => {
     const checkToken = async () => {
       const token = await AsyncStorage.getItem("token");
       if (token) {
+        dispatch(setToken(token));
         navigation.navigate("Main");
       }
     };

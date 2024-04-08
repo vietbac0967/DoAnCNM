@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
@@ -7,6 +7,8 @@ import ChatMessage from "../components/ChatMessage";
 import { baseURL } from "../api/baseURL";
 import { useDispatch, useSelector } from "react-redux";
 import ChatScreen from "./ChatScreen";
+import { getFriends } from "../services/user.service";
+import UserChat from "../components/UserChat";
 
 const chats = [
   {
@@ -24,39 +26,20 @@ const chats = [
 ];
 
 export default function HomeScreen({ navigation }) {
-  // const token = useSelector((state) => state.token);
-  // const dispatch = useDispatch();
-  // const refreshToken = async (token) => {
-  //   try {
-  //     const res = await baseURL.post("/auth/refreshToken", { token: token });
-  //     const newToken = res.data.token;
-  //     dispatch(setToken(newToken));
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const checkToken = async () => {
-  //     try {
-  //       const decoded = jwtDecode(token);
-  //       console.log(decoded);
-  //       if (decoded.exp * 1000 < Date.now()) {
-  //         await refreshToken(token);
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   checkToken();
-  // },[]);
-
-  const handleLogout = async () => {
-    // baseURL.post("/auth/logout");
-    await AsyncStorage.removeItem("token");
-    navigation.replace("Login");
-  };
-
+  const [friends, setFriends] = useState([]);
+  useEffect(() => {
+    const getListFriend = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const friends = await getFriends(token);
+        setFriends(friends);
+      } catch (error) {
+        console.log("error:::", error);
+      }
+    };
+    getListFriend();
+  }, []);
+  console.log("Friends:::", friends)
   return (
     <View style={styles.container}>
       {/* Search bar */}
@@ -71,7 +54,7 @@ export default function HomeScreen({ navigation }) {
           placeholder="Tìm kiếm"
           placeholderTextColor={"#B1B1B1"}
         ></TextInput>
-        <Pressable>
+        <Pressable onPress={() => navigation.navigate("AddFriend")}>
           <Ionicons
             style={{ paddingTop: 5 }}
             name="person-add-outline"
@@ -82,12 +65,11 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       {/* Chat list */}
-      <View style={{ marginTop: 50 }}>
-        <Pressable onPress={() => navigation.navigate("ChatScreen")}>
-          <ChatMessage chat={chats[0]}></ChatMessage>
-        </Pressable>          
-        <ChatMessage chat={chats[1]}></ChatMessage>
-      </View>
+      {
+        friends.map((friend) => (
+          <UserChat key={friend._id} item={friend} />
+        ))
+      }
     </View>
   );
 }
@@ -98,7 +80,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f1f1f1",
   },
   search: {
-    marginTop:25,
+    marginTop: 25,
     height: 40,
     flexDirection: "row",
     borderTopLeftRadius: 0,
