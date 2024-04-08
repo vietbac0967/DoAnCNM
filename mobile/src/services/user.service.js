@@ -16,6 +16,31 @@ export const getFriendRequests = async (token) => {
     return [];
   }
 };
+
+export const getReceiverService = async (token, receiverId) => {
+  try {
+    const response = await baseURL.post(
+      `/user/`,
+      {
+        userId: receiverId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const { EC, EM, DT } = response.data;
+    if (EC === 0 && EM === "Success") {
+      return DT;
+    } else {
+      return {};
+    }
+  } catch (error) {
+    return {};
+  }
+};
+
 export const getFriends = async (token) => {
   try {
     const response = await baseURL.get("user/getFriends", {
@@ -44,13 +69,9 @@ export const searchUser = async (token, phone) => {
         },
       }
     );
-    const { EC, EM, DT } = response.data;
-    if (EC === 0 && EM === "Success") {
-      return DT;
-    } else {
-      return {};
-    }
+    return response.data;
   } catch (error) {
+    console.log("Error:::", error)
     return {};
   }
 };

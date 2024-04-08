@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import {
   acceptFriendRequestToUser,
   findUserByPhone,
+  getUserByIdService,
   rejectFriendRequestToUser,
   sendFriendRequestToUser,
   showFriendRequests,
@@ -11,12 +12,16 @@ import {
 
 export const getUser = async (req, res) => {
   try {
-    const user = req.user;
-    res.status(200).json({
-      EC: 0,
-      EM: "Success",
-      DT: user,
-    });
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(400).json({
+        EC: 1,
+        EM: "userId query parameter is required",
+        DT: "",
+      });
+    }
+    const user = await getUserByIdService(userId);
+    res.status(200).json(user);
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -29,7 +34,8 @@ export const getUser = async (req, res) => {
 export const getUserByPhone = async (req, res) => {
   try {
     const { phone } = req.body;
-    const user = await findUserByPhone(phone);
+    const senderId = req.user._id;
+    const user = await findUserByPhone(phone, senderId);
     return res.status(200).json(user);
   } catch (error) {
     console.log(error.message);
@@ -104,6 +110,7 @@ export const rejectFriendRequest = async (req, res) => {
 export const getFriends = async (req, res) => {
   try {
     const user = req.user;
+    console.log("UserID:::::", user._id);
     const friends = await showFriends(user._id);
     res.status(200).json(friends);
   } catch (error) {

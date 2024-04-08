@@ -21,12 +21,8 @@ export default function AddFriendScreen({ navigation }) {
     });
   }, []);
   const [phone, setPhone] = useState("");
-  const [user, setUser] = useState({
-    _id: "",
-    name: "",
-    avatar: "",
-    phone: "",
-  });
+  const [user, setUser] = useState({});
+  const [status, setStatus] = useState(false);
   const handleSearchUser = async () => {
     const token = await AsyncStorage.getItem("token");
     if (phone.trim() === "" || !validatePhoneNumber(phone)) {
@@ -38,19 +34,16 @@ export default function AddFriendScreen({ navigation }) {
       return;
     }
     const res = await searchUser(token, phone);
-    console.log(res);
-    if (res) {
-      setUser({
-        _id: res._id,
-        name: res.name,
-        avatar: res.avatar,
-        phone: res.phoneNumber,
-      });
-    } else {
-      Alert.alert("Thông báo", res.EM, [{ text: "OK" }]);
+    if (res.EC === 1 && res.EM === "User not found") {
+      Alert.alert("Thông báo", "Người dùng không tồn tại", [{ text: "OK" }]);
+      return;
     }
+    if (res.EC === 1 && res.EM === "User is already your friend") {
+      setStatus(true);
+    }
+    setUser(res.DT);
   };
-
+  console.log(user);
   const handleSendRequest = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -117,35 +110,63 @@ export default function AddFriendScreen({ navigation }) {
             borderRadius: 8,
             width: "80%",
             marginTop: 20,
+            borderWidth: 1,
           }}
         >
           <Image
             source={{ uri: user.avatar }}
-            style={{ width: 50, height: 50, borderRadius: 50 / 2 }}
+            style={{
+              width: 50,
+              height: 50,
+              borderRadius: 50 / 2,
+              marginTop: 15,
+            }}
           />
-          <View>
+          <View style={{ paddingTop: 30 }}>
             <Text>{user.name}</Text>
             <Text>{user.phone}</Text>
           </View>
-          <Pressable style={styles.btn} onPress={handleSendRequest}>
-            <LinearGradient
-              // Button Linear Gradient
-              colors={["#25aae1", "#4481eb", "#04befe", "#3f86ed"]}
-              style={styles.button}
-            >
-              <Text
-                style={{
-                  textAlign: "center",
-                  fontWeight: "600",
-                  color: "#fff",
-                }}
+          {status ? (
+            <Pressable style={styles.button}>
+              <LinearGradient
+                // Button Linear Gradient
+                colors={["#00ff87", "#60efff"]}
+                style={styles.button}
               >
-                KẾT BẠN
-              </Text>
-            </LinearGradient>
-          </Pressable>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontWeight: "600",
+                    color: "#fff",
+                  }}
+                >
+                  NHẮN TIN
+                </Text>
+              </LinearGradient>
+            </Pressable>
+          ) : (
+            <Pressable style={styles.button} onPress={handleSendRequest}>
+              <LinearGradient
+                // Button Linear Gradient
+                colors={["#25aae1", "#4481eb", "#04befe", "#3f86ed"]}
+                style={styles.button}
+              >
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontWeight: "600",
+                    color: "#fff",
+                  }}
+                >
+                  KẾT BẠN
+                </Text>
+              </LinearGradient>
+            </Pressable>
+          )}
         </View>
-      ) : null}
+      ) : (
+        ""
+      )}
     </View>
   );
 }

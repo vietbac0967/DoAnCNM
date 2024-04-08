@@ -1,13 +1,9 @@
-import dotenv from "dotenv";
-import socket from "socket.io";
-dotenv.config();
-const URL_CLIENT = process.env.CLIENT_URL;
-
+import { Server } from "socket.io";
 const configSocket = (server) => {
   let clients = [];
-  const io = socket()(server, {
+  const io = new Server(server, {
     cors: {
-      origin: URL_CLIENT,
+      origin: "*",
       credentials: true,
     },
   });
@@ -125,3 +121,4 @@ const configSocket = (server) => {
     });
   });
 };
+export default configSocket;
