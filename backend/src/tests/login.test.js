@@ -77,14 +77,14 @@ describe("loginService", () => {
   it("should return token if login successful", async () => {
     const mockUser = {
       _id: "userSuccess",
-      email: "userSuccess@gmail.com",
+      email: "duongngoc378@gmail.com",
       password: "@123123Az",
       verify: true,
     };
     User.findOne.mockResolvedValueOnce(mockUser);
     bcrypt.compare.mockResolvedValueOnce(true);
     const result = await loginService({
-      username: "userSuccess@gmail.com",
+      username: "duongngoc378@gmail.com",
       password: "@123123Az",
     });
     expect(result).toEqual({
