@@ -28,8 +28,8 @@ describe("registerService", () => {
     User.findOne.mockResolvedValueOnce(true);
     const result = await registerService({
       name: "test",
-      phoneNumber: "0815615961",
-      email: "vietbacnguyen2002@gmail.com",
+      phoneNumber: "0359395747",
+      email: "duongngoc378@gmail.com",
       password: "Vip@12345",
       gender: "male",
       confirmPassword: "Vip@12345",

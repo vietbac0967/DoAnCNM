@@ -37,7 +37,7 @@ const ChatScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back-outline" size={24} color="black" />
+          <Ionicons name="chevron-back-outline" size={24} color="black" style={{marginTop: 30}}/>
         </TouchableOpacity>
         <View style={styles.titleContainer}>
           <Image source={require("../assets/avt.jpg")} style={styles.avatar} />
@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     flex: 1,
+    marginTop: 30,
     flexDirection: 'row',
     marginLeft: 10,
   },
@@ -124,6 +125,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: 'auto',
     marginRight: 10,
+    marginTop: 30,
   },
   videocallButton: {
     marginLeft: 15,

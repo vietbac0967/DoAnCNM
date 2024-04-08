@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 export const sendOTPForUser = async (otp, toEmail) => {
   try {
     transporter.sendMail({
-      from: { name: "Chat App", address: "testingmtt2808@gmail.com" }, // sender address
+      from: { name: "Suprise Message", address: "thanhthang2808@gmail.com" }, // sender address
       to: toEmail, // list of receivers
       subject:
         "Bạn đã đăng ký thành công vui lòng xác nhận để sử dụng tài khoản", // Subject line
