@@ -3,6 +3,7 @@ import {
   acceptFriendRequestToUser,
   findUserByPhone,
   getUserByIdService,
+  getUserInfoService,
   rejectFriendRequestToUser,
   sendFriendRequestToUser,
   showFriendRequests,
@@ -31,6 +32,21 @@ export const getUser = async (req, res) => {
     });
   }
 };
+export const getUserInfo = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await getUserInfoService(userId);
+    return res.status(200).json(user);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    });
+  }
+};
+
 export const getUserByPhone = async (req, res) => {
   try {
     const { phone } = req.body;

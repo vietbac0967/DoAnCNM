@@ -13,8 +13,9 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from "@expo/vector-icons";
 import { baseURL } from "../api/baseURL";
-
+import { useSelector } from "react-redux";
 export default function ProfileScreen({ navigation }) {
+  const token = useSelector((state) => state.token.token);
   const [modalVisible, setModalVisible] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -24,8 +25,8 @@ export default function ProfileScreen({ navigation }) {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const token = await AsyncStorage.getItem("token");
-        const response = await baseURL.get("/user", {
+        // const token = await AsyncStorage.getItem("token");
+        const response = await baseURL.get("/info", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -34,7 +35,7 @@ export default function ProfileScreen({ navigation }) {
         if (EC === 0 && EM === "Success") {
           setUsername(DT.name);
           setAvatar(DT.avatar);
-        }else{
+        } else {
           console.log("Error getting user:", EM);
         }
       } catch (error) {
@@ -75,7 +76,7 @@ export default function ProfileScreen({ navigation }) {
   };
 
   const extractUsername = (email) => {
-    const atIndex = email.indexOf('@'); // Tìm vị trí của kí tự '@'
+    const atIndex = email.indexOf("@"); // Tìm vị trí của kí tự '@'
     if (atIndex !== -1) {
       return email.substring(0, atIndex); // Trả về phần từ đầu đến '@'
     } else {

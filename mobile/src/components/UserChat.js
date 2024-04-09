@@ -1,10 +1,12 @@
 import { Pressable, StyleSheet, Text, View, Image } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { baseURL } from "../api/baseURL";
+import io from "socket.io-client";
 export default function UserChat({ item }) {
   const [messages, setMessages] = useState([]);
+  const socket = useRef();
   const navigation = useNavigation();
   const getMessages = async () => {
     try {
@@ -28,6 +30,9 @@ export default function UserChat({ item }) {
       console.log("error:::", error);
     }
   };
+
+  
+
   useEffect(() => {
     getMessages();
   }, []);
@@ -69,7 +74,9 @@ export default function UserChat({ item }) {
     <Pressable
       style={styles.btn}
       onPress={() =>
-        navigation.navigate("ChatScreen", { recevierId: item._id })
+        navigation.navigate("ChatScreen", {
+          recevierId: item._id,
+        })
       }
     >
       <Image

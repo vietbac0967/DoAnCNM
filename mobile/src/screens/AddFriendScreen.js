@@ -15,6 +15,7 @@ import { baseURL } from "../api/baseURL";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { searchUser, sendFriendRequest } from "../services/user.service";
 export default function AddFriendScreen({ navigation }) {
+  const token = useSelector(state => state.token.token);
   useEffect(() => {
     navigation.setOptions({
       headerTitle: "Thêm bạn bè",
@@ -24,7 +25,6 @@ export default function AddFriendScreen({ navigation }) {
   const [user, setUser] = useState({});
   const [status, setStatus] = useState(false);
   const handleSearchUser = async () => {
-    const token = await AsyncStorage.getItem("token");
     if (phone.trim() === "" || !validatePhoneNumber(phone)) {
       Alert.alert(
         "Thông báo",
@@ -46,7 +46,6 @@ export default function AddFriendScreen({ navigation }) {
   console.log(user);
   const handleSendRequest = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
       const res = await baseURL.post(
         "/user/sendFriendRequest",
         { receiver: user._id },

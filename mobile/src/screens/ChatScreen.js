@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useLayoutEffect,
+  useCallback,
+} from "react";
 import {
   View,
   Text,
@@ -29,42 +35,38 @@ import { Feather } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { io } from "socket.io-client";
+import { useSelector } from "react-redux";
 const ChatScreen = ({ navigation, route }) => {
+  const token = useSelector((state) => state.token.token);
   // const ENDPOINT = "http://192.168.0.104/5000";
   // const socket = io(ENDPOINT);
-  const scaleValue = React.useRef(new Animated.Value(0)).current;
 
-  // const [istyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState([]);
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
   const { recevierId } = route.params;
+  const socket = useRef();
   const [selectMessage, setSetlectMessage] = useState({});
-  // const [socketConnected, setSocketConnected] = useState(false);
   const [message, setMessage] = useState("");
-  // const [typing, setTyping] = useState(false);
   const [status, setStatus] = useState("Đang hoạt động"); // Trạng thái mặc định
   const [modalVisible, setModalVisible] = useState(false);
   const [receiver, setReceiver] = useState({});
   const scrollViewRef = useRef(null);
-  // Hàm cuộn xuống cuối cùng
+
   const scrollToBottom = () => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollToEnd({ animated: false });
     }
   };
-
-  // Hàm xử lý sự kiện thay đổi kích thước nội dung
   const handleContentSizeChange = () => {
     scrollToBottom();
   };
-  // Hàm xử lý sự kiện nhấn nút gửi tin nhắn
+
   const handleEmojiPress = () => {
     setShowEmojiSelector(!showEmojiSelector);
   };
-  // Hàm lấy tin nhắn
+
   const getMessages = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
       const response = await getMessagesService(token, recevierId);
       // console.log("response:::", response);
       setMessages(response);
@@ -72,6 +74,7 @@ const ChatScreen = ({ navigation, route }) => {
       console.log("error:::", error);
     }
   };
+
   const getReceiver = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -82,30 +85,52 @@ const ChatScreen = ({ navigation, route }) => {
     }
   };
 
+  useEffect(() => {
+    socket.current = io("http://192.168.0.104:5000");
+    socket.current.emit("add-user", recevierId);
+  }, []);
+
+  useEffect(() => {
+    getMessages();
+  }, []);
+  // useEffect(() => {
+  // }, []);
   const handleSend = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
       const { DT, EC, EM } = await sendMessageService(
         token,
         recevierId,
         message
       );
-      setMessage("");
       if (EC === 0 && EM === "Success") {
-        setMessage([...messages, DT]);
+        socket.current.emit("send-msg", {
+          from: DT.receiverId,
+          to: DT.senderId,
+          msg: DT.content,
+        });
+        setMessage("");
+        getMessages();
+        return;
       }
-      getMessages();
     } catch (error) {
       console.log("error:::", error);
     }
   };
 
   useEffect(() => {
-    getMessages();
+    if (socket.current) {
+      socket.current.on("msg-recieve", (msg) => {
+        getMessages();
+      });
+    }
   }, []);
   useEffect(() => {
     getReceiver();
   }, []);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   const formatTime = (time) => {
     const options = { hour: "numeric", minute: "numeric" };
     return new Date(time).toLocaleString("en-US", options);
@@ -120,8 +145,7 @@ const ChatScreen = ({ navigation, route }) => {
       {
         text: "Có",
         onPress: async () => {
-          const token = await AsyncStorage.getItem("token");
-          const response = await recallMessageService(token,selectMessage._id);
+          const response = await recallMessageService(token, selectMessage._id);
           setModalVisible(false);
           if (response) {
             getMessages();
@@ -130,21 +154,20 @@ const ChatScreen = ({ navigation, route }) => {
       },
     ]);
   };
-  const handleDeleteMessage = async () =>{
+  const handleDeleteMessage = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await deleteMessageService(token,selectMessage._id);
-      const {EC,EM,DT} = response;
+      const response = await deleteMessageService(token, selectMessage._id);
+      const { EC, EM, DT } = response;
       if (EC === 0 && EM === "Success") {
         getMessages();
         setModalVisible(false);
-      }else{
-        Alert("Thông báo","Xóa không thành công");
+      } else {
+        Alert("Thông báo", "Xóa không thành công");
       }
     } catch (error) {
       console.log(error);
     }
-  }
+  };
   return (
     <KeyboardAvoidingView style={styles.container}>
       <View style={styles.header}>
@@ -197,7 +220,8 @@ const ChatScreen = ({ navigation, route }) => {
           >
             <View style={styles.modalContainer}>
               {/* xóa tin nhắn ở phía người gửi */}
-              <Pressable onPress={handleDeleteMessage}
+              <Pressable
+                onPress={handleDeleteMessage}
                 style={{
                   flex: 1,
                   alignItems: "center",
@@ -209,16 +233,18 @@ const ChatScreen = ({ navigation, route }) => {
                   Xóa tin nhắn
                 </Text>
               </Pressable>
-                  {/* Thu hồi tin nhắn ở hai phía */}
+              {/* Thu hồi tin nhắn ở hai phía */}
               <Pressable
                 disabled={selectMessage.receiverId !== receiver?._id}
-
                 onPress={() => handleRecallMessage(message._id)}
                 style={{
                   flex: 1,
                   alignItems: "center",
                   justifyContent: "center",
-                  display: selectMessage.receiverId !== receiver?._id ? "none" : "flex",
+                  display:
+                    selectMessage.receiverId !== receiver?._id
+                      ? "none"
+                      : "flex",
                 }}
               >
                 <FontAwesome name="refresh" size={22} color="orange" />
@@ -434,7 +460,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
   },
- 
 });
 
 export default ChatScreen;

@@ -159,3 +159,14 @@ export const showSentFriendRequests = async (userId) => {
     return { EC: 1, EM: error.message, DT: "" };
   }
 };
+export const getUserInfoService = async (userId) => {
+  try {
+    const user = await User.findById(userId).select("-password").lean();
+    if (!user) {
+      return { EC: 1, EM: "User not found", DT: "" };
+    }
+    return { EC: 0, EM: "Success", DT: user };
+  } catch (error) {
+    return { EC: 1, EM: error.message, DT: "" };
+  }
+};

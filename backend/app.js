@@ -18,5 +18,6 @@ app.use(compression());
 app.use("/api/auth", authRoutes);
 app.use("/api/", userRoutes);
 app.use("/api/", messageRoutes);
+// export default app;
 
 export default app;
