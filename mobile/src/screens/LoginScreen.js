@@ -14,7 +14,6 @@ import { Feather } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { baseURL } from "../api/baseURL";
-import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { setToken } from "../app/tokenSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";

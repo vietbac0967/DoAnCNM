@@ -10,6 +10,7 @@ export const sendMessage = async (req, res) => {
     const { receiverId, content } = req.body;
     const senderId = req.user._id;
     const sendMessage = await sendMessageService(receiverId, senderId, content);
+    
     res.status(200).json(sendMessage);
   } catch (error) {
     res.status(500).json({ EC: 1, EM: error.message, DT: "" });

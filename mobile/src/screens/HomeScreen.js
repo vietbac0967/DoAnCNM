@@ -1,36 +1,16 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
+import React, { useEffect, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import ChatMessage from "../components/ChatMessage";
-import { baseURL } from "../api/baseURL";
 import { useDispatch, useSelector } from "react-redux";
-import ChatScreen from "./ChatScreen";
 import { getFriends } from "../services/user.service";
 import UserChat from "../components/UserChat";
 
-const chats = [
-  {
-    name: "Nguyễn Văn A",
-    content: "Hello",
-    date: "12:00",
-    notification: "1",
-  },
-  {
-    name: "Nguyễn Văn B",
-    content: "Hello",
-    date: "12:00",
-    notification: "2",
-  },
-];
-
 export default function HomeScreen({ navigation }) {
+  const token = useSelector((state) => state.token.token);
   const [friends, setFriends] = useState([]);
   useEffect(() => {
     const getListFriend = async () => {
       try {
-        const token = await AsyncStorage.getItem("token");
         const friends = await getFriends(token);
         setFriends(friends);
       } catch (error) {
@@ -67,7 +47,7 @@ export default function HomeScreen({ navigation }) {
       {/* Chat list */}
       {
         friends.map((friend) => (
-          <UserChat key={friend._id} item={friend} />
+          <UserChat key={friend._id} item={friend}  />
         ))
       }
     </View>
