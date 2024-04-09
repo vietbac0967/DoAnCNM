@@ -15,7 +15,7 @@ import {
   getFriends,
   getSendFriendRequests,
 } from "../services/user.service";
-export default function ContactScreen( {navigation} ) {
+export default function FriendRequestScreen() {
   const [activeTab, setActiveTab] = useState("friends");
   const [friendRequests, setFriendRequests] = useState([]);
   const [sendFriendRequests, setSendFriendRequests] = useState([]);
@@ -54,27 +54,45 @@ export default function ContactScreen( {navigation} ) {
     <View style={styles.container}>
       <View style={styles.tabContainer}>
         <Pressable
-          style={[styles.tab, activeTab === "friends" && styles.activeTab]}
-          onPress={() => setActiveTab("friends")}
+          style={[styles.tab, activeTab === "friendsRequest" && styles.activeTab]}
+          onPress={() => setActiveTab("friendsRequest")}
         >
           <View style={{ flexDirection: "row" }}>
-            <Feather name="users" size={25} color="#444444" />
-            <Text style={styles.tabText}>Danh sách bạn bè</Text>
+            <Feather name="user-plus" size={25} color="#444444" />
+            <Text style={styles.tabText}>Lời mời kết bạn</Text>
           </View>
         </Pressable>
 
         <Pressable
-          onPress={() => navigation.navigate("FriendRequest")}
+          style={[
+            styles.tab,
+            activeTab === "sendFriendsRequest" && styles.activeTab,
+          ]}
+          onPress={() => setActiveTab("sendFriendsRequest")}
         >
+          <View style={{ flexDirection: "row" }}>
             <Feather name="user-plus" size={25} color="#444444" />
+            <Text style={styles.tabText}>Lời mời đã gửi</Text>
+          </View>
         </Pressable>
       </View>
-      
+
+      {activeTab === "friendsRequest" ? (
+        friendRequests.map((item) => (
+          <FriendRequestCard
+            key={item._id}
+            item={item}
+            friendRequests={friendRequests}
+            setFriendRequests={setFriendRequests}
+          />
+        ))
+      ) : activeTab === "sendFriendsRequest" ? (
         <FlatList
-          data={friends}
+          data={sendFriendRequests}
           renderItem={renderFriendItem}
           keyExtractor={(item) => item._id}
         />
+      ): null}
     </View>
   );
 }
@@ -88,7 +106,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     marginBottom: 10,
-    marginTop: 30
   },
   tab: {
     paddingHorizontal: 20,
