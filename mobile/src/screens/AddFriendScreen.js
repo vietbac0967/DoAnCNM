@@ -14,6 +14,7 @@ import { validatePhoneNumber } from "../utils/validate";
 import { baseURL } from "../api/baseURL";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { searchUser, sendFriendRequest } from "../services/user.service";
+import {useSelector} from "react-redux"
 export default function AddFriendScreen({ navigation }) {
   const token = useSelector(state => state.token.token);
   useEffect(() => {

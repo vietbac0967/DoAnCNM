@@ -7,6 +7,7 @@ import BottomTab from "./BottomTab";
 import VerifyOTPScreen from "../screens/VerifyOTPScreen";
 import AddFriendScreen from "../screens/AddFriendScreen";
 import ChatScreen from "../screens/ChatScreen";
+import FriendRequestScreen from "../screens/FriendRequestScreen";
 
 const Stack = createNativeStackNavigator();
 const StackNavigation = () => {
@@ -41,6 +42,10 @@ const StackNavigation = () => {
         <Stack.Screen
           name="AddFriend"
           component={AddFriendScreen}
+        ></Stack.Screen>
+        <Stack.Screen
+          name="FriendRequest"
+          component={FriendRequestScreen}
         ></Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
