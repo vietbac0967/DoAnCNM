@@ -101,18 +101,26 @@ export const acceptFriendRequestToUser = async (senderId, receiverId) => {
   try {
     const sender = await User.findById(senderId);
     const receiver = await User.findById(receiverId);
+
     if (!sender || !receiver) {
       return { EC: 1, EM: "User not found", DT: "" };
+    }
+
+    // Check if the friendship already exists
+    if (
+      sender.friends.includes(receiverId) ||
+      receiver.friends.includes(senderId)
+    ) {
+      return { EC: 1, EM: "Friendship already exists", DT: "" };
     }
     sender.friends.push(receiverId);
     receiver.friends.push(senderId);
     // delete request from user accepcted
     receiver.friendRequests = receiver.friendRequests.filter(
-      (friend) => friend !== senderId
+      (friend) => friend.toString() !== senderId.toString()
     );
-    // delete request from sender
     sender.sentFriendRequests = sender.sentFriendRequests.filter(
-      (friend) => friend !== receiverId
+      (friend) => friend.toString() !== receiverId.toString()
     );
     await sender.save();
     await receiver.save();

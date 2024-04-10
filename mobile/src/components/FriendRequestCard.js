@@ -17,7 +17,9 @@ export default function FriendRequestCard({
         setFriendRequests(
           friendRequests.filter((item) => item._id !== senderId)
         );
-        navigation.navigate("Message");
+        navigation.navigate("Message",{
+          isLoading: true
+        });
       }
     } catch (err) {
       Alert.alert("Thông báo", err.message, [{ text: "OK" }]);
