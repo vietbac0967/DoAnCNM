@@ -18,10 +18,18 @@ io.on("connection", (socket) => {
   socket.on("add-user", (userId) => {
     onlineUsers.set(userId, socket.id);
   });
+  // delete message
+
+  // recall message
+  socket.on("recall-msg", (data) => {
+    console.log("recall-msg", data);
+    const sendUserSocket = onlineUsers.get(data.to._id);
+    socket.to(sendUserSocket).emit("recall", data);
+  });
 
   socket.on("send-msg", (data) => {
-    console.log("message sended", data);
     const sendUserSocket = onlineUsers.get(data.to);
+    console.log("send-msg", data);
     if (sendUserSocket) {
       socket.to(sendUserSocket).emit("msg-recieve", data.msg);
     }

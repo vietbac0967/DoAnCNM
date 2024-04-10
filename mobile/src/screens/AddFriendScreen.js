@@ -14,9 +14,9 @@ import { validatePhoneNumber } from "../utils/validate";
 import { baseURL } from "../api/baseURL";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { searchUser, sendFriendRequest } from "../services/user.service";
-import {useSelector} from "react-redux"
+import { useSelector } from "react-redux";
 export default function AddFriendScreen({ navigation }) {
-  const token = useSelector(state => state.token.token);
+  const token = useSelector((state) => state.token.token);
   useEffect(() => {
     navigation.setOptions({
       headerTitle: "Thêm bạn bè",
@@ -42,6 +42,7 @@ export default function AddFriendScreen({ navigation }) {
     if (res.EC === 1 && res.EM === "User is already your friend") {
       setStatus(true);
     }
+    setPhone("");
     setUser(res.DT);
   };
   console.log(user);
@@ -59,6 +60,9 @@ export default function AddFriendScreen({ navigation }) {
       const { EC, EM, DT } = res.data;
       if (EC === 0 && EM === "Success") {
         Alert.alert("Thông báo", "Gửi lời mời thành công", [{ text: "OK" }]);
+        navigation.navigate("Message", {
+          isLoading: true,
+        });
         return;
       }
     } catch (error) {
@@ -127,7 +131,12 @@ export default function AddFriendScreen({ navigation }) {
             <Text>{user.phone}</Text>
           </View>
           {status ? (
-            <Pressable style={styles.button}>
+            <Pressable
+              style={styles.button}
+              onPress={() => {
+                navigation.navigate("ChatScreen", { recevierId: user._id });
+              }}
+            >
               <LinearGradient
                 // Button Linear Gradient
                 colors={["#00ff87", "#60efff"]}

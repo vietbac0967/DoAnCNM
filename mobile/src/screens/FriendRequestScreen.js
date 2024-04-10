@@ -19,7 +19,6 @@ export default function FriendRequestScreen() {
   const [activeTab, setActiveTab] = useState("friends");
   const [friendRequests, setFriendRequests] = useState([]);
   const [sendFriendRequests, setSendFriendRequests] = useState([]);
-  const [friends, setFriends] = useState([]);
   useEffect(() => {
     fetchData();
   }, []);
@@ -29,7 +28,6 @@ export default function FriendRequestScreen() {
     const friends = await getFriends(token);
     const friendRequests = await getFriendRequests(token);
     const sendFriendRequests = await getSendFriendRequests(token);
-    setFriends(friends);
     setFriendRequests(friendRequests);
     setSendFriendRequests(sendFriendRequests);
   };

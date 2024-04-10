@@ -36,10 +36,9 @@ import { EvilIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { io } from "socket.io-client";
 import { useSelector } from "react-redux";
+import { URL_SERVER } from "@env";
 const ChatScreen = ({ navigation, route }) => {
   const token = useSelector((state) => state.token.token);
-  // const ENDPOINT = "http://192.168.0.104/5000";
-  // const socket = io(ENDPOINT);
 
   const [messages, setMessages] = useState([]);
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
@@ -86,7 +85,7 @@ const ChatScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    socket.current = io("http://192.168.9.188:5000");
+    socket.current = io(URL_SERVER);
     socket.current.emit("add-user", recevierId);
   }, []);
 
@@ -122,8 +121,12 @@ const ChatScreen = ({ navigation, route }) => {
       socket.current.on("msg-recieve", (msg) => {
         getMessages();
       });
+      socket.current.on("recall", (msg) => {
+        getMessages();
+      });
     }
   }, []);
+
   useEffect(() => {
     getReceiver();
   }, []);
@@ -136,7 +139,7 @@ const ChatScreen = ({ navigation, route }) => {
     return new Date(time).toLocaleString("en-US", options);
   };
   const handleRecallMessage = (messageID) => {
-    Alert.alert("Cảnh báo", "Bạn có muốn xóa tin nhắn này không?", [
+    Alert.alert("Cảnh báo", "Bạn có muốn thu hồi nhắn này không?", [
       {
         text: "Không",
         onPress: () => console.log("Cancel Pressed"),
@@ -148,7 +151,13 @@ const ChatScreen = ({ navigation, route }) => {
           const response = await recallMessageService(token, selectMessage._id);
           setModalVisible(false);
           if (response) {
+            socket.current.emit("recall-msg", {
+              from: selectMessage.receiverId,
+              to: selectMessage.senderId,
+              msg: selectMessage.content,
+            });
             getMessages();
+            return;
           }
         },
       },
@@ -172,7 +181,12 @@ const ChatScreen = ({ navigation, route }) => {
     <KeyboardAvoidingView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back-outline" size={24} color="black" style={{marginTop: 30}}/>
+          <Ionicons
+            name="chevron-back-outline"
+            size={24}
+            color="black"
+            style={{ marginTop: 30 }}
+          />
         </TouchableOpacity>
 
         <View style={styles.titleContainer}>
@@ -374,7 +388,7 @@ const styles = StyleSheet.create({
   titleContainer: {
     flex: 1,
     marginTop: 30,
-    flexDirection: 'row',
+    flexDirection: "row",
     marginLeft: 10,
   },
   avatar: {
