@@ -6,7 +6,7 @@ import { AntDesign } from '@expo/vector-icons';
 import React, { useEffect, useRef, useState } from "react";
 import {  useSelector } from "react-redux";
 
-export default function GroupScreen({ navigation }) {
+export default function CreateGroupScreen({ navigation }) {
   const [groupName, setGroupName] = useState('');
   const [members, setMembers] = useState([]);
   const token = useSelector((state) => state.token.token);
@@ -46,17 +46,36 @@ export default function GroupScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={{flexDirection: "row",justifyContent: "space-around",}}><Text style={styles.title}>Tạo Nhóm Chat</Text>
-    
-      <Pressable
-          onPress={() => navigation.navigate("CreateGroup")}
-        >
-      <AntDesign name="addusergroup" size={30} color="black" />
-     </Pressable>
+    <View>
+      <TextInput
+        style={styles.input}
+        placeholder="Nhập tên nhóm"
+        value={groupName}
+        onChangeText={setGroupName}
+      />
+      <View style={styles.memberContainer}>
+        <TextInput
+          style={styles.memberInput}
+          placeholder="Tên thành viên"
+          onChangeText={(text) => {/* Thêm logic xử lý thêm thành viên */}}
+        />
+        <Button title="Thêm" onPress={addMember} />
       </View>
-      
-     
+      <View style={styles.memberContainer}>
+  {selectedFriends.map((friendId) => (
+    <Text key={friendId}>{friends.find(friend => friend._id === friendId)?.name}</Text>
+  ))}
+</View>
+      <View>
+        {/* Hiển thị danh sách thành viên */}
+      </View>
+
+      <Button title="Tạo Nhóm" onPress={createGroupChat} />
+      {
+        friends.map((friend) => (
+          <UserChat key={friend._id} item={friend}  />
+        ))
+      }
     </View>
   );
 }
