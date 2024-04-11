@@ -157,7 +157,7 @@ export default function LoginScreen({ navigation }) {
               )}
             </Pressable>
           </View>
-          <Pressable style={{ marginTop: 8, marginLeft: 200 }}>
+          <Pressable onPress={() => navigation.navigate("ForgotPassword")} style={{ marginTop: 8, marginLeft: 200 }}>
             <Text style={{ fontSize: 15, fontWeight: 400, textAlign: "right" }}>
               Quên mật khẩu ?
             </Text>

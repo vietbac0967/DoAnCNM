@@ -209,3 +209,111 @@ export const loginService = async (data) => {
     };
   }
 };
+
+// Forgot password service function
+export const forgotPasswordService = async (data) => {
+  try {
+    const email = data;
+
+    if (!validateEmail(email)) {
+      return {
+        EC: 1,
+        EM: "Invalid data",
+        DT: "",
+      };
+    }
+
+    const existingUser = await User.findOne({ email });
+    // console.log("ExistingUser::::", existingUser);
+    if (!existingUser) {
+      return {
+        EC: 1,
+        EM: "User not found",
+        DT: "",
+      };
+    }
+
+    // const salt = await bcrypt.genSalt(10);
+    // const hashedPassword = await bcrypt.hash(password, salt);
+
+    // console.log("HashPassword::::", hashedPassword);
+
+    const otp = otpGenerator.generate(6, {
+      digits: true,
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
+    const { EC, EM, DT } = await sendOTPForUser(otp, email);
+    if (EC === 0 && EM === "Success") {
+      await insertOTP(otp, email);
+      return {
+        EC: 0,
+        EM: "Success",
+        DT,
+      };
+    } else {
+      return {
+        EC: 1,
+        EM: "Failed",
+        DT: "",
+      };
+    }
+  } catch (err) {
+    return { EC: 1, EM: err.message, DT: "" };
+  }
+};
+
+export const forgotPasswordOTPService = async ({ email, otp }) => {
+  try {
+    const otpHolder = await OTP.find({ email });
+    if (otpHolder.length === 0)
+      return {
+        EC: 1,
+        EM: "OTP expired",
+        DT: "",
+      };
+    // get last otp
+    const lastOTP = otpHolder[otpHolder.length - 1];
+    const isValid = await validateOTP({ otp, hashOTP: lastOTP.otp });
+    if (!isValid) return { EC: 1, EM: "Invalid OTP", DT: "" };
+    if (isValid && email === lastOTP.email) {
+      // update user verify
+      const user = await User.findOne({ email });
+      console.log("User::::", user);
+      return {
+        EC: 0,
+        EM: "Success",
+        DT: user,
+      };
+    }
+  } catch (err) {
+    return {
+      EC: 1,
+      EM: err.message,
+      DT: "",
+    };
+  }
+};
+
+export const changePasswordService = async (email, password) => {
+  try {
+    const user = await User.findOne({ email });
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    console.log("HashPassword::::", hashedPassword);
+    user.password = hashedPassword;
+    await user.save();
+    return {
+      EC: 0,
+      EM: "Success",
+      DT: user,
+    };
+  } catch (err) {
+    return {
+      EC: 1,
+      EM: err.message,
+      DT: "",
+    };
+  }
+};
