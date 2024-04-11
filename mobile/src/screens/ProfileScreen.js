@@ -21,7 +21,6 @@ export default function ProfileScreen({ navigation }) {
   const [user, setUser] = useState({});
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-
   const [avatar, setAvatar] = useState(
     "https://avatar.iran.liara.run/username"
   );
@@ -123,7 +122,7 @@ export default function ProfileScreen({ navigation }) {
     <View style={styles.container}>
       <ImageBackground
         resizeMode="cover"
-        style={{ width: "100%", height: "55%" }}
+        style={{ width: "100%", height: "50%" }}
         source={backgroundImage}
       >
         <View style={styles.profileContainer}>
@@ -132,6 +131,7 @@ export default function ProfileScreen({ navigation }) {
           </TouchableOpacity>
           <Text style={styles.username}>{user?.name}</Text>
           {/* <Text style={styles.email}>{user?.email}</Text> */}
+          <Text style={styles.username}>{username}</Text>
         </View>
         <Pressable style={styles.logoutButton} onPress={handleUpdateImage}>
           <Feather name="edit" size={20} color="#444444" />
@@ -153,42 +153,42 @@ export default function ProfileScreen({ navigation }) {
           </TouchableOpacity>
         </Modal>
         <View style={styles.bottomContainer}>
-          <TouchableOpacity style={styles.bottomButton}>
+          <Pressable style={styles.bottomButton} onPress={() => navigation.navigate("UserInfo")}>
             <Feather name="shield" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Tài khoản và bảo mật</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity style={styles.bottomButton}>
+          <Pressable style={styles.bottomButton}>
             <Feather name="settings" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Quyền riêng tư</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity style={styles.bottomButton}>
+          <Pressable style={styles.bottomButton}>
             <Feather name="bell" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Thông báo</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity style={styles.bottomButton}>
+          <Pressable style={styles.bottomButton}>
             <Feather name="users" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Danh bạ</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity style={styles.bottomButton}>
+          <Pressable style={styles.bottomButton}>
             <Feather name="bookmark" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Nhật ký</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity style={styles.bottomButton}>
+          <Pressable style={styles.bottomButton}>
             <Feather name="archive" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Sao lưu và ngôn ngữ</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity style={styles.bottomButton} onPress={handleLogout}>
+          <Pressable style={styles.bottomButton} onPress={handleLogout}>
             <Feather name="log-out" size={15} color="red" />
             <Text style={{ fontSize: 14, marginLeft: 10, color: "red" }}>
               Đăng xuất
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </ImageBackground>
     </View>
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     borderRadius: 75,
     borderWidth: 4,
     borderColor: "#fff",
-    marginTop: 20,
+    marginTop: 30,
   },
   username: {
     marginTop: 10,

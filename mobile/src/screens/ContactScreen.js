@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import FriendRequestCard from "../components/FriendRequestCard";
 import {
   getFriendRequests,
   getFriends,
@@ -42,7 +41,11 @@ export default function ContactScreen( {navigation} ) {
           <Pressable style={styles.contactButton}>
             <Feather name="phone" size={20} color="grey" />
           </Pressable>
-          <Pressable style={styles.contactButton}>
+          <Pressable style={styles.contactButton} onPress={() =>
+        navigation.navigate("ChatScreen", {
+          recevierId: item._id,
+        })
+      }>
             <Feather name="message-square" size={20} color="grey" />
           </Pressable>
         </View>

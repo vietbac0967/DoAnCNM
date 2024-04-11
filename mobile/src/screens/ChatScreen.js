@@ -49,6 +49,7 @@ const ChatScreen = ({ navigation, route }) => {
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
   const { recevierId } = route.params;
   const socket = useRef();
+  const inputRef = useRef(null);
   const [selectMessage, setSetlectMessage] = useState({});
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("Đang hoạt động"); // Trạng thái mặc định
@@ -67,6 +68,7 @@ const ChatScreen = ({ navigation, route }) => {
 
   const handleEmojiPress = () => {
     setShowEmojiSelector(!showEmojiSelector);
+    inputRef.current.blur();
   };
 
   const pickImage = async () => {
@@ -300,9 +302,9 @@ const ChatScreen = ({ navigation, route }) => {
     });
   }, [navigation, receiver]);
   return (
-    <View
-      // behavior="padding"
-      // keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+    <KeyboardAvoidingView
+      behavior="padding"
+      keyboardVerticalOffset={1}
       style={styles.container}
     >
       {/* <View style={styles.header}>
@@ -520,7 +522,7 @@ const ChatScreen = ({ navigation, route }) => {
           paddingVertical: 10,
           borderTopWidth: 1,
           borderTopColor: "#dddddd",
-          marginBottom: showEmojiSelector ? 0 : 25,
+          marginBottom: showEmojiSelector ? 0 : 1,
         }}
       >
         <Entypo
@@ -532,20 +534,15 @@ const ChatScreen = ({ navigation, route }) => {
         />
 
         <TextInput
+          ref={inputRef}
           inputMode="text"
           value={message}
           onChangeText={(text) => {
             setMessage(text);
             setShowEmojiSelector(false);
           }}
-          style={{
-            flex: 1,
-            height: 40,
-            borderWidth: 1,
-            borderColor: "#dddddd",
-            borderRadius: 20,
-            paddingHorizontal: 10,
-          }}
+          onChangeText={setMessage}
+          onFocus={() => setShowEmojiSelector(false)}
           placeholder="Type Your message..."
         />
 

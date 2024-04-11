@@ -10,8 +10,8 @@ import { getFriends } from "../services/user.service";
 import UserChat from "../components/UserChat";
 import { AntDesign } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-
+import {  useSelector } from "react-redux";
+import Feather from "react-native-vector-icons/Feather";
 export default function GroupScreen({ navigation }) {
   const [groupName, setGroupName] = useState("");
   const [members, setMembers] = useState([]);
@@ -64,6 +64,17 @@ export default function GroupScreen({ navigation }) {
           <AntDesign name="addusergroup" size={30} color="black" />
         </Pressable>
       </View>
+      {/* <View>
+        <Pressable style={styles.contactButton} 
+        onPress={() => navigation.navigate("ChatScreen",{recevierId: item._id} )}>
+            <Feather name="message-square" size={20} color="grey" />
+          </Pressable>
+          </View> */}
+      {
+        friends.map((friend) => (
+          <UserChat key={friend._id} item={friend}  />
+        ))
+      }
     </View>
   );
 }

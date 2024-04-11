@@ -1,18 +1,8 @@
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  Button,
-  Pressable,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, TextInput, View, Button, FlatList, Image, CheckBox } from 'react-native';
 import { getFriends } from "../services/user.service";
-import UserChat from "../components/UserChat";
-import { AntDesign } from "@expo/vector-icons";
-import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import FriendCard from "../components/FriendCard";
-
+import { MaterialIcons } from '@expo/vector-icons';
 export default function CreateGroupScreen({ navigation }) {
   const [groupName, setGroupName] = useState("");
   const [members, setMembers] = useState([]);
@@ -22,37 +12,38 @@ export default function CreateGroupScreen({ navigation }) {
   const [selectedFriends, setSelectedFriends] = useState([]);
 
   useEffect(() => {
-    navigation.setOptions({title:"Tạo nhóm chat"})
-    const getListFriend = async () => {
       try {
-        const friends = await getFriends(token);
-        setFriends(friends);
+        const friendsData = await getFriends(token);
+        setFriends(friendsData);
       } catch (error) {
-        console.log("error:::", error);
+        console.log("Error fetching friends:", error);
       }
     };
-    getListFriend();
-  }, []);
-  const handleSelectFriend = (friendId) => {
-    if (!selectedFriends.includes(friendId)) {
-      setSelectedFriends([...selectedFriends, friendId]);
-    } else {
-      setSelectedFriends(selectedFriends.filter((id) => id !== friendId));
-    }
-  };
+    
+    fetchFriends();
+  }, [token]);
 
-  // Hàm xử lý thêm thành viên vào nhóm
+  const handleSelectFriend = (friendId) => {
   const addMember = () => {
     if (selectedFriends.length === 0) {
-      return; // Không thêm nếu không có thành viên nào được chọn
+      return; // No selected friends, do nothing
     }
     setMembers([...members, ...selectedFriends]);
-    setSelectedFriends([]); // Reset danh sách thành viên đã chọn
+    setSelectedFriends([]); // Reset selected friends
   };
-  // Hàm xử lý tạo nhóm chat
-  const createGroupChat = () => {
-    // Thực hiện logic tạo nhóm chat và chuyển đến màn hình chat nhóm
-  };
+
+  const renderFriendItem = ({ item }) => (
+    <View style={styles.friendItem}>
+      <Image source={{ uri: item.avatar }} style={styles.avatar} />
+      <View style={styles.friendInfo}>
+        <Text>{item.name}</Text>
+        <CheckBox
+          value={selectedFriends.includes(item._id)}
+          onValueChange={() => handleSelectFriend(item._id)}
+        />
+      </View>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -62,39 +53,14 @@ export default function CreateGroupScreen({ navigation }) {
         value={groupName}
         onChangeText={setGroupName}
       />
-      <TextInput
-        value={user}
-        style={[styles.input, { marginTop: 10 }]}
-        placeholder="Tên thành viên"
-        onChangeText={(text) => {
-          /* Thêm logic xử lý thêm thành viên */
-        }}
-      />
-      {/* <Button  title="Thêm" onPress={addMember}  /> */}
-      <View style={[styles.memberContainer,{marginBottom:5}]}>
-        {selectedFriends.map((friendId) => (
-          <Text key={friendId}>
-            {friends.find((friend) => friend._id === friendId)?.name}
-          </Text>
-        ))}
       </View>
-      <View>{/* Hiển thị danh sách thành viên */}</View>
-
-      {/* <Button title="Tạo Nhóm" onPress={createGroupChat} /> */}
-      {friends.map((friend) => (
-        <View
-          key={friend._id}
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
-          <FriendCard item={friend} setUser={setUser} />
-          <Pressable style={styles.button}>
-            <Text style={styles.text}>Mời</Text>
-          </Pressable>
-        </View>
-      ))}
+      <FlatList
+        data={friends}
+        renderItem={renderFriendItem}
+        keyExtractor={(item) => item._id}
+      />
+       
+       <Button  title="Tạo Nhóm" onPress={addMember} /> {/*chưa có sự kiện tạo nhóm */}
     </View>
   );
 }
@@ -133,5 +99,44 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     letterSpacing: 0.25,
     color: "white",
+=======
+    backgroundColor: '#fff',
   },
+  tabText: {
+    fontSize: 18,
+   marginTop:5,
+   marginRight:5,
+    fontWeight:"600",
+    marginLeft: 10,
+    color: "#444444",
+  },
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginRight: 8,
+  },
+  friendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  friendInfo: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  
 });
