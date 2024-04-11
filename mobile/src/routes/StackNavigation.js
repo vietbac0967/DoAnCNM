@@ -38,7 +38,7 @@ const StackNavigation = () => {
         <Stack.Screen
           name="ChatScreen"
           component={ChatScreen}
-          options={{ headerShown: false }}
+          // options={{ headerShown: false }}
         />
         <Stack.Screen
           name="VerifyOTP"

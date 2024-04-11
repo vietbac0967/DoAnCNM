@@ -19,8 +19,10 @@ import {
   Alert,
   Modal,
   Animated,
+  Keyboard,
+  Button,
+  FlatList,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import EmojiSelector from "react-native-emoji-selector";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -35,6 +37,7 @@ import { Entypo } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { io } from "socket.io-client";
 import { useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
@@ -107,7 +110,7 @@ const ChatScreen = ({ navigation, route }) => {
       }
     } catch (error) {
       console.error("Error while picking image and sending message:", error);
-      Alert.alert("Cảnh báo","Kích thước ảnh quá lớn, vui lòng chọn ảnh khác")
+      Alert.alert("Cảnh báo", "Kích thước ảnh quá lớn, vui lòng chọn ảnh khác");
     }
   };
 
@@ -164,7 +167,7 @@ const ChatScreen = ({ navigation, route }) => {
   useEffect(() => {
     if (socket.current) {
       socket.current.on("msg-recieve", (msg) => {
-       getMessages();
+        getMessages();
       });
       socket.current.on("recall", (msg) => {
         // setMessages((prevMessages) => {
@@ -248,13 +251,63 @@ const ChatScreen = ({ navigation, route }) => {
       console.log(error);
     }
   };
+  // update use useLayoutEffect make header for chat screen
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: "",
+      headerLeft: () => (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+          <Ionicons
+            onPress={() => navigation.goBack()}
+            name="arrow-back"
+            size={24}
+            color="black"
+          />
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Image
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: 15,
+                resizeMode: "cover",
+              }}
+              source={{ uri: receiver?.avatar }}
+            />
+
+            <Text style={{ marginLeft: 5, fontSize: 15, fontWeight: "bold" }}>
+              {receiver?.name}
+            </Text>
+          </View>
+        </View>
+      ),
+      headerRight: () => (
+        <View style={styles.rightIcons}>
+          <TouchableOpacity onPress={() => console.log("Call")}>
+            <Ionicons name="call-outline" size={24} color="#566573" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => console.log("Videocall")}
+            style={styles.videocallButton}
+          >
+            <Ionicons name="videocam-outline" size={24} color="#566573" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => console.log("Setting")}
+            style={styles.settingButton}
+          >
+            <Ionicons name="list-outline" size={24} color="#566573" />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, [navigation, receiver]);
   return (
     <KeyboardAvoidingView
       behavior="padding"
       keyboardVerticalOffset={1}
       style={styles.container}
     >
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons
             name="chevron-back-outline"
@@ -288,7 +341,8 @@ const ChatScreen = ({ navigation, route }) => {
             <Ionicons name="list-outline" size={24} color="#566573" />
           </TouchableOpacity>
         </View>
-      </View>
+      </View> */}
+
       <ScrollView
         ref={scrollViewRef}
         contentContainerStyle={{ flexGrow: 1 }}
@@ -483,16 +537,12 @@ const ChatScreen = ({ navigation, route }) => {
           ref={inputRef}
           inputMode="text"
           value={message}
+          onChangeText={(text) => {
+            setMessage(text);
+            setShowEmojiSelector(false);
+          }}
           onChangeText={setMessage}
           onFocus={() => setShowEmojiSelector(false)}
-          style={{
-            flex: 1,
-            height: 40,
-            borderWidth: 1,
-            borderColor: "#dddddd",
-            borderRadius: 20,
-            paddingHorizontal: 10,
-          }}
           placeholder="Type Your message..."
         />
 
@@ -523,7 +573,7 @@ const ChatScreen = ({ navigation, route }) => {
           style={{ height: 320 }}
         />
       )}
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 
@@ -531,7 +581,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "rgb(238, 240, 241)",
-    marginTop: 20,
   },
   header: {
     flexDirection: "row",
@@ -565,7 +614,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginLeft: "auto",
     marginRight: 10,
-    marginTop: 30,
+    marginTop: 15,
   },
   videocallButton: {
     marginLeft: 15,

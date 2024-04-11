@@ -67,9 +67,7 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior="position"
-      keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+    <View
       style={styles.container}
     >
       <ImageBackground
@@ -123,7 +121,11 @@ export default function LoginScreen({ navigation }) {
           </View>
         </View>
 
-        <View style={styles.panel}>
+        <KeyboardAvoidingView
+          keyboardVerticalOffset={60}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.panel}
+        >
           <View style={styles.input}>
             <Feather name="phone" size={24} color="black" />
             <TextInput
@@ -157,7 +159,10 @@ export default function LoginScreen({ navigation }) {
               )}
             </Pressable>
           </View>
-          <Pressable onPress={() => navigation.navigate("ForgotPassword")} style={{ marginTop: 8, marginLeft: 200 }}>
+          <Pressable
+            onPress={() => navigation.navigate("ForgotPassword")}
+            style={{ marginTop: 8, marginLeft: 200 }}
+          >
             <Text style={{ fontSize: 15, fontWeight: 400, textAlign: "right" }}>
               Quên mật khẩu ?
             </Text>
@@ -204,9 +209,9 @@ export default function LoginScreen({ navigation }) {
               </Text>
             </Text>
           </Pressable>
-        </View>
+        </KeyboardAvoidingView>
       </ImageBackground>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -235,7 +240,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 35,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
-    width:"100%"
+    width: "100%",
   },
   input: {
     flexDirection: "row",

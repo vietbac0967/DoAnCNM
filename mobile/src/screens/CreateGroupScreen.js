@@ -4,14 +4,14 @@ import { getFriends } from "../services/user.service";
 import { useSelector } from "react-redux";
 import { MaterialIcons } from '@expo/vector-icons';
 export default function CreateGroupScreen({ navigation }) {
-  const [groupName, setGroupName] = useState('');
+  const [groupName, setGroupName] = useState("");
   const [members, setMembers] = useState([]);
   const token = useSelector((state) => state.token.token);
+  const [user, setUser] = useState("");
   const [friends, setFriends] = useState([]);
   const [selectedFriends, setSelectedFriends] = useState([]);
 
   useEffect(() => {
-    const fetchFriends = async () => {
       try {
         const friendsData = await getFriends(token);
         setFriends(friendsData);
@@ -24,22 +24,6 @@ export default function CreateGroupScreen({ navigation }) {
   }, [token]);
 
   const handleSelectFriend = (friendId) => {
-    if (selectedFriends.includes(friendId)) {
-      setSelectedFriends(selectedFriends.filter(id => id !== friendId));
-    } else {
-      setSelectedFriends([...selectedFriends, friendId]);
-    }
-  };
-
-  const updateGroupName = () => {
-    const selectedNames = selectedFriends.map((id) => friends.find((friend) => friend._id === id)?.name);
-    setGroupName(selectedNames.join(", "));
-  };
-
-  useEffect(() => {
-    updateGroupName();
-  }, [selectedFriends]);
-
   const addMember = () => {
     if (selectedFriends.length === 0) {
       return; // No selected friends, do nothing
@@ -63,11 +47,6 @@ export default function CreateGroupScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={{
-      flexDirection:"row",
-     
-    }}>
-     <MaterialIcons name="drive-file-rename-outline" size={28} color="black" style={{marginRight:10}} />
       <TextInput
         style={styles.input}
         placeholder="Nhập tên nhóm"
@@ -90,6 +69,37 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    marginTop: 35,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  input: {
+    height: 40,
+    borderWidth: 1,
+    borderColor: "gray",
+    borderRadius: 20,
+    padding: 10,
+  },
+  button: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 30,
+    backgroundColor: "#00ACEE",
+    width: 100,
+    height: 38,
+    marginTop:7
+  },
+  text: {
+    textAlign: "center",
+    fontSize: 16,
+    lineHeight: 21,
+    fontWeight: "bold",
+    letterSpacing: 0.25,
+    color: "white",
+=======
     backgroundColor: '#fff',
   },
   tabText: {

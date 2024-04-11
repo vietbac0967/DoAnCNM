@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -36,9 +37,17 @@ const ResetPasswordScreen = ({ route, navigation }) => {
       const { EC, EM, DT } = response.data;
       console.log("data is", response.data);
       if (EM === "Success" && EC === 0) {
-        alert("Mật khẩu đã được thay đổi thành công");
+        Alert.alert("Thông báo", "Mật khẩu đã được thay đổi thành công");
         navigation.navigate("Login");
-        return;
+      }
+      if (EC === 1 && EM === "Weak password") {
+        Alert.alert(
+          "Thông báo",
+          "Mật khẩu phải bao gồm ít nhất 8 ký tự, bao gồm chữ cái,ký tự đặc biệt và số"
+        );
+      }
+      if (EC === 1 && EM === "Password is the same") {
+        Alert.alert("Thông báo", "Bạn đã sử dụng mật khẩu này.\nVui lòng chọn mật khẩu khác");
       }
     } catch (error) {
       // Xử lý lỗi trong trường hợp gửi yêu cầu thất bại
