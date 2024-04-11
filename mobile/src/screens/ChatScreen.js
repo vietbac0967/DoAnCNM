@@ -27,6 +27,7 @@ import {
   deleteMessageService,
   getMessagesService,
   recallMessageService,
+  sendImageService,
   sendMessageService,
 } from "../services/message.service";
 import { getReceiverService } from "../services/user.service";
@@ -36,10 +37,11 @@ import { EvilIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { io } from "socket.io-client";
 import { useSelector } from "react-redux";
+import * as ImagePicker from "expo-image-picker";
 import { URL_SERVER } from "@env";
+import { baseURL } from "../api/baseURL";
 const ChatScreen = ({ navigation, route }) => {
   const token = useSelector((state) => state.token.token);
-
   const [messages, setMessages] = useState([]);
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
   const { recevierId } = route.params;
@@ -62,6 +64,49 @@ const ChatScreen = ({ navigation, route }) => {
 
   const handleEmojiPress = () => {
     setShowEmojiSelector(!showEmojiSelector);
+  };
+
+  const pickImage = async () => {
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        aspect: [4, 3],
+        quality: 1,
+      });
+      if (!result.canceled) {
+        let localUri = result.assets[0].uri;
+        let filename = localUri.split("/").pop();
+        let match = /\.(\w+)$/.exec(filename);
+        let type = match ? `image/${match[1]}` : "image";
+        const formData = new FormData();
+        formData.append("image", {
+          uri: localUri,
+          name: filename,
+          type,
+        });
+        formData.append("receiverId", recevierId);
+        const response = await baseURL.post("/message/sendImage", formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        const { DT, EC, EM } = response.data;
+        if (EC === 0 && EM === "Success") {
+          socket.current.emit("send-msg", {
+            from: DT.receiverId,
+            to: DT.senderId,
+            msg: DT.content,
+          });
+          setMessage("");
+          getMessages();
+          return;
+        }
+      }
+    } catch (error) {
+      console.error("Error while picking image and sending message:", error);
+      Alert.alert("Cảnh báo","Kích thước ảnh quá lớn, vui lòng chọn ảnh khác")
+    }
   };
 
   const getMessages = async () => {
@@ -92,8 +137,7 @@ const ChatScreen = ({ navigation, route }) => {
   useEffect(() => {
     getMessages();
   }, []);
-  // useEffect(() => {
-  // }, []);
+
   const handleSend = async () => {
     try {
       const { DT, EC, EM } = await sendMessageService(
@@ -109,7 +153,6 @@ const ChatScreen = ({ navigation, route }) => {
         });
         setMessage("");
         getMessages();
-        return;
       }
     } catch (error) {
       console.log("error:::", error);
@@ -119,9 +162,18 @@ const ChatScreen = ({ navigation, route }) => {
   useEffect(() => {
     if (socket.current) {
       socket.current.on("msg-recieve", (msg) => {
-        getMessages();
+       getMessages();
       });
       socket.current.on("recall", (msg) => {
+        // setMessages((prevMessages) => {
+        //   const newMessages = prevMessages.map((message) => {
+        //     if (message._id === msg._id) {
+        //       return msg;
+        //     }
+        //     return message;
+        //   });
+        //   return newMessages;
+        // });
         getMessages();
       });
     }
@@ -134,9 +186,26 @@ const ChatScreen = ({ navigation, route }) => {
     scrollToBottom();
   }, [messages]);
 
+  const formatDate = (date) => {
+    const options = { hour: "2-digit", minute: "2-digit" };
+    const formattedTime = new Date(date).toLocaleTimeString("vi-VN", options);
+    return formattedTime;
+  };
   const formatTime = (time) => {
     const options = { hour: "numeric", minute: "numeric" };
     return new Date(time).toLocaleString("en-US", options);
+  };
+  const formatDateOrTime = (updatedAt) => {
+    const today = new Date();
+    const updatedAtDate = new Date(updatedAt);
+
+    if (updatedAtDate.toDateString() === today.toDateString()) {
+      // Display time if updatedAt is today
+      return formatDate(updatedAt);
+    } else {
+      // Display full date if updatedAt is not today
+      return updatedAtDate.toLocaleDateString("en-US");
+    }
   };
   const handleRecallMessage = (messageID) => {
     Alert.alert("Cảnh báo", "Bạn có muốn thu hồi nhắn này không?", [
@@ -178,7 +247,10 @@ const ChatScreen = ({ navigation, route }) => {
     }
   };
   return (
-    <KeyboardAvoidingView style={styles.container}>
+    <KeyboardAvoidingView
+      keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+      style={styles.container}
+    >
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons
@@ -271,38 +343,118 @@ const ChatScreen = ({ navigation, route }) => {
         </Modal>
 
         {messages.length > 0 &&
-          messages.map((message) => (
-            <Pressable
-              onPress={() => {
-                setSetlectMessage(message);
-                setModalVisible(true);
-              }}
-              key={message._id}
-              style={[
-                message.senderId?._id === receiver?._id
-                  ? {
-                      alignSelf: "flex-start",
-                      backgroundColor: "white",
-                      padding: 8,
-                      margin: 10,
-                      borderRadius: 7,
-                      maxWidth: "60%",
-                    }
-                  : {
-                      alignSelf: "flex-end",
-                      backgroundColor: "#DCF8C6",
-                      padding: 8,
-                      maxWidth: "60%",
-                      borderRadius: 7,
-                      margin: 10,
-                    },
-              ]}
-            >
-              <Text style={{ fontSize: 13, textAlign: "left" }}>
-                {message.content}
-              </Text>
-            </Pressable>
-          ))}
+          messages.map((message) => {
+            if (message.messageType === "text") {
+              return (
+                <Pressable
+                  onPress={() => {
+                    setSetlectMessage(message);
+                    setModalVisible(true);
+                  }}
+                  key={message._id}
+                  style={[
+                    message.senderId?._id === receiver?._id
+                      ? {
+                          alignSelf: "flex-start",
+                          backgroundColor: "white",
+                          padding: 8,
+                          margin: 10,
+                          borderRadius: 7,
+                          maxWidth: "60%",
+                        }
+                      : {
+                          alignSelf: "flex-end",
+                          backgroundColor: "#DCF8C6",
+                          padding: 8,
+                          maxWidth: "60%",
+                          borderRadius: 7,
+                          margin: 10,
+                        },
+                  ]}
+                >
+                  <Text style={{ fontSize: 13, textAlign: "left" }}>
+                    {message.content}
+                  </Text>
+                  <Text
+                    style={{
+                      textAlign: "right",
+                      fontSize: 9,
+                      color: "gray",
+                      marginTop: 5,
+                    }}
+                  >
+                    {formatDateOrTime(message?.createdAt)}
+                  </Text>
+                </Pressable>
+              );
+            }
+            if (message.messageType === "image") {
+              return (
+                <Pressable
+                  onPress={() => {
+                    setSetlectMessage(message);
+                    setModalVisible(true);
+                  }}
+                  key={message._id}
+                  style={[
+                    message?.senderId?._id !== recevierId
+                      ? {
+                          alignSelf: "flex-end",
+                          // backgroundColor: "#DCF8C6",
+                          padding: 8,
+                          maxWidth: "60%",
+                          borderRadius: 7,
+                          margin: 10,
+                        }
+                      : {
+                          alignSelf: "flex-start",
+                          // backgroundColor: "white",
+                          padding: 8,
+                          margin: 10,
+                          borderRadius: 7,
+                          maxWidth: "60%",
+                        },
+                  ]}
+                >
+                  <View>
+                    <Image
+                      source={{ uri: message.content }}
+                      resizeMode="cover"
+                      style={{
+                        width: 200,
+                        height: 200,
+                        borderRadius: 7,
+                        alignItems: "flex-end",
+                      }}
+                    />
+                    <Pressable
+                      style={{
+                        width: 70,
+                        borderRadius: 35,
+                        backgroundColor: "gray",
+                        alignSelf: "flex-end",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginTop: 10,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          fontSize: 11,
+                          color: "white",
+                          paddingVertical: 5,
+                          paddingHorizontal: 2,
+                        }}
+                      >
+                        {formatDateOrTime(message?.createdAt)}
+                      </Text>
+                    </Pressable>
+                  </View>
+                </Pressable>
+              );
+            }
+          })}
       </ScrollView>
 
       <View
@@ -347,7 +499,7 @@ const ChatScreen = ({ navigation, route }) => {
             marginHorizontal: 8,
           }}
         >
-          {/* <Entypo onPress={{}} name="camera" size={24} color="gray" /> */}
+          <Entypo onPress={pickImage} name="camera" size={24} color="gray" />
 
           <Feather name="mic" size={24} color="gray" />
         </View>
@@ -363,7 +515,7 @@ const ChatScreen = ({ navigation, route }) => {
           onEmojiSelected={(emoji) => {
             setMessage((prevMessage) => prevMessage + emoji);
           }}
-          style={{ height: 200 }}
+          style={{ height: 320 }}
         />
       )}
     </KeyboardAvoidingView>
