@@ -7,6 +7,7 @@ import {
   register,
   verifyOTP,
   forgotPassword,
+  resetPassword,
   changePassword
 } from "../controllers/auth.controller.js";
 import { verifyAccount } from "../middlewares/verifyAccount.js";
@@ -18,6 +19,7 @@ router.post("/verifyAccount", verifyAccount);
 router.post("/login", login);
 router.post("/logout",verifyAccount, logout);
 router.post("/forgotPassword", forgotPassword);
+router.post("/resetPassword", resetPassword);
 router.post("/changePassword", changePassword);
 // router.post("/refreshToken", refreshToken);
 export default router;

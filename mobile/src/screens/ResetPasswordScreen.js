@@ -28,7 +28,7 @@ const ResetPasswordScreen = ({ route, navigation }) => {
       }
 
       // Gửi yêu cầu thay đổi mật khẩu đến máy chủ
-      const response = await baseURL.post("/auth/changePassword", {
+      const response = await baseURL.post("/auth/resetPassword", {
         email,
         newPassword,
         confirmPassword,
