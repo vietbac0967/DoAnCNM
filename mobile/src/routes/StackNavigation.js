@@ -9,7 +9,7 @@ import AddFriendScreen from "../screens/AddFriendScreen";
 import ChatScreen from "../screens/ChatScreen";
 import FriendRequestScreen from "../screens/FriendRequestScreen";
 import CreateGroupScreen from "../screens/CreateGroupScreen";
-
+import ChatGroupScreen from "../screens/ChatGroupScreen";
 const Stack = createNativeStackNavigator();
 const StackNavigation = () => {
   return (
@@ -52,6 +52,11 @@ const StackNavigation = () => {
           name="CreateGroup"
           component={CreateGroupScreen}
         ></Stack.Screen>
+         <Stack.Screen
+          name="ChatGroupScreen"
+          component={ChatGroupScreen}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
