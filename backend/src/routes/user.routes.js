@@ -9,6 +9,7 @@ import {
   getUserByPhone,
   getUserInfo,
   sendFriendRequest,
+  updatedUserInfo,
 } from "../controllers/user.controller.js";
 const router = express.Router();
 router.post("/user", verifyAccount, getUser);
@@ -19,5 +20,5 @@ router.post("/user/getByPhone", verifyAccount, getUserByPhone);
 router.post("/user/sendFriendRequest", verifyAccount, sendFriendRequest);
 router.post("/user/acceptFriendRequest", verifyAccount, acceptFriendRequest);
 router.get("/user/getSentFriendRequests", verifyAccount, getSentFriendRequests);
-
+router.post("/update", verifyAccount, updatedUserInfo)
 export default router;

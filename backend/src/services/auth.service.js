@@ -296,9 +296,36 @@ export const forgotPasswordOTPService = async ({ email, otp }) => {
   }
 };
 
-export const changePasswordService = async (email, password) => {
+export const changePasswordService = async (
+  email,
+  password,
+  confirmPassword
+) => {
   try {
+    if (password !== confirmPassword) {
+      return {
+        EC: 1,
+        EM: "Password does not match",
+        DT: "",
+      };
+    }
+
+    if (!validatePassword(password)) {
+      return {
+        EC: 1,
+        EM: "Weak password",
+        DT: "",
+      };
+    }
     const user = await User.findOne({ email });
+    const passwordExist = await bcrypt.compare(password, user.password);
+    if (passwordExist) {
+      return {
+        EC: 1,
+        EM: "Password is the same",
+        DT: "",
+      };
+    }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     console.log("HashPassword::::", hashedPassword);

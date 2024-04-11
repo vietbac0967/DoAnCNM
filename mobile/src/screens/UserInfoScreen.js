@@ -18,8 +18,9 @@ const UserInfoScreen = ({ navigation }) => {
   const [data, setData] = useState([]);
   const [changePasswordVisible, setChangePasswordVisible] = useState(false);
   const [buttonText, setButtonText] = useState("Đổi mật khẩu");
+  const [email, setEmail] = useState("");
   const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
+  const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   useEffect(() => {
@@ -33,6 +34,7 @@ const UserInfoScreen = ({ navigation }) => {
         const { DT, EM, EC } = response.data;
         if (EC === 0 && EM === "Success") {
           setData(DT);
+          setEmail(DT.email);
         } else {
           console.log("Error getting user:", EM);
         }
@@ -50,7 +52,7 @@ const UserInfoScreen = ({ navigation }) => {
 
   const toggleChangePasswordVisible = () => {
     setChangePasswordVisible(!changePasswordVisible);
-    if (changePasswordVisible===true) {
+    if (changePasswordVisible === true) {
       setButtonText("Đổi mật khẩu");
     } else {
       setButtonText("Ẩn");
@@ -58,7 +60,41 @@ const UserInfoScreen = ({ navigation }) => {
   };
 
   const handlePasswordChange = async () => {
-    // Handle password change logic here
+    // try {
+    //   // Kiểm tra mật khẩu mới và mật khẩu xác nhận có khớp nhau không
+    //   if (password !== confirmPassword) {
+    //     alert("Mật khẩu và xác nhận mật khẩu không khớp");
+    //     return;
+    //   }
+    //   console.log("email is", email);
+
+    //   // Gửi yêu cầu thay đổi mật khẩu đến máy chủ
+    //   const response = await baseURL.post("/auth/changePassword", {
+    //     email,
+    //     password,
+    //     confirmPassword,
+    //   });
+
+    //   const { EC, EM, DT } = response.data;
+    //   console.log("data is", response.data);
+    //   if (EM === "Success" && EC === 0) {
+    //     Alert.alert("Thông báo", "Mật khẩu đã được thay đổi thành công");
+    //     navigation.navigate("Login");
+    //   }
+    //   if (EC === 1 && EM === "Weak password") {
+    //     Alert.alert(
+    //       "Thông báo",
+    //       "Mật khẩu phải bao gồm ít nhất 8 ký tự, bao gồm chữ cái,ký tự đặc biệt và số"
+    //     );
+    //   }
+    //   if (EC === 1 && EM === "Password is the same") {
+    //     Alert.alert("Thông báo", "Bạn đã sử dụng mật khẩu này.\nVui lòng chọn mật khẩu khác");
+    //   }
+    // } catch (error) {
+    //   // Xử lý lỗi trong trường hợp gửi yêu cầu thất bại
+    //   alert("Đã có lỗi xảy ra: " + error.message);
+    //   console.error(error);
+    // }
   };
 
   return (
@@ -107,10 +143,10 @@ const UserInfoScreen = ({ navigation }) => {
           <Text style={styles.grandLabel}>Bảo mật</Text>
         </View>
         <View style={styles.detailItem}>
-            <Text style={styles.label}>Mật khẩu:</Text>
-            <Pressable onPress={toggleChangePasswordVisible}>
-                <Text style={{ color: "blue"}}>{buttonText}</Text>
-            </Pressable>
+          <Text style={styles.label}>Mật khẩu:</Text>
+          <Pressable onPress={toggleChangePasswordVisible}>
+            <Text style={{ color: "blue" }}>{buttonText}</Text>
+          </Pressable>
         </View>
         {changePasswordVisible && (
           <>
@@ -125,8 +161,8 @@ const UserInfoScreen = ({ navigation }) => {
               style={styles.input}
               placeholder="Mật khẩu mới"
               secureTextEntry={true}
-              value={newPassword}
-              onChangeText={setNewPassword}
+              value={password}
+              onChangeText={setPassword}
             />
             <TextInput
               style={styles.input}

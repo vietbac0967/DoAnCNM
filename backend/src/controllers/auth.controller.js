@@ -140,17 +140,10 @@ export const forgotPasswordOTP = async (req, res) => {
 export const changePassword = async (req, res) => {
   try {
     const email = req.body.email;
-    const newPassword = req.body.newPassword;
+    const password = req.body.passwordassword;
     const confirmPassword = req.body.confirmPassword;
-    if (newPassword !== confirmPassword) {
-      return res.status(400).json({
-        EC: 1,
-        EM: "Password and confirm password do not match",
-        DT: "",
-      });
-    }
-    const { EM, EC, DT } = await forgotPasswordOTPService({ email, confirmPassword });
-    res.status(200).json({ EC, EM, DT });
+    const response = await changePasswordService(email, password, confirmPassword);
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({
       EC: 1,
@@ -159,3 +152,4 @@ export const changePassword = async (req, res) => {
     });
   }
 };
+
