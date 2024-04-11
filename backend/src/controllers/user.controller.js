@@ -1,4 +1,3 @@
-import { Types } from "mongoose";
 import {
   acceptFriendRequestToUser,
   findUserByPhone,
@@ -10,7 +9,9 @@ import {
   showFriends,
   showSentFriendRequests,
   updateUserInfoService,
+  updateUserImageService,
 } from "../services/user.service.js";
+import s3 from "../utils/UploadCloud.js";
 
 export const getUser = async (req, res) => {
   try {
@@ -124,6 +125,7 @@ export const rejectFriendRequest = async (req, res) => {
     });
   }
 };
+// endpoint to get friends
 export const getFriends = async (req, res) => {
   try {
     const user = req.user;
@@ -139,6 +141,7 @@ export const getFriends = async (req, res) => {
     });
   }
 };
+// endpoint to get sent friend requests
 export const getSentFriendRequests = async (req, res) => {
   try {
     const user = req.user;
@@ -169,4 +172,34 @@ export const updatedUserInfo = async (req, res) => {
   }
 }
 
+// endpoint to update user image
+export const updateUserImage = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const image = req.file?.originalname;
+    console.log("image::::", image);
+    const fileType = image.split(".").pop();
+    const filePath = `${userId}_${Date.now()}.${fileType}`;
+    console.log("filePath::::", filePath);
+    s3.upload({
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: filePath,
+      Body: req.file.buffer,
+      ContentType: req.file.mimetype,
+    },async (err,data) => {
+      if(err){
+        res.status(500).json({EC:1,EM:"Error",DT:""});
+      }else{
+        const result = await updateUserImageService(userId,data.Location);
+        res.status(200).json(result);
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    });
+  }
+};
 

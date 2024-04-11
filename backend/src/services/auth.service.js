@@ -264,37 +264,37 @@ export const forgotPasswordService = async (data) => {
   }
 };
 
-export const forgotPasswordOTPService = async ({ email, otp }) => {
-  try {
-    const otpHolder = await OTP.find({ email });
-    if (otpHolder.length === 0)
-      return {
-        EC: 1,
-        EM: "OTP expired",
-        DT: "",
-      };
-    // get last otp
-    const lastOTP = otpHolder[otpHolder.length - 1];
-    const isValid = await validateOTP({ otp, hashOTP: lastOTP.otp });
-    if (!isValid) return { EC: 1, EM: "Invalid OTP", DT: "" };
-    if (isValid && email === lastOTP.email) {
-      // update user verify
-      const user = await User.findOne({ email });
-      console.log("User::::", user);
-      return {
-        EC: 0,
-        EM: "Success",
-        DT: user,
-      };
-    }
-  } catch (err) {
-    return {
-      EC: 1,
-      EM: err.message,
-      DT: "",
-    };
-  }
-};
+// export const forgotPasswordOTPService = async ({ email, otp }) => {
+//   try {
+//     const otpHolder = await OTP.find({ email });
+//     if (otpHolder.length === 0)
+//       return {
+//         EC: 1,
+//         EM: "OTP expired",
+//         DT: "",
+//       };
+//     // get last otp
+//     const lastOTP = otpHolder[otpHolder.length - 1];
+//     const isValid = await validateOTP({ otp, hashOTP: lastOTP.otp });
+//     if (!isValid) return { EC: 1, EM: "Invalid OTP", DT: "" };
+//     if (isValid && email === lastOTP.email) {
+//       // update user verify
+//       const user = await User.findOne({ email });
+//       console.log("User::::", user);
+//       return {
+//         EC: 0,
+//         EM: "Success",
+//         DT: user,
+//       };
+//     }
+//   } catch (err) {
+//     return {
+//       EC: 1,
+//       EM: err.message,
+//       DT: "",
+//     };
+//   }
+// };
 
 export const changePasswordService = async (
   email,
@@ -317,6 +317,7 @@ export const changePasswordService = async (
         DT: "",
       };
     }
+    
     const user = await User.findOne({ email });
     const passwordExist = await bcrypt.compare(password, user.password);
     if (passwordExist) {

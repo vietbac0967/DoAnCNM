@@ -194,5 +194,16 @@ export const updateUserInfoService = async (userId, updatedUserInfo) => {
   }
 }
 
-
-
+export const updateUserImageService = async (userId, image) => {
+  try {
+    const user = await User.findOne({ _id: userId });
+    if (!user) {
+      return { EC: 1, EM: "User not found", DT: "" };
+    }
+    user.avatar = image;
+    await user.save();
+    return { EC: 0, EM: "Success", DT: "" };
+  } catch (error) {
+    return { EC: 1, EM: error.message, DT: "" };
+  }
+};

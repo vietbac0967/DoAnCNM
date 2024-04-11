@@ -1,81 +1,84 @@
-
-import { StyleSheet, Text, TextInput, View, Button, Pressable } from 'react-native';
+import React, { useEffect, useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Button,
+  FlatList,
+  Image,
+} from "react-native";
 import { getFriends } from "../services/user.service";
-import UserChat from "../components/UserChat";
-import { AntDesign } from '@expo/vector-icons';
-import React, { useEffect, useRef, useState } from "react";
-import {  useSelector } from "react-redux";
-
+import { useSelector } from "react-redux";
+import { MaterialIcons } from "@expo/vector-icons";
+import { RadioButton } from "react-native-paper";
 export default function CreateGroupScreen({ navigation }) {
-  const [groupName, setGroupName] = useState('');
+  const [groupName, setGroupName] = useState("");
   const [members, setMembers] = useState([]);
   const token = useSelector((state) => state.token.token);
   const [friends, setFriends] = useState([]);
   const [selectedFriends, setSelectedFriends] = useState([]);
 
   useEffect(() => {
-    const getListFriend = async () => {
+    const fetchFriends = async () => {
       try {
-        const friends = await getFriends(token);
-        setFriends(friends);
+        const friendsData = await getFriends(token);
+        setFriends(friendsData);
       } catch (error) {
-        console.log("error:::", error);
+        console.log("Error fetching friends:", error);
       }
     };
-    getListFriend();
-  }, []);
+
+    fetchFriends();
+  }, [token]);
+  console.log("friends", friends);
+
   const handleSelectFriend = (friendId) => {
-    if (!selectedFriends.includes(friendId)) {
-      setSelectedFriends([...selectedFriends, friendId]);
+    if (selectedFriends.includes(friendId)) {
+      setSelectedFriends(selectedFriends.filter((id) => id !== friendId));
     } else {
-      setSelectedFriends(selectedFriends.filter(id => id !== friendId));
+      setSelectedFriends([...selectedFriends, friendId]);
     }
   };
-  
-  // Hàm xử lý thêm thành viên vào nhóm
+
+  useEffect(() => {
+  }, [selectedFriends]);
+
   const addMember = () => {
     if (selectedFriends.length === 0) {
-      return; // Không thêm nếu không có thành viên nào được chọn
+      return; // No selected friends, do nothing
     }
     setMembers([...members, ...selectedFriends]);
-    setSelectedFriends([]); // Reset danh sách thành viên đã chọn
+    setSelectedFriends([]); // Reset selected friends
   };
-  // Hàm xử lý tạo nhóm chat
-  const createGroupChat = () => {
-    // Thực hiện logic tạo nhóm chat và chuyển đến màn hình chat nhóm
-  };
+
+  const renderFriendItem = ({ item }) => (
+    <View style={styles.friendItem}>
+      <Image source={{ uri: item?.avatar }} style={styles.avatar} />
+      <View style={styles.friendInfo}>
+        <Text>{item.name}</Text>
+        <RadioButton value="dong y"></RadioButton>
+      </View>
+    </View>
+  );
 
   return (
-    <View>
-      <TextInput
-        style={styles.input}
-        placeholder="Nhập tên nhóm"
-        value={groupName}
-        onChangeText={setGroupName}
-      />
-      <View style={styles.memberContainer}>
-        <TextInput
-          style={styles.memberInput}
-          placeholder="Tên thành viên"
-          onChangeText={(text) => {/* Thêm logic xử lý thêm thành viên */}}
+    <View style={styles.container}>
+      <View style={{ flexDirection: "row" }}>
+        <MaterialIcons
+          name="drive-file-rename-outline"
+          size={28}
+          color="black"
+          style={{ marginRight: 10 }}
         />
-        <Button title="Thêm" onPress={addMember} />
+        <TextInput
+          style={styles.input}
+          placeholder="Nhập tên nhóm"
+          value={groupName}
+          onChangeText={setGroupName}
+        />
       </View>
-      <View style={styles.memberContainer}>
-  {selectedFriends.map((friendId) => (
-    <Text key={friendId}>{friends.find(friend => friend._id === friendId)?.name}</Text>
-  ))}
-</View>
-      <View>
-        {/* Hiển thị danh sách thành viên */}
-      </View>
-
-      <Button title="Tạo Nhóm" onPress={createGroupChat} />
-      {
-        friends.map((friend) => (
-          <UserChat key={friend._id} item={friend}  />
-        ))
-      }
+      <FlatList data={friends} renderItem={renderFriendItem}></FlatList>
     </View>
   );
 }
@@ -84,31 +87,42 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
-    marginTop:50
+    backgroundColor: "#fff",
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+  tabText: {
+    fontSize: 18,
+    marginTop: 5,
+    marginRight: 5,
+    fontWeight: "600",
+    marginLeft: 10,
+    color: "#444444",
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-  memberContainer: {
-    flexDirection: 'row',
-    marginBottom: 10,
-  },
-  memberInput: {
     flex: 1,
-    height: 40,
-    borderColor: 'gray',
     borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginRight: 8,
+  },
+  friendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     marginRight: 10,
-    paddingHorizontal: 10,
+  },
+  friendInfo: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 });

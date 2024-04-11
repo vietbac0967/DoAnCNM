@@ -107,7 +107,7 @@ const ChatScreen = ({ navigation, route }) => {
       }
     } catch (error) {
       console.error("Error while picking image and sending message:", error);
-      Alert.alert("Cảnh báo","Kích thước ảnh quá lớn, vui lòng chọn ảnh khác")
+      Alert.alert("Cảnh báo", "Kích thước ảnh quá lớn, vui lòng chọn ảnh khác");
     }
   };
 
@@ -164,7 +164,7 @@ const ChatScreen = ({ navigation, route }) => {
   useEffect(() => {
     if (socket.current) {
       socket.current.on("msg-recieve", (msg) => {
-       getMessages();
+        getMessages();
       });
       socket.current.on("recall", (msg) => {
         // setMessages((prevMessages) => {
@@ -248,29 +248,35 @@ const ChatScreen = ({ navigation, route }) => {
       console.log(error);
     }
   };
-  return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      keyboardVerticalOffset={1}
-      style={styles.container}
-    >
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: "",
+      headerLeft: () => (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
           <Ionicons
-            name="chevron-back-outline"
+            onPress={() => navigation.goBack()}
+            name="arrow-back"
             size={24}
             color="black"
-            style={{ marginTop: 30 }}
           />
-        </TouchableOpacity>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Image
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: 15,
+                resizeMode: "cover",
+              }}
+              source={{ uri: receiver?.avatar }}
+            />
 
-        <View style={styles.titleContainer}>
-          <Image source={{ uri: receiver?.avatar }} style={styles.avatar} />
-          <View style={{ flexDirection: "column", marginLeft: 10 }}>
-            <Text style={styles.headerText}>{receiver?.name}</Text>
-            <Text style={styles.statusText}>{status}</Text>
+            <Text style={{ marginLeft: 5, fontSize: 15, fontWeight: "bold" }}>
+              {receiver?.name}
+            </Text>
           </View>
         </View>
+      ),
+      headerRight: () => (
         <View style={styles.rightIcons}>
           <TouchableOpacity onPress={() => console.log("Call")}>
             <Ionicons name="call-outline" size={24} color="#566573" />
@@ -288,7 +294,15 @@ const ChatScreen = ({ navigation, route }) => {
             <Ionicons name="list-outline" size={24} color="#566573" />
           </TouchableOpacity>
         </View>
-      </View>
+      ),
+    });
+  }, [navigation, receiver]);
+  return (
+    <KeyboardAvoidingView
+      behavior="padding"
+      keyboardVerticalOffset={1}
+      style={styles.container}
+    >
       <ScrollView
         ref={scrollViewRef}
         contentContainerStyle={{ flexGrow: 1 }}
@@ -565,7 +579,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginLeft: "auto",
     marginRight: 10,
-    marginTop: 30,
+    marginTop: 7,
   },
   videocallButton: {
     marginLeft: 15,
