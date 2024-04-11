@@ -55,7 +55,11 @@ export default function GroupScreen({ navigation }) {
       <AntDesign name="addusergroup" size={30} color="black" />
      </Pressable>
       </View>
-      
+      {
+        friends.map((friend) => (
+          <UserChat key={friend._id} item={friend}  />
+        ))
+      }
      
     </View>
   );

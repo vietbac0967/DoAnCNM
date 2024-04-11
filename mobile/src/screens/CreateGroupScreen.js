@@ -71,11 +71,7 @@ export default function CreateGroupScreen({ navigation }) {
       </View>
 
       <Button title="Tạo Nhóm" onPress={createGroupChat} />
-      {
-        friends.map((friend) => (
-          <UserChat key={friend._id} item={friend}  />
-        ))
-      }
+     
     </View>
   );
 }
