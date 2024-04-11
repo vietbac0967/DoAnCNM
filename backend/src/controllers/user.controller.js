@@ -8,6 +8,7 @@ import {
   showFriendRequests,
   showFriends,
   showSentFriendRequests,
+  updateUserInfoService,
   updateUserImageService,
 } from "../services/user.service.js";
 import s3 from "../utils/UploadCloud.js";
@@ -155,6 +156,22 @@ export const getSentFriendRequests = async (req, res) => {
     });
   }
 };
+
+export const updatedUserInfo = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const updatedUser = await updateUserInfoService(userId, req.body);
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      EC: 1,
+      EM: "Error updating user info",
+      DT: "",
+    });
+  }
+}
+
 // endpoint to update user image
 export const updateUserImage = async (req, res) => {
   try {
@@ -185,3 +202,4 @@ export const updateUserImage = async (req, res) => {
     });
   }
 };
+

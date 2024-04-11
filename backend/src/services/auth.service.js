@@ -317,6 +317,7 @@ export const changePasswordService = async (
         DT: "",
       };
     }
+    
     const user = await User.findOne({ email });
     const passwordExist = await bcrypt.compare(password, user.password);
     if (passwordExist) {

@@ -143,7 +143,7 @@ export const forgotPassword = async (req, res) => {
 export const changePassword = async (req, res) => {
   try {
     const email = req.body.email;
-    const newPassword = req.body.newPassword;
+    const password = req.body.passwordassword;
     const confirmPassword = req.body.confirmPassword;
     const response = await changePasswordService(email,newPassword, confirmPassword);
     res.status(200).json(response);
@@ -155,3 +155,4 @@ export const changePassword = async (req, res) => {
     });
   }
 };
+
