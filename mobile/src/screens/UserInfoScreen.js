@@ -7,11 +7,14 @@ import {
   Pressable,
   SafeAreaView,
   TextInput,
+  Alert
 } from "react-native";
 import { useSelector } from "react-redux";
 import { baseURL } from "../api/baseURL";
 import { useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+
 
 const UserInfoScreen = ({ navigation }) => {
   const token = useSelector((state) => state.token.token);
@@ -20,30 +23,66 @@ const UserInfoScreen = ({ navigation }) => {
   const [buttonText, setButtonText] = useState("Đổi mật khẩu");
   const [email, setEmail] = useState("");
   const [oldPassword, setOldPassword] = useState("");
-  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const response = await baseURL.get("/info", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const { DT, EM, EC } = response.data;
-        if (EC === 0 && EM === "Success") {
-          setData(DT);
-          setEmail(DT.email);
-        } else {
-          console.log("Error getting user:", EM);
-        }
-      } catch (error) {
-        console.log("Error getting user:", error);
+  const getUser = async () => {
+    try {
+      const response = await baseURL.get("/info", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const { DT, EM, EC } = response.data;
+      if (EC === 0 && EM === "Success") {
+        setData(DT);
+        setEmail(DT.email);
+      } else {
+        console.log("Error getting user:", EM);
       }
-    };
+    } catch (error) {
+      console.log("Error getting user:", error);
+    }
+  };
+  useEffect(() => {
     getUser();
   }, []);
+
+  const handleUpdateImage = async () => {
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        aspect: [4, 3],
+        quality: 1,
+      });
+      if (!result.canceled) {
+        let localUri = result.assets[0].uri;
+        let filename = localUri.split("/").pop();
+        let match = /\.(\w+)$/.exec(filename);
+        let type = match ? `image/${match[1]}` : "image";
+        const formData = new FormData();
+        formData.append("image", {
+          uri: localUri,
+          name: filename,
+          type,
+        });
+        const response = await baseURL.post("/user/updateImage", formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        const { DT, EC, EM } = response.data;
+        if (EC === 0 && EM === "Success") {
+          await getUser();
+          Alert.alert("Thông báo", "Cập nhật ảnh đại diện thành công");
+        }
+      }
+    } catch (error) {
+      Alert.alert("Cảnh báo", "Hình ảnh quá lớn, vui lòng chọn hình khác");
+      console.error("Error while picking image and sending message:", error);
+    }
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -60,41 +99,44 @@ const UserInfoScreen = ({ navigation }) => {
   };
 
   const handlePasswordChange = async () => {
-    // try {
-    //   // Kiểm tra mật khẩu mới và mật khẩu xác nhận có khớp nhau không
-    //   if (password !== confirmPassword) {
-    //     alert("Mật khẩu và xác nhận mật khẩu không khớp");
-    //     return;
-    //   }
-    //   console.log("email is", email);
+    try {
+      // Kiểm tra mật khẩu mới và mật khẩu xác nhận có khớp nhau không
+      if (newPassword !== confirmPassword) {
+        alert("Mật khẩu và xác nhận mật khẩu không khớp");
+        return;
+      }
 
-    //   // Gửi yêu cầu thay đổi mật khẩu đến máy chủ
-    //   const response = await baseURL.post("/auth/changePassword", {
-    //     email,
-    //     password,
-    //     confirmPassword,
-    //   });
+      // Gửi yêu cầu thay đổi mật khẩu đến máy chủ
+      const response = await baseURL.post("/auth/changePassword", {
+        email,
+        oldPassword,
+        newPassword,
+        confirmPassword,
+      });
 
-    //   const { EC, EM, DT } = response.data;
-    //   console.log("data is", response.data);
-    //   if (EM === "Success" && EC === 0) {
-    //     Alert.alert("Thông báo", "Mật khẩu đã được thay đổi thành công");
-    //     navigation.navigate("Login");
-    //   }
-    //   if (EC === 1 && EM === "Weak password") {
-    //     Alert.alert(
-    //       "Thông báo",
-    //       "Mật khẩu phải bao gồm ít nhất 8 ký tự, bao gồm chữ cái,ký tự đặc biệt và số"
-    //     );
-    //   }
-    //   if (EC === 1 && EM === "Password is the same") {
-    //     Alert.alert("Thông báo", "Bạn đã sử dụng mật khẩu này.\nVui lòng chọn mật khẩu khác");
-    //   }
-    // } catch (error) {
-    //   // Xử lý lỗi trong trường hợp gửi yêu cầu thất bại
-    //   alert("Đã có lỗi xảy ra: " + error.message);
-    //   console.error(error);
-    // }
+      const { EC, EM, DT } = response.data;
+      console.log("data is", response.data);
+      if (EM === "Success" && EC === 0) {
+        Alert.alert(
+          "Thông báo",
+          "Đổi mật khẩu thành công!\nVui lòng đăng nhập lại để sử dụng."
+        );
+        navigation.navigate("Login");
+      }
+      if (EC === 1 && EM === "Weak password") {
+        Alert.alert(
+          "Thông báo",
+          "Mật khẩu phải bao gồm ít nhất 8 ký tự, bao gồm chữ cái,ký tự đặc biệt và số"
+        );
+      }
+      if (EC === 1 && EM === "Old password is incorrect") {
+        Alert.alert("Thông báo", "Mật khẩu cũ không khớp!");
+      }
+    } catch (error) {
+      // Xử lý lỗi trong trường hợp gửi yêu cầu thất bại
+      alert("Đã có lỗi xảy ra: " + error.message);
+      console.error(error);
+    }
   };
 
   return (
@@ -109,6 +151,9 @@ const UserInfoScreen = ({ navigation }) => {
           />
         </Pressable>
         <Image source={{ uri: data.avatar }} style={styles.avatar} />
+        <Pressable style={styles.updateAvatarBtn} onPress={handleUpdateImage}>
+          <Ionicons name="camera" size={12} color="#363636" />
+        </Pressable>
         <Text style={styles.fullName}>{data.name}</Text>
       </View>
       <View style={styles.detailsContainer}>
@@ -122,10 +167,10 @@ const UserInfoScreen = ({ navigation }) => {
           <Text style={styles.label}>Giới tính:</Text>
           <Text>{data.gender}</Text>
         </View>
-        <View style={styles.detailItem}>
+        {/* <View style={styles.detailItem}>
           <Text style={styles.label}>Sinh nhật:</Text>
           <Text>Chưa cập nhật</Text>
-        </View>
+        </View> */}
         <View style={styles.detailItem}>
           <Text style={styles.label}>Điện thoại:</Text>
           <Text>{data.phoneNumber}</Text>
@@ -161,8 +206,8 @@ const UserInfoScreen = ({ navigation }) => {
               style={styles.input}
               placeholder="Mật khẩu mới"
               secureTextEntry={true}
-              value={password}
-              onChangeText={setPassword}
+              value={newPassword}
+              onChangeText={setNewPassword}
             />
             <TextInput
               style={styles.input}
@@ -198,6 +243,16 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 50,
     marginRight: 20,
+  },
+  updateAvatarBtn: {
+    position: "absolute",
+    top: 40,
+    left: 90,
+    backgroundColor: "#B5B5B5",
+    padding: 5,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: "#fff",
   },
   fullName: {
     fontSize: 18,

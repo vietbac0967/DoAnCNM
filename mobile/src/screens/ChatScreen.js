@@ -300,7 +300,7 @@ const ChatScreen = ({ navigation, route }) => {
   return (
     <KeyboardAvoidingView
       behavior="padding"
-      keyboardVerticalOffset={1}
+      keyboardVerticalOffset={100}
       style={styles.container}
     >
       <ScrollView
@@ -507,7 +507,7 @@ const ChatScreen = ({ navigation, route }) => {
             borderRadius: 20,
             paddingHorizontal: 10,
           }}
-          placeholder="Type Your message..."
+          placeholder="Nhập tin nhắn..."
         />
 
         <View
