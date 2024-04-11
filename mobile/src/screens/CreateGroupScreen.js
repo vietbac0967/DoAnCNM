@@ -1,17 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput, View, Button, FlatList, Image, CheckBox } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Button,
+  FlatList,
+  Image,
+} from "react-native";
 import { getFriends } from "../services/user.service";
 import { useSelector } from "react-redux";
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from "@expo/vector-icons";
+import { RadioButton } from "react-native-paper";
 export default function CreateGroupScreen({ navigation }) {
   const [groupName, setGroupName] = useState("");
   const [members, setMembers] = useState([]);
   const token = useSelector((state) => state.token.token);
-  const [user, setUser] = useState("");
   const [friends, setFriends] = useState([]);
   const [selectedFriends, setSelectedFriends] = useState([]);
 
   useEffect(() => {
+    const fetchFriends = async () => {
       try {
         const friendsData = await getFriends(token);
         setFriends(friendsData);
@@ -19,11 +28,22 @@ export default function CreateGroupScreen({ navigation }) {
         console.log("Error fetching friends:", error);
       }
     };
-    
+
     fetchFriends();
   }, [token]);
+  console.log("friends", friends);
 
   const handleSelectFriend = (friendId) => {
+    if (selectedFriends.includes(friendId)) {
+      setSelectedFriends(selectedFriends.filter((id) => id !== friendId));
+    } else {
+      setSelectedFriends([...selectedFriends, friendId]);
+    }
+  };
+
+  useEffect(() => {
+  }, [selectedFriends]);
+
   const addMember = () => {
     if (selectedFriends.length === 0) {
       return; // No selected friends, do nothing
@@ -34,33 +54,31 @@ export default function CreateGroupScreen({ navigation }) {
 
   const renderFriendItem = ({ item }) => (
     <View style={styles.friendItem}>
-      <Image source={{ uri: item.avatar }} style={styles.avatar} />
+      <Image source={{ uri: item?.avatar }} style={styles.avatar} />
       <View style={styles.friendInfo}>
         <Text>{item.name}</Text>
-        <CheckBox
-          value={selectedFriends.includes(item._id)}
-          onValueChange={() => handleSelectFriend(item._id)}
-        />
+        <RadioButton value="dong y"></RadioButton>
       </View>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Nhập tên nhóm"
-        value={groupName}
-        onChangeText={setGroupName}
-      />
+      <View style={{ flexDirection: "row" }}>
+        <MaterialIcons
+          name="drive-file-rename-outline"
+          size={28}
+          color="black"
+          style={{ marginRight: 10 }}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Nhập tên nhóm"
+          value={groupName}
+          onChangeText={setGroupName}
+        />
       </View>
-      <FlatList
-        data={friends}
-        renderItem={renderFriendItem}
-        keyExtractor={(item) => item._id}
-      />
-       
-       <Button  title="Tạo Nhóm" onPress={addMember} /> {/*chưa có sự kiện tạo nhóm */}
+      <FlatList data={friends} renderItem={renderFriendItem}></FlatList>
     </View>
   );
 }
@@ -69,44 +87,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    marginTop: 35,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  input: {
-    height: 40,
-    borderWidth: 1,
-    borderColor: "gray",
-    borderRadius: 20,
-    padding: 10,
-  },
-  button: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 30,
-    backgroundColor: "#00ACEE",
-    width: 100,
-    height: 38,
-    marginTop:7
-  },
-  text: {
-    textAlign: "center",
-    fontSize: 16,
-    lineHeight: 21,
-    fontWeight: "bold",
-    letterSpacing: 0.25,
-    color: "white",
-=======
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   tabText: {
     fontSize: 18,
-   marginTop:5,
-   marginRight:5,
-    fontWeight:"600",
+    marginTop: 5,
+    marginRight: 5,
+    fontWeight: "600",
     marginLeft: 10,
     color: "#444444",
   },
@@ -138,5 +125,4 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  
 });
