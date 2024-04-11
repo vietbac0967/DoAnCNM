@@ -11,6 +11,7 @@ import FriendRequestScreen from "../screens/FriendRequestScreen";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import ForgotPasswordOTPScreen from "../screens/ForgotPasswordOTPScreen";
 import ResetPasswordScreen from "../screens/ResetPasswordScreen";
+import CreateGroupScreen from "../screens/CreateGroupScreen";
 
 const Stack = createNativeStackNavigator();
 const StackNavigation = () => {
@@ -62,6 +63,10 @@ const StackNavigation = () => {
           name="ResetPassword"
           component={ResetPasswordScreen}
           options={{ headerShown: false }}
+        ></Stack.Screen>
+        <Stack.Screen
+          name="CreateGroup"
+          component={CreateGroupScreen}
         ></Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>

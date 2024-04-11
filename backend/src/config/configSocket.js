@@ -26,12 +26,19 @@ io.on("connection", (socket) => {
     const sendUserSocket = onlineUsers.get(data.to._id);
     socket.to(sendUserSocket).emit("recall", data);
   });
-
+  
   socket.on("send-msg", (data) => {
     const sendUserSocket = onlineUsers.get(data.to);
     console.log("send-msg", data);
     if (sendUserSocket) {
       socket.to(sendUserSocket).emit("msg-recieve", data.msg);
+    }
+  });
+  socket.on("send-image", (data) => {
+    const sendUserSocket = onlineUsers.get(data.to);
+    console.log("send-image", data);
+    if (sendUserSocket) {
+      socket.to(sendUserSocket).emit("image-recieve", data);
     }
   });
 });

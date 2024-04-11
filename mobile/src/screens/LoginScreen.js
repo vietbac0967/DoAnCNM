@@ -67,7 +67,11 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      behavior="position"
+      keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+      style={styles.container}
+    >
       <ImageBackground
         resizeMode="cover"
         style={{ width: "100%", height: "100%" }}
@@ -119,11 +123,7 @@ export default function LoginScreen({ navigation }) {
           </View>
         </View>
 
-        <KeyboardAvoidingView
-          style={styles.panel}
-          keyboardVerticalOffset={40}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-        >
+        <View style={styles.panel}>
           <View style={styles.input}>
             <Feather name="phone" size={24} color="black" />
             <TextInput
@@ -204,9 +204,9 @@ export default function LoginScreen({ navigation }) {
               </Text>
             </Text>
           </Pressable>
-        </KeyboardAvoidingView>
+        </View>
       </ImageBackground>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -235,6 +235,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 35,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
+    width:"100%"
   },
   input: {
     flexDirection: "row",
