@@ -19,10 +19,8 @@ import {
   Alert,
   Modal,
   Animated,
-  Keyboard,
-  Button,
-  FlatList,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import EmojiSelector from "react-native-emoji-selector";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -37,7 +35,6 @@ import { Entypo } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
 import { io } from "socket.io-client";
 import { useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
@@ -251,7 +248,6 @@ const ChatScreen = ({ navigation, route }) => {
       console.log(error);
     }
   };
-  // update use useLayoutEffect make header for chat screen
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: "",
@@ -307,42 +303,6 @@ const ChatScreen = ({ navigation, route }) => {
       keyboardVerticalOffset={1}
       style={styles.container}
     >
-      {/* <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons
-            name="chevron-back-outline"
-            size={24}
-            color="black"
-            style={{ marginTop: 30 }}
-          />
-        </TouchableOpacity>
-
-        <View style={styles.titleContainer}>
-          <Image source={{ uri: receiver?.avatar }} style={styles.avatar} />
-          <View style={{ flexDirection: "column", marginLeft: 10 }}>
-            <Text style={styles.headerText}>{receiver?.name}</Text>
-            <Text style={styles.statusText}>{status}</Text>
-          </View>
-        </View>
-        <View style={styles.rightIcons}>
-          <TouchableOpacity onPress={() => console.log("Call")}>
-            <Ionicons name="call-outline" size={24} color="#566573" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => console.log("Videocall")}
-            style={styles.videocallButton}
-          >
-            <Ionicons name="videocam-outline" size={24} color="#566573" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => console.log("Setting")}
-            style={styles.settingButton}
-          >
-            <Ionicons name="list-outline" size={24} color="#566573" />
-          </TouchableOpacity>
-        </View>
-      </View> */}
-
       <ScrollView
         ref={scrollViewRef}
         contentContainerStyle={{ flexGrow: 1 }}
@@ -537,12 +497,16 @@ const ChatScreen = ({ navigation, route }) => {
           ref={inputRef}
           inputMode="text"
           value={message}
-          onChangeText={(text) => {
-            setMessage(text);
-            setShowEmojiSelector(false);
-          }}
           onChangeText={setMessage}
           onFocus={() => setShowEmojiSelector(false)}
+          style={{
+            flex: 1,
+            height: 40,
+            borderWidth: 1,
+            borderColor: "#dddddd",
+            borderRadius: 20,
+            paddingHorizontal: 10,
+          }}
           placeholder="Type Your message..."
         />
 
@@ -573,7 +537,7 @@ const ChatScreen = ({ navigation, route }) => {
           style={{ height: 320 }}
         />
       )}
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -581,6 +545,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "rgb(238, 240, 241)",
+    marginTop: 20,
   },
   header: {
     flexDirection: "row",
@@ -614,7 +579,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginLeft: "auto",
     marginRight: 10,
-    marginTop: 15,
+    marginTop: 7,
   },
   videocallButton: {
     marginLeft: 15,

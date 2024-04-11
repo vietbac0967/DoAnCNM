@@ -148,7 +148,7 @@ export default function ProfileScreen({ navigation }) {
             onPressOut={() => setModalVisible(false)}
           >
             <View style={styles.modalContent}>
-              <Image style={styles.modalAvatar} source={{ uri: avatar }} />
+              <Image style={styles.modalAvatar} source={{ uri: user?.avatar }} />
             </View>
           </TouchableOpacity>
         </Modal>
