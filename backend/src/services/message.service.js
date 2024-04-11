@@ -1,10 +1,13 @@
 import Message from "../models/message.model.js";
-export const sendMessageService = async (receiverId, senderId, content) => {
+
+export const sendMessageService = async (receiverId, senderId, content,messageType) => {
+  
   try {
     const newMessage = new Message({
       senderId,
       receiverId,
       content,
+      messageType
     });
     await newMessage.save();
     return {
@@ -20,6 +23,9 @@ export const sendMessageService = async (receiverId, senderId, content) => {
     };
   }
 };
+
+
+
 export const getMessagesService = async (senderId, receiverId) => {
   try {
     const messages = await Message.find({
