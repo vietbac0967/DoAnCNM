@@ -14,39 +14,38 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from "@expo/vector-icons";
 import { baseURL } from "../api/baseURL";
 import { useSelector } from "react-redux";
+import * as ImagePicker from "expo-image-picker";
 export default function ProfileScreen({ navigation }) {
   const token = useSelector((state) => state.token.token);
   const [modalVisible, setModalVisible] = useState(false);
+  const [user, setUser] = useState({});
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+
   const [avatar, setAvatar] = useState(
     "https://avatar.iran.liara.run/username"
   );
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        // const token = await AsyncStorage.getItem("token");
-        const response = await baseURL.get("/info", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const { DT, EM, EC } = response.data;
-        if (EC === 0 && EM === "Success") {
-          setUsername(DT.name);
-          setAvatar(DT.avatar);
-        } else {
-          console.log("Error getting user:", EM);
-        }
-      } catch (error) {
-        console.log("Error getting user:", error);
+  const getUser = async () => {
+    try {
+      // const token = await AsyncStorage.getItem("token");
+      const response = await baseURL.get("/info", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const { DT, EM, EC } = response.data;
+      if (EC === 0 && EM === "Success") {
+        setUser(DT);
+      } else {
+        console.log("Error getting user:", EM);
       }
-    };
+    } catch (error) {
+      console.log("Error getting user:", error);
+    }
+  };
+  useEffect(() => {
     getUser();
   }, []);
-  // console.log("User:::", user);
-  // const username = user.name;
-  // const avatar = user.avatar;
   console.log("Avatar:", avatar);
   const backgroundImage = require("../assets/bg.jpg");
 
@@ -75,6 +74,42 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
+  const handleUpdateImage = async () => {
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        aspect: [4, 3],
+        quality: 1,
+      });
+      if (!result.canceled) {
+        let localUri = result.assets[0].uri;
+        let filename = localUri.split("/").pop();
+        let match = /\.(\w+)$/.exec(filename);
+        let type = match ? `image/${match[1]}` : "image";
+        const formData = new FormData();
+        formData.append("image", {
+          uri: localUri,
+          name: filename,
+          type,
+        });
+        const response = await baseURL.post("/user/updateImage", formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        const { DT, EC, EM } = response.data;
+        if (EC === 0 && EM === "Success") {
+          await getUser();
+          Alert.alert("Thông báo", "Cập nhật ảnh đại diện thành công");
+        }
+      }
+    } catch (error) {
+      Alert.alert("Cảnh báo", "Hình ảnh quá lớn, vui lòng chọn hình khác");
+      console.error("Error while picking image and sending message:", error);
+    }
+  };
+
   const extractUsername = (email) => {
     const atIndex = email.indexOf("@"); // Tìm vị trí của kí tự '@'
     if (atIndex !== -1) {
@@ -93,12 +128,12 @@ export default function ProfileScreen({ navigation }) {
       >
         <View style={styles.profileContainer}>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
-            <Image style={styles.avatar} source={{ uri: avatar }} />
+            <Image style={styles.avatar} source={{ uri: user?.avatar }} />
           </TouchableOpacity>
-          <Text style={styles.username}>{username}</Text>
-          <Text style={styles.email}>{email}</Text>
+          <Text style={styles.username}>{user?.name}</Text>
+          {/* <Text style={styles.email}>{user?.email}</Text> */}
         </View>
-        <Pressable style={styles.logoutButton}>
+        <Pressable style={styles.logoutButton} onPress={handleUpdateImage}>
           <Feather name="edit" size={20} color="#444444" />
         </Pressable>
         <Modal

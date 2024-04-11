@@ -1,13 +1,19 @@
-
-import { StyleSheet, Text, TextInput, View, Button, Pressable } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Button,
+  Pressable,
+} from "react-native";
 import { getFriends } from "../services/user.service";
 import UserChat from "../components/UserChat";
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
-import {  useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 export default function GroupScreen({ navigation }) {
-  const [groupName, setGroupName] = useState('');
+  const [groupName, setGroupName] = useState("");
   const [members, setMembers] = useState([]);
   const token = useSelector((state) => state.token.token);
   const [friends, setFriends] = useState([]);
@@ -28,10 +34,10 @@ export default function GroupScreen({ navigation }) {
     if (!selectedFriends.includes(friendId)) {
       setSelectedFriends([...selectedFriends, friendId]);
     } else {
-      setSelectedFriends(selectedFriends.filter(id => id !== friendId));
+      setSelectedFriends(selectedFriends.filter((id) => id !== friendId));
     }
   };
-  
+
   // Hàm xử lý thêm thành viên vào nhóm
   const addMember = () => {
     if (selectedFriends.length === 0) {
@@ -47,16 +53,17 @@ export default function GroupScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={{flexDirection: "row",justifyContent: "space-around",}}><Text style={styles.title}>Tạo Nhóm Chat</Text>
-    
-      <Pressable
-          onPress={() => navigation.navigate("CreateGroup")}
+      <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+        <Text style={styles.title}>Tạo Nhóm Chat</Text>
+
+        <Pressable
+          onPress={() => {
+            navigation.navigate("CreateGroup");
+          }}
         >
-      <AntDesign name="addusergroup" size={30} color="black" />
-     </Pressable>
+          <AntDesign name="addusergroup" size={30} color="black" />
+        </Pressable>
       </View>
-      
-     
     </View>
   );
 }
@@ -65,29 +72,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
-    marginTop:50
+    backgroundColor: "#fff",
+    marginTop: 50,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
   },
   memberContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 10,
   },
   memberInput: {
     flex: 1,
     height: 40,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     marginRight: 10,
     paddingHorizontal: 10,

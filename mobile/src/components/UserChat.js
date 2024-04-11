@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { baseURL } from "../api/baseURL";
-import io from "socket.io-client";
 export default function UserChat({ item }) {
   const [messages, setMessages] = useState([]);
   const socket = useRef();

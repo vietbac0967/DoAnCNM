@@ -52,7 +52,7 @@ export default function HomeScreen({ navigation, route }) {
 
       {/* Chat list */}
       {friends.map((friend) => (
-        <UserChat key={friend._id} item={friend} />
+        <UserChat key={friend._id} navigation={navigation} item={friend} />
       ))}
     </View>
   );

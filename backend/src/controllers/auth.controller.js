@@ -1,6 +1,6 @@
 import User from "../models/user.model.js";
 import {
-  forgotPasswordOTPService,
+  changePasswordService,
   loginService,
   registerService,
   verifyOTPService,
@@ -12,6 +12,7 @@ import { sendOTPForUser } from "../services/sendMail.service.js";
 import { insertOTP } from "../services/otp.service.js";
 import { forgotPasswordService } from "../services/auth.service.js";
 
+// endpoint to register user
 export const register = async (req, res) => {
   try {
     const { EC, EM, DT } = await registerService(req.body);
@@ -21,7 +22,7 @@ export const register = async (req, res) => {
     return res.status(500).json(error.message);
   }
 };
-
+// endpoint to verify OTP
 export const verifyOTP = async (req, res, next) => {
   try {
     const { email, otp } = req.body;
@@ -31,7 +32,7 @@ export const verifyOTP = async (req, res, next) => {
     next(error);
   }
 };
-
+// endpoint to resend email
 export const reSendEmail = async (req, res) => {
   try {
     const { email } = req.body;
@@ -55,7 +56,7 @@ export const reSendEmail = async (req, res) => {
     });
   }
 };
-
+// endpoint to login user
 export const login = async (req, res) => {
   try {
     const { EC, EM, DT } = await loginService(req.body);
@@ -68,6 +69,7 @@ export const login = async (req, res) => {
     });
   }
 };
+// endpoint to logout user
 export const logout = async (req, res) => {
   try {
     const user = req.user._id;
@@ -92,6 +94,7 @@ export const logout = async (req, res) => {
     });
   }
 };
+// endpoint to refresh token
 export const refreshToken = async (req, res) => {
   try {
     const token = req.body.token;
@@ -106,7 +109,7 @@ export const refreshToken = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
+// endpoint to forgot password
 export const forgotPassword = async (req, res) => {
   try {
     const email = req.body.email;
@@ -122,35 +125,28 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
-export const forgotPasswordOTP = async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-    const { EM, EC, DT } = await forgotPasswordOTPService({ email, otp });
-    res.status(200).json({ EC, EM, DT });
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({
-      EC: 1,
-      EM: error.message,
-      DT: "",
-    });
-  }
-};
-
+// export const forgotPasswordOTP = async (req, res) => {
+//   try {
+//     const { email, otp } = req.body;
+//     const { EM, EC, DT } = await forgotPasswordOTPService({ email, otp });
+//     res.status(200).json({ EC, EM, DT });
+//   } catch (error) {
+//     console.log(error.message);
+//     res.status(500).json({
+//       EC: 1,
+//       EM: error.message,
+//       DT: "",
+//     });
+//   }
+// };
+// endpoint to change password
 export const changePassword = async (req, res) => {
   try {
     const email = req.body.email;
     const newPassword = req.body.newPassword;
     const confirmPassword = req.body.confirmPassword;
-    if (newPassword !== confirmPassword) {
-      return res.status(400).json({
-        EC: 1,
-        EM: "Password and confirm password do not match",
-        DT: "",
-      });
-    }
-    const { EM, EC, DT } = await forgotPasswordOTPService({ email, confirmPassword });
-    res.status(200).json({ EC, EM, DT });
+    const response = await changePasswordService(email,newPassword, confirmPassword);
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({
       EC: 1,
