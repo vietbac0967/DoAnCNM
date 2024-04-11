@@ -1,13 +1,13 @@
 import { Pressable, StyleSheet, Text, View, Image } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { baseURL } from "../api/baseURL";
-import io from "socket.io-client";
+
 export default function UserChat({ item }) {
   const [messages, setMessages] = useState([]);
-  const socket = useRef();
   const navigation = useNavigation();
+
   const getMessages = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -24,18 +24,17 @@ export default function UserChat({ item }) {
       if (EC === 0 && EM === "Success") {
         setMessages(DT);
       } else {
-        console.log("error:::", error);
+        console.log("error:::", EM);
       }
     } catch (error) {
       console.log("error:::", error);
     }
   };
 
-  
-
   useEffect(() => {
     getMessages();
   }, []);
+
   const getLastMessage = () => {
     if (!Array.isArray(messages) || messages.length === 0) {
       return "Các bạn giờ đã là bạn bè, hãy bắt đầu trò chuyện nào!";
@@ -47,10 +46,13 @@ export default function UserChat({ item }) {
         return "No text messages found!";
       }
       const lastMessage = userMessages[userMessages.length - 1];
+      console.log("lastMessage:::", lastMessage.content);
       return lastMessage;
     }
   };
+
   const lastMessage = getLastMessage();
+  
   const formatDate = (date) => {
     const options = { hour: "2-digit", minute: "2-digit" };
     const formattedTime = new Date(date).toLocaleTimeString("vi-VN", options);
