@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import {
+  forgotPasswordOTPService,
   loginService,
   registerService,
   verifyOTPService,
@@ -9,6 +10,7 @@ import { generateRefreshToken } from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
 import { sendOTPForUser } from "../services/sendMail.service.js";
 import { insertOTP } from "../services/otp.service.js";
+import { forgotPasswordService } from "../services/auth.service.js";
 
 export const register = async (req, res) => {
   try {
@@ -102,5 +104,58 @@ export const refreshToken = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: error.message });
+  }
+};
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const email = req.body.email;
+    const { EC, EM, DT } = await forgotPasswordService(email);
+    res.status(200).json({ EC, EM, DT });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    });
+  }
+};
+
+export const forgotPasswordOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const { EM, EC, DT } = await forgotPasswordOTPService({ email, otp });
+    res.status(200).json({ EC, EM, DT });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const email = req.body.email;
+    const newPassword = req.body.newPassword;
+    const confirmPassword = req.body.confirmPassword;
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        EC: 1,
+        EM: "Password and confirm password do not match",
+        DT: "",
+      });
+    }
+    const { EM, EC, DT } = await forgotPasswordOTPService({ email, confirmPassword });
+    res.status(200).json({ EC, EM, DT });
+  } catch (error) {
+    res.status(500).json({
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    });
   }
 };

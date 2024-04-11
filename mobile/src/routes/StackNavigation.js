@@ -8,8 +8,13 @@ import VerifyOTPScreen from "../screens/VerifyOTPScreen";
 import AddFriendScreen from "../screens/AddFriendScreen";
 import ChatScreen from "../screens/ChatScreen";
 import FriendRequestScreen from "../screens/FriendRequestScreen";
+import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
+import ForgotPasswordOTPScreen from "../screens/ForgotPasswordOTPScreen";
+import ResetPasswordScreen from "../screens/ResetPasswordScreen";
 import CreateGroupScreen from "../screens/CreateGroupScreen";
 import ChatGroupScreen from "../screens/ChatGroupScreen";
+
+
 const Stack = createNativeStackNavigator();
 const StackNavigation = () => {
   return (
@@ -47,6 +52,19 @@ const StackNavigation = () => {
         <Stack.Screen
           name="FriendRequest"
           component={FriendRequestScreen}
+        ></Stack.Screen>
+        <Stack.Screen
+          name="ForgotPassword"
+          component={ForgotPasswordScreen}
+        ></Stack.Screen>
+        <Stack.Screen
+          name="ForgotPasswordOTP"
+          component={ForgotPasswordOTPScreen}
+        ></Stack.Screen>
+        <Stack.Screen
+          name="ResetPassword"
+          component={ResetPasswordScreen}
+          options={{ headerShown: false }}
         ></Stack.Screen>
         <Stack.Screen
           name="CreateGroup"
