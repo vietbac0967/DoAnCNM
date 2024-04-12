@@ -1,0 +1,29 @@
+.my-messenge-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    .info-messenge {
+        padding: 8px;
+        max-width: 70%;
+
+        .form-text {
+            display: flex;
+            align-items: center;
+            min-height: 60px;
+            min-width: 90px;
+            padding: 10px;
+            background-color: #e5efff;
+
+            .text {
+                font-size: .9375rem;
+                font-weight: 400;
+                line-height: 1.5;
+                user-select: text;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                color: var(--text-primary);
+            }
+        }
+    }
+}

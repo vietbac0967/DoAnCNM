@@ -1,0 +1,22 @@
+.header-chat-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+
+    .info-user {
+        display: flex;
+        margin-left: 10px;
+
+        .info-name-user {
+            margin-left: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+        }
+    }
+
+    .action-info {}
+}

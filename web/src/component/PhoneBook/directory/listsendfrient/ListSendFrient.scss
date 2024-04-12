@@ -1,0 +1,25 @@
+.list-send-frient-container {
+    height: 100%;
+    width: 100%;
+
+    .list-send-frient-header {
+        height: 10%;
+        width: 100%;
+    }
+
+    .list-send-frient-body {
+        background-color: #eeeeee;
+        height: 90%;
+        width: 100%;
+
+        .list-send-frient-invitation {
+            width: 100%;
+            height: 50%;
+        }
+
+        .list-send-frient-send-invitation {
+            width: 100%;
+            height: 50%;
+        }
+    }
+}

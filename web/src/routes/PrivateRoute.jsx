@@ -9,8 +9,6 @@ const PrivateRoute = (props) => {
     const dispatch = useDispatch();
     const dataredux = useSelector((state) => state.userisaccess);
 
-    console.log(dataredux)
-
     useEffect(() => {
         if (window.location.pathname !== '/login' || window.location.pathname !== '/register')
             dispatch(fechUserToken())

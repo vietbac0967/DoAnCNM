@@ -60,7 +60,7 @@ export const login = async (req, res) => {
     if (DT) {
       res.cookie('jwt',
         DT,
-        { maxAge: 900000, httpOnly: true }
+        { maxAge: 86400000, httpOnly: true }
       );
     }
     res.status(200).json({ EC, EM, DT });

@@ -2,3 +2,23 @@
   margin: 0;
   padding: 0;
 }
+
+.app-container {
+  width: 100%;
+  height: 100vh;
+
+  .app-header {
+    height: 8%;
+
+  }
+
+  .app-action {
+    height: 92%;
+
+  }
+
+  .app-frient {
+    height: 92%;
+
+  }
+}

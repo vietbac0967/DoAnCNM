@@ -6,8 +6,7 @@ import Home from '../component/Home/Home'
 import PrivateRoute from './PrivateRoute';
 import LocalRoutes from './LocalRoutes';
 import Otp from '../component/OTP/Otp';
-import MessagePage from '../pages/MessagePage/MessagePage';
-import GroupPage from '../pages/GroupPage/GroupPage';
+import PhoneBook from '../component/PhoneBook/PhoneBook';
 
 const AppRoutes = () => {
     return (
@@ -16,9 +15,9 @@ const AppRoutes = () => {
             <Route path='register' element={<LocalRoutes component={<Register />} />} />
 
             <Route path='/otp/:email' element={<Otp />} />
-            <Route path='message' element={<MessagePage />} />
-            <Route path='group' element={<GroupPage />} />
             <Route path='/' element={<PrivateRoute component={<Home />} />} />
+            <Route path='/phonebook' element={<PrivateRoute component={<PhoneBook />} />} />
+
 
             <Route path="*" element={<>404 not found</>} />
         </Routes>

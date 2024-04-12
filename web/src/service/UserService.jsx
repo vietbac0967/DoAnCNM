@@ -20,6 +20,21 @@ const resendEmail = (data) => {
     return axios.post("/api/auth/reSendEmail", data)
 }
 
+const getuserbyPhone = (data) => {
+    return axios.post("/api/user/getByPhone", data)
+}
+
+const sendRequestFrient = (data) => {
+    return axios.post("/api/user/sendFriendRequest", data)
+
+}
+
+const acceptRequestFrient = (data) => {
+    return axios.post("/api/user/acceptFriendRequest", data)
+
+}
+
 export {
-    register, accountUser, login, verifyOTP, resendEmail
+    register, accountUser, login, verifyOTP, resendEmail, getuserbyPhone,
+    sendRequestFrient, acceptRequestFrient
 }
