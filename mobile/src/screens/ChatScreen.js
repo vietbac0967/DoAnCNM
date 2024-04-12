@@ -51,6 +51,7 @@ const ChatScreen = ({ navigation, route }) => {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("Đang hoạt động"); // Trạng thái mặc định
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalImageVisible, setModalImageVisible] = useState(false);
   const [receiver, setReceiver] = useState({});
   const scrollViewRef = useRef(null);
 
@@ -359,12 +360,34 @@ const ChatScreen = ({ navigation, route }) => {
           </Pressable>
         </Modal>
 
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalImageVisible}
+          onRequestClose={() => setModalImageVisible(false)}
+        >
+          <Pressable style={styles.modalBackGround} onPressOut={() => setModalImageVisible(false)}>
+            <View style={styles.modalImageContainer}>
+              <Image
+              source={require("../assets/loading.gif")}
+              style={{ width: 100, height: 100, position: "absolute", top: "50%", left: "50%", transform: [{translateX: -50}, {translateY: -50}] }}
+              />
+              <Image
+                source={{ uri: selectMessage.content }}
+                style={{ width: "100%", height: "100%", borderRadius: 20}}
+                resizeMode="contain"
+              />
+              <Feather name="x" size={25} color="#363636" style={{ position: "absolute", top: 50, right: 20 }} onPress={() => setModalImageVisible(false)} />
+            </View>
+          </Pressable>
+        </Modal>
+
         {messages.length > 0 &&
           messages.map((message) => {
             if (message.messageType === "text") {
               return (
                 <Pressable
-                  onPress={() => {
+                  onLongPress={() => {
                     setSetlectMessage(message);
                     setModalVisible(true);
                   }}
@@ -408,9 +431,13 @@ const ChatScreen = ({ navigation, route }) => {
             if (message.messageType === "image") {
               return (
                 <Pressable
-                  onPress={() => {
+                  onLongPress={() => {
                     setSetlectMessage(message);
                     setModalVisible(true);
+                  }}
+                  onPress={() => {
+                    setSetlectMessage(message);
+                    setModalImageVisible(true);
                   }}
                   key={message._id}
                   style={[
@@ -646,6 +673,13 @@ const styles = StyleSheet.create({
     elevation: 20,
     flexDirection: "row",
     justifyContent: "space-around",
+  },
+  modalImageContainer: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: "white",
+    elevation: 20,
+    flexDirection: "row",
   },
 });
 
