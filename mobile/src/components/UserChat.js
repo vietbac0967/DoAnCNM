@@ -83,6 +83,7 @@ export default function UserChat({ item }) {
       <Image
         style={{ width: 50, height: 50, borderRadius: 25, resizeMode: "cover" }}
         source={{ uri: item.avatar }}
+        defaultSource={require("../assets/avt.jpg")}
       ></Image>
       <View style={{ flex: 1 }}>
         <Text style={{ fontSize: 15, fontWeight: "500" }}>{item?.name}</Text>

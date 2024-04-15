@@ -258,23 +258,26 @@ const ChatScreen = ({ navigation, route }) => {
         <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
           <Ionicons
             onPress={() => navigation.goBack()}
-            name="arrow-back"
+            name="chevron-back-outline"
             size={24}
-            color="black"
+            color="#fff"
           />
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Image
               style={{
-                width: 30,
-                height: 30,
-                borderRadius: 15,
+                width: 40,
+                height: 40,
+                borderRadius: 20,
                 resizeMode: "cover",
               }}
               source={{ uri: receiver?.avatar }}
+              defaultSource={require("../assets/avt.jpg")}
             />
 
-            <Text style={{ marginLeft: 5, fontSize: 15, fontWeight: "bold" }}>
-              {receiver?.name}
+            <Text style={{ marginLeft: 10, fontSize: 15, fontWeight: "bold", color:"#fff" }}>
+              {receiver?.name && receiver.name.length > 17
+                ? receiver.name.substring(0, 17) + "..."
+                : receiver.name}
             </Text>
           </View>
         </View>
@@ -282,19 +285,19 @@ const ChatScreen = ({ navigation, route }) => {
       headerRight: () => (
         <View style={styles.rightIcons}>
           <TouchableOpacity onPress={() => console.log("Call")}>
-            <Ionicons name="call-outline" size={24} color="#566573" />
+            <Ionicons name="call" size={24} color="#fff" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => console.log("Videocall")}
             style={styles.videocallButton}
           >
-            <Ionicons name="videocam-outline" size={24} color="#566573" />
+            <Ionicons name="videocam" size={24} color="#fff" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => console.log("Setting")}
             style={styles.settingButton}
           >
-            <Ionicons name="list-outline" size={24} color="#566573" />
+            <Ionicons name="list" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
       ),
@@ -405,6 +408,7 @@ const ChatScreen = ({ navigation, route }) => {
             message={item}
             receiverId={recevierId}
             setModalVisible={setModalVisible}
+            setModalImageVisible={setModalImageVisible}
             setSelectMessage={setSelectMessage}
             key={item._id}
           />
@@ -484,7 +488,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "rgb(238, 240, 241)",
-    marginTop: 20,
   },
   header: {
     flexDirection: "row",
@@ -517,8 +520,8 @@ const styles = StyleSheet.create({
   rightIcons: {
     flexDirection: "row",
     marginLeft: "auto",
-    marginRight: 10,
-    marginTop: 7,
+    marginRight: 3,
+    marginTop: 3,
   },
   videocallButton: {
     marginLeft: 15,
