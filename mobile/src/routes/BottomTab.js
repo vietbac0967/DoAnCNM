@@ -61,8 +61,11 @@ export default function BottomTab({ navigation }) {
         name="Group"
         component={GroupScreen}
         options={{
-          headerShown: false,
+          // headerShown: false,
           tabBarLabel: "Nhóm",
+          headerStyle: {
+            backgroundColor: "#00ACED",
+          },
           tabBarIcon: ({ focused }) =>
             focused ? (
               <MaterialCommunityIcons

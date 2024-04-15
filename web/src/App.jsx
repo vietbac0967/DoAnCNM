@@ -1,33 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { ToastContainer } from 'react-toastify'
+import './App.scss'
+import AppRoutes from './routes/AppRoutes'
+import { useDispatch, useSelector } from 'react-redux';
+import { Grid, useMediaQuery, useTheme } from '@mui/material'
+import Header from './component/Home/header/Header';
+import Action from './component/Home/actions/Action';
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  const theme = useTheme();
+  const mdup = useMediaQuery(theme.breakpoints.up('md'))
+
+  const dispatch = useDispatch();
+  const dataredux = useSelector((state) => state.userisaccess)
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {
+        dataredux && dataredux.isAuthenticated ?
+          <Grid className='app-container' container spacing={0} columns={12}>
+            <Grid className='app-header' item xs={12}>
+              <Header />
+            </Grid>
+            <Grid className='app-action' item xs={2} sm={1.3} md={0.8}>
+              <Action />
+            </Grid>
+            <Grid className='app-frient' item xs={10} sm={10.7} md={11.2}>
+              <AppRoutes />
+            </Grid>
+          </Grid>
+          :
+          <AppRoutes />
+      }
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </>
   )
 }

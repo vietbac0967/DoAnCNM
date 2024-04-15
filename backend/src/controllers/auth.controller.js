@@ -163,7 +163,11 @@ export const changePassword = async (req, res) => {
     const oldPassword = req.body.oldPassword;
     const newPassword = req.body.newPassword;
     const confirmPassword = req.body.confirmPassword;
-    const response = await changePasswordService(email, oldPassword, newPassword, confirmPassword);
+    const response = await changePasswordService(
+      email,
+      newPassword,
+      confirmPassword
+    );
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({
@@ -174,3 +178,17 @@ export const changePassword = async (req, res) => {
   }
 };
 
+export const account = (req, res) => {
+  try {
+    if (req.user) {
+      return res.status(200).json({
+        EC: 0,
+        EM: "verify account success",
+        DT: req.user,
+      });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};

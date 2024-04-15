@@ -1,6 +1,7 @@
 import {
   acceptFriendRequestToUser,
   findUserByPhone,
+  getFriendsNotInGroupService,
   getUserByIdService,
   getUserInfoService,
   rejectFriendRequestToUser,
@@ -181,21 +182,38 @@ export const updateUserImage = async (req, res) => {
     const fileType = image.split(".").pop();
     const filePath = `${userId}_${Date.now()}.${fileType}`;
     console.log("filePath::::", filePath);
-    s3.upload({
-      Bucket: process.env.S3_BUCKET_NAME,
-      Key: filePath,
-      Body: req.file.buffer,
-      ContentType: req.file.mimetype,
-    },async (err,data) => {
-      if(err){
-        res.status(500).json({EC:1,EM:"Error",DT:""});
-      }else{
-        const result = await updateUserImageService(userId,data.Location);
-        res.status(200).json(result);
+    s3.upload(
+      {
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: filePath,
+        Body: req.file.buffer,
+        ContentType: req.file.mimetype,
+      },
+      async (err, data) => {
+        if (err) {
+          res.status(500).json({ EC: 1, EM: "Error", DT: "" });
+        } else {
+          const result = await updateUserImageService(userId, data.Location);
+          res.status(200).json(result);
+        }
       }
-    });
+    );
   } catch (error) {
     res.status(500).json({
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    });
+  }
+};
+export const getFriendsInNotGroup = async (req, res) => {
+  try {
+    const groupId = req.params.groupId;
+    const userId = req.user._id;
+    const users = await getFriendsNotInGroupService(userId, groupId);
+    return res.status(200).json(users);
+  } catch (error) {
+    return res.status(500).json({
       EC: 1,
       EM: error.message,
       DT: "",

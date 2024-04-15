@@ -1,0 +1,40 @@
+.chat-info-container {
+    padding: 5px;
+    display: flex;
+
+    // &:hover {
+    //     cursor: pointer;
+    //     background-color: #eeeeee;
+    // }
+
+    .name-chat-info {
+        margin-left: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        .name-info {
+            font-style: inherit;
+            font-weight: 600;
+            font-size: 18px;
+            line-height: 16.94px;
+            color: #000000;
+        }
+
+        .chat-info {
+            font-style: inherit;
+            font-weight: 400;
+            font-size: 15px;
+            line-height: 14.52px;
+            color: #545454;
+        }
+
+        .time-info {
+            font-style: inherit;
+            font-weight: 400;
+            font-size: 10px;
+            line-height: 12.1px;
+            color: #8A8A8A;
+        }
+    }
+}

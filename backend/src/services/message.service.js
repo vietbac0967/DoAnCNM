@@ -1,19 +1,27 @@
 import Message from "../models/message.model.js";
 
-export const sendMessageService = async (receiverId, senderId, content,messageType) => {
-  
+export const sendMessageService = async (
+  receiverId,
+  senderId,
+  content,
+  messageType
+) => {
   try {
     const newMessage = new Message({
       senderId,
       receiverId,
       content,
-      messageType
+      messageType,
     });
     await newMessage.save();
+    const populatedMessage = await Message.findById(newMessage._id).populate(
+      "senderId",
+      "_id name avatar"
+    );
     return {
       EC: 0,
       EM: "Success",
-      DT: newMessage,
+      DT: populatedMessage,
     };
   } catch (error) {
     return {
@@ -23,8 +31,6 @@ export const sendMessageService = async (receiverId, senderId, content,messageTy
     };
   }
 };
-
-
 
 export const getMessagesService = async (senderId, receiverId) => {
   try {
@@ -38,7 +44,7 @@ export const getMessagesService = async (senderId, receiverId) => {
         },
         { senderDelete: { $ne: senderId } },
       ],
-    }).populate("senderId", "_id name");
+    }).populate("senderId", "_id name avatar");
 
     return {
       EC: 0,
@@ -53,6 +59,7 @@ export const getMessagesService = async (senderId, receiverId) => {
     };
   }
 };
+
 export const deleteMessageService = async (messageId, senderID) => {
   try {
     const message = await Message.findByIdAndUpdate(messageId, {
@@ -78,6 +85,7 @@ export const deleteMessageService = async (messageId, senderID) => {
     };
   }
 };
+
 export const recallMessageService = async (messageId) => {
   try {
     const messages = await Message.findByIdAndDelete(messageId);
@@ -95,6 +103,71 @@ export const recallMessageService = async (messageId) => {
     };
   } catch (error) {
     console.log(error);
+    return {
+      EC: 1,
+      EM: "Error",
+      DT: error,
+    };
+  }
+};
+
+export const sendMessageGroupService = async (
+  senderId,
+  groupId,
+  content,
+  messageType
+) => {
+  try {
+    const newMessage = new Message({
+      senderId,
+      groupId,
+      content,
+      messageType,
+    });
+    await newMessage.save();
+    const populatedMessage = await Message.findById(newMessage._id).populate(
+      "senderId",
+      "_id name avatar"
+    );
+    return {
+      EC: 0,
+      EM: "Success",
+      DT: populatedMessage,
+    };
+  } catch (error) {
+    return {
+      EC: 1,
+      EM: "Error",
+      DT: error,
+    };
+  }
+};
+
+export const getMessagesGroupService = async (groupId, senderId) => {
+  try {
+    const messages = await Message.find({
+      $and: [
+        {
+          groupId: groupId,
+        },
+        {
+          senderDelete: { $ne: senderId },
+        },
+      ],
+    }).populate("senderId", "_id name avatar");
+    if (!messages) {
+      return {
+        EC: 1,
+        EM: "Message not found",
+        DT: "",
+      };
+    }
+    return {
+      EC: 0,
+      EM: "Success",
+      DT: messages,
+    };
+  } catch (error) {
     return {
       EC: 1,
       EM: "Error",

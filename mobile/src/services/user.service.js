@@ -71,7 +71,7 @@ export const searchUser = async (token, phone) => {
     );
     return response.data;
   } catch (error) {
-    console.log("Error:::", error)
+    console.log("Error:::", error);
     return {};
   }
 };
@@ -155,5 +155,18 @@ export const sendFriendRequest = async (token, receiverId) => {
   } catch (error) {
     console.log("Error:::", error);
     return false;
+  }
+};
+
+export const getUserInfo = async (token) => {
+  try {
+    const response = await baseURL.get("/info", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    return {};
   }
 };
