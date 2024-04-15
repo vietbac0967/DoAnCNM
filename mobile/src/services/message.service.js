@@ -39,6 +39,27 @@ export const sendMessageService = async (token, receiverId, message) => {
   }
 };
 
+export const sendMessageGroupService = async (token, groupId, message) => {
+  try {
+    const response = await baseURL.post(
+      "/message/sendMessageGroup",
+      {
+        groupId,
+        content: message,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error:::", error);
+    return {};
+  }
+};
+
 export const deleteMessageService = async (token, messageId) => {
   try {
     const response = await baseURL.post(
@@ -67,11 +88,7 @@ export const recallMessageService = async (token, messageId) => {
         },
       }
     );
-    if (response.data.EC === 0 && response.data.EM === "Success") {
-      return true;
-    } else {
-      return false;
-    }
+    return response.data;
   } catch (error) {
     console.log("error:::", error);
     return false;

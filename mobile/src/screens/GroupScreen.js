@@ -5,56 +5,118 @@ import {
   View,
   Button,
   Pressable,
+  Alert,
+  FlatList,
 } from "react-native";
 import { getFriends } from "../services/user.service";
 import UserChat from "../components/UserChat";
 import { AntDesign } from "@expo/vector-icons";
-import React, { useEffect, useRef, useState } from "react";
-import {  useSelector } from "react-redux";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import Feather from "react-native-vector-icons/Feather";
+import { getGroupsService } from "../services/group.service";
+import GroupCard from "../components/GroupCard";
+import { Ionicons } from "@expo/vector-icons";
 export default function GroupScreen({ navigation }) {
   const [groupName, setGroupName] = useState("");
   const [members, setMembers] = useState([]);
   const token = useSelector((state) => state.token.token);
   const [friends, setFriends] = useState([]);
   const [selectedFriends, setSelectedFriends] = useState([]);
+  const [groups, setGroups] = useState([]);
+
+  const getGroups = async () => {
+    try {
+      const response = await getGroupsService(token);
+      const { EC, EM, DT } = response;
+      if (EC === 0) {
+        setGroups(DT);
+      } else {
+        Alert.alert("Cảnh báo", EM);
+      }
+    } catch (error) {
+      Alert.alert("Cảnh báo", "Có một sự cố sảy ra");
+    }
+  };
 
   useEffect(() => {
-    const getListFriend = async () => {
-      try {
-        const friends = await getFriends(token);
-        setFriends(friends);
-      } catch (error) {
-        console.log("error:::", error);
-      }
-    };
-    getListFriend();
+    // const getListFriend = async () => {
+    //   try {
+    //     const friends = await getFriends(token);
+    //     setFriends(friends);
+    //   } catch (error) {
+    //     console.log("error:::", error);
+    //   }
+    // };
+    // getListFriend();
+    getGroups();
   }, []);
-  const handleSelectFriend = (friendId) => {
-    if (!selectedFriends.includes(friendId)) {
-      setSelectedFriends([...selectedFriends, friendId]);
-    } else {
-      setSelectedFriends(selectedFriends.filter((id) => id !== friendId));
-    }
-  };
+  console.log(groups);
+  // const handleSelectFriend = (friendId) => {
+  //   if (!selectedFriends.includes(friendId)) {
+  //     setSelectedFriends([...selectedFriends, friendId]);
+  //   } else {
+  //     setSelectedFriends(selectedFriends.filter((id) => id !== friendId));
+  //   }
+  // };
 
   // Hàm xử lý thêm thành viên vào nhóm
-  const addMember = () => {
-    if (selectedFriends.length === 0) {
-      return; // Không thêm nếu không có thành viên nào được chọn
-    }
-    setMembers([...members, ...selectedFriends]);
-    setSelectedFriends([]); // Reset danh sách thành viên đã chọn
-  };
+  // const addMember = () => {
+  //   if (selectedFriends.length === 0) {
+  //     return; // Không thêm nếu không có thành viên nào được chọn
+  //   }
+  //   setMembers([...members, ...selectedFriends]);
+  //   setSelectedFriends([]); // Reset danh sách thành viên đã chọn
+  // };
   // Hàm xử lý tạo nhóm chat
-  const createGroupChat = () => {
-    // Thực hiện logic tạo nhóm chat và chuyển đến màn hình chat nhóm
-  };
+  // const createGroupChat = () => {
+  //   // Thực hiện logic tạo nhóm chat và chuyển đến màn hình chat nhóm
+  // };
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: "",
+      headerLeft: () => (
+        <View style={{ flexDirection: "row", marginLeft: 5 }}>
+          <Ionicons
+            style={{ paddingTop: 8 }}
+            name="search"
+            size={24}
+            color="#fff"
+          />
+          <Pressable onPress={() => navigation.navigate("Search")} style={{width:200}}>
+            <Text
+              style={{
+                paddingTop: 10,
+                paddingLeft: 20,
+                fontSize: 12,
+                color: "#fff",
+              }}
+            >
+              Tìm kiếm
+            </Text>
+          </Pressable>
+        </View>
+      ),
+      headerRight: () => (
+        <Pressable
+          style={{ marginRight: 10 }}
+          onPress={() => navigation.navigate("AddFriend")}
+        >
+          <Ionicons
+            style={{ paddingTop: 5 }}
+            name="person-add-outline"
+            size={24}
+            color="#fff"
+          />
+        </Pressable>
+      ),
+    });
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-        <Text style={styles.title}>Tạo Nhóm Chat</Text>
+        <Text style={styles.title}>Nhóm</Text>
 
         <Pressable
           onPress={() => {
@@ -64,17 +126,20 @@ export default function GroupScreen({ navigation }) {
           <AntDesign name="addusergroup" size={30} color="black" />
         </Pressable>
       </View>
+      <Text style={{ fontSize: 13, fontWeight: "bold", marginBottom: 10 }}>
+        Nhóm đã tham gia {groups.length}
+      </Text>
       {/* <View>
         <Pressable style={styles.contactButton} 
         onPress={() => navigation.navigate("ChatScreen",{recevierId: item._id} )}>
             <Feather name="message-square" size={20} color="grey" />
           </Pressable>
           </View> */}
-      {
-        friends.map((friend) => (
-          <UserChat key={friend._id} item={friend}  />
-        ))
-      }
+      <FlatList
+        data={groups}
+        renderItem={({ item }) => <GroupCard item={item} />}
+        keyExtractor={(item) => item._id}
+      ></FlatList>
     </View>
   );
 }
@@ -84,7 +149,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#fff",
-    marginTop: 50,
+    // marginTop: 50,
   },
   title: {
     fontSize: 24,
@@ -109,5 +174,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginRight: 10,
     paddingHorizontal: 10,
+  },
+  search: {
+    marginTop: 25,
+    height: 40,
+    flexDirection: "row",
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    backgroundColor: "white",
+    justifyContent: "space-around",
   },
 });

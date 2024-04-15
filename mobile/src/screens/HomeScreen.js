@@ -4,14 +4,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getFriends } from "../services/user.service";
 import UserChat from "../components/UserChat";
-import { URL_SERVER } from "@env";
+// import { URL_SERVER } from "@env";
 export default function HomeScreen({ navigation, route }) {
   const token = useSelector((state) => state.token.token);
-  console.log("token:::", token);
+  // console.log("token:::", token);
   const isLoading = route.params?.isLoading;
-  console.log("isLoading:::", isLoading ? "true" : "false");
+  // console.log("isLoading:::", isLoading ? "true" : "false");
   const [friends, setFriends] = useState([]);
-  console.log("URL_SERVER:::", URL_SERVER);
+  // console.log("URL_SERVER:::", URL_SERVER);
   const getListFriend = async () => {
     try {
       const friends = await getFriends(token);

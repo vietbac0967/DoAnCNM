@@ -1,213 +1,110 @@
-import React, {
-    useState,
-    useEffect,
-    useRef,
-    useLayoutEffect,
-    useCallback,
-  } from "react";
-  import {
-    View,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    ScrollView,
-    StyleSheet,
-    Image,
-    KeyboardAvoidingView,
-    Pressable,
-    Platform,
-    Alert,
-    Modal,
-    Animated,
-  } from "react-native";
-  import { Ionicons } from "@expo/vector-icons";
-  import EmojiSelector from "react-native-emoji-selector";
-  import AsyncStorage from "@react-native-async-storage/async-storage";
-  import {
-    deleteMessageService,
-    getMessagesService,
-    recallMessageService,
-    sendImageService,
-    sendMessageService,
-  } from "../services/message.service";
-  import { getReceiverService } from "../services/user.service";
-  import { Entypo } from "@expo/vector-icons";
-  import { Feather } from "@expo/vector-icons";
-  import { EvilIcons } from "@expo/vector-icons";
-  import { FontAwesome } from "@expo/vector-icons";
-  import { io } from "socket.io-client";
-  import { useSelector } from "react-redux";
-  import * as ImagePicker from "expo-image-picker";
-  import { URL_SERVER } from "@env";
-  import { baseURL } from "../api/baseURL";
-  const ChatGroupScreen = ({ navigation, route }) => {
-    const token = useSelector((state) => state.token.token);
-    const [messages, setMessages] = useState([]);
-    const [showEmojiSelector, setShowEmojiSelector] = useState(false);
-    const { recevierId } = route.params;
-    const socket = useRef();
-    const [selectMessage, setSetlectMessage] = useState({});
-    const [message, setMessage] = useState("");
-    const [status, setStatus] = useState("Đang hoạt động"); // Trạng thái mặc định
-    const [modalVisible, setModalVisible] = useState(false);
-    const [receiver, setReceiver] = useState({});
-    const scrollViewRef = useRef(null);
-  
-    const scrollToBottom = () => {
-      if (scrollViewRef.current) {
-        scrollViewRef.current.scrollToEnd({ animated: false });
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Pressable,
+  KeyboardAvoidingView,
+  TextInput,
+  FlatList,
+  ScrollView,
+  Modal,
+} from "react-native";
+import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
+import { baseURL } from "../api/baseURL";
+import { useSelector } from "react-redux";
+import { Ionicons, AntDesign, EvilIcons } from "@expo/vector-icons";
+import EmojiSelector from "react-native-emoji-selector";
+import { Entypo, Feather, FontAwesome } from "@expo/vector-icons";
+import { io } from "socket.io-client";
+import { URL_SERVER } from "@env";
+import { getUserInfo } from "../services/user.service";
+import {
+  deleteMessageService,
+  recallMessageService,
+  sendMessageGroupService,
+} from "../services/message.service";
+import formatDateOrTime from "../utils/formatDateOrTime";
+import MessageCard from "../components/MessageCard";
+export default function ChatGroupScreen({ route, navigation }) {
+  const token = useSelector((state) => state.token.token);
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectMessage, setSelectMessage] = useState({});
+  const inputRef = useRef(null);
+  const socket = useRef();
+  const user = useRef({});
+  const [showEmojiSelector, setShowEmojiSelector] = useState(false);
+  const group = route.params?.group;
+  const scrollViewRef = useRef(null);
+  const getMessagesGroup = async () => {
+    try {
+      const response = await baseURL.get("/message/messagesGroup", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          groupId: group._id,
+        },
+      });
+      const { EM, EC, DT } = response.data;
+      if (EC === 0 && EM === "Success") {
+        setMessages(DT);
       }
-    };
-    const handleContentSizeChange = () => {
-      scrollToBottom();
-    };
-  
-    const handleEmojiPress = () => {
-      setShowEmojiSelector(!showEmojiSelector);
-    };
-  
-    const pickImage = async () => {
-      try {
-        let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          aspect: [4, 3],
-          quality: 1,
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Something went wrong");
+    }
+  };
+  const handleEmojiPress = () => {
+    setShowEmojiSelector(!showEmojiSelector);
+    inputRef.current.blur();
+  };
+  const handleSendMessage = async () => {
+    try {
+      const response = await sendMessageGroupService(token, group._id, message);
+      const { EM, EC, DT } = response;
+      console.log("DT:::", DT);
+      if (EC === 0 && EM === "Success") {
+        socket.current.emit("send-group-msg", {
+          groupId: group._id,
+          message: DT,
         });
-        if (!result.canceled) {
-          let localUri = result.assets[0].uri;
-          let filename = localUri.split("/").pop();
-          let match = /\.(\w+)$/.exec(filename);
-          let type = match ? `image/${match[1]}` : "image";
-          const formData = new FormData();
-          formData.append("image", {
-            uri: localUri,
-            name: filename,
-            type,
-          });
-          formData.append("receiverId", recevierId);
-          const response = await baseURL.post("/message/sendImage", formData, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
-          });
-          const { DT, EC, EM } = response.data;
-          if (EC === 0 && EM === "Success") {
-            socket.current.emit("send-msg", {
-              from: DT.receiverId,
-              to: DT.senderId,
-              msg: DT.content,
-            });
-            setMessage("");
-            getMessages();
-            return;
-          }
-        }
-      } catch (error) {
-        console.error("Error while picking image and sending message:", error);
-        Alert.alert("Cảnh báo","Kích thước ảnh quá lớn, vui lòng chọn ảnh khác")
+        setMessage("");
+        getMessagesGroup();
       }
-    };
-  
-    const getMessages = async () => {
-      try {
-        const response = await getMessagesService(token, recevierId);
-        // console.log("response:::", response);
-        setMessages(response);
-      } catch (error) {
-        console.log("error:::", error);
-      }
-    };
-  
-    const getReceiver = async () => {
-      try {
-        const token = await AsyncStorage.getItem("token");
-        const response = await getReceiverService(token, recevierId);
-        setReceiver(response);
-      } catch (error) {
-        console.log("error:::", error);
-      }
-    };
-  
-    useEffect(() => {
-      socket.current = io(URL_SERVER);
-      socket.current.emit("add-user", recevierId);
-    }, []);
-  
-    useEffect(() => {
-      getMessages();
-    }, []);
-  
-    const handleSend = async () => {
-      try {
-        const { DT, EC, EM } = await sendMessageService(
-          token,
-          recevierId,
-          message
-        );
-        if (EC === 0 && EM === "Success") {
-          socket.current.emit("send-msg", {
-            from: DT.receiverId,
-            to: DT.senderId,
-            msg: DT.content,
-          });
-          setMessage("");
-          getMessages();
-        }
-      } catch (error) {
-        console.log("error:::", error);
-      }
-    };
-  
-    useEffect(() => {
-      if (socket.current) {
-        socket.current.on("msg-recieve", (msg) => {
-         getMessages();
-        });
-        socket.current.on("recall", (msg) => {
-          // setMessages((prevMessages) => {
-          //   const newMessages = prevMessages.map((message) => {
-          //     if (message._id === msg._id) {
-          //       return msg;
-          //     }
-          //     return message;
-          //   });
-          //   return newMessages;
-          // });
-          getMessages();
-        });
-      }
-    }, []);
-  
-    useEffect(() => {
-      getReceiver();
-    }, []);
-    useEffect(() => {
-      scrollToBottom();
-    }, [messages]);
-  
-    const formatDate = (date) => {
-      const options = { hour: "2-digit", minute: "2-digit" };
-      const formattedTime = new Date(date).toLocaleTimeString("vi-VN", options);
-      return formattedTime;
-    };
-    const formatTime = (time) => {
-      const options = { hour: "numeric", minute: "numeric" };
-      return new Date(time).toLocaleString("en-US", options);
-    };
-    const formatDateOrTime = (updatedAt) => {
-      const today = new Date();
-      const updatedAtDate = new Date(updatedAt);
-  
-      if (updatedAtDate.toDateString() === today.toDateString()) {
-        // Display time if updatedAt is today
-        return formatDate(updatedAt);
+    } catch (error) {
+      Alert.alert("Error", "Something went wrong");
+    }
+  };
+  const scrollToBottom = () => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd({ animated: false });
+    }
+  };
+  const handleContentSizeChange = () => {
+    scrollToBottom();
+  };
+
+  const handleDeleteMessage = async () => {
+    try {
+      const response = await deleteMessageService(token, selectMessage?._id);
+      const { EC, EM, DT } = response;
+      console.log("response:::", response);
+      if (EC === 0 && EM === "Success") {
+        getMessagesGroup();
+        setModalVisible(false);
       } else {
-        // Display full date if updatedAt is not today
-        return updatedAtDate.toLocaleDateString("en-US");
+        Alert("Thông báo", "Xóa không thành công");
       }
-    };
-    const handleRecallMessage = (messageID) => {
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleRecallMessage = async () => {
+    try {
       Alert.alert("Cảnh báo", "Bạn có muốn thu hồi nhắn này không?", [
         {
           text: "Không",
@@ -217,167 +114,233 @@ import React, {
         {
           text: "Có",
           onPress: async () => {
-            const response = await recallMessageService(token, selectMessage._id);
-            setModalVisible(false);
-            if (response) {
-              socket.current.emit("recall-msg", {
-                from: selectMessage.receiverId,
-                to: selectMessage.senderId,
-                msg: selectMessage.content,
-              });
-              getMessages();
-              return;
+            try {
+              const response = await recallMessageService(
+                token,
+                selectMessage?._id
+              );
+              console.log("response:::", response);
+              const { EC, EM, DT } = response;
+              if (EC === 0 && EM === "Success") {
+                setModalVisible(false);
+                socket.current.emit("recall-group-msg", {
+                  groupId: group._id,
+                  messageId: selectMessage?._id,
+                });
+
+                // Update the messages state by filtering out the deleted message
+                setMessages((messages) =>
+                  messages.filter(
+                    (message) => message._id !== selectMessage._id
+                  )
+                );
+              }
+            } catch (error) {
+              Alert.alert("Error", error.message);
             }
           },
         },
       ]);
-    };
-    const handleDeleteMessage = async () => {
-      try {
-        const response = await deleteMessageService(token, selectMessage._id);
-        const { EC, EM, DT } = response;
-        if (EC === 0 && EM === "Success") {
-          getMessages();
-          setModalVisible(false);
-        } else {
-          Alert("Thông báo", "Xóa không thành công");
-        }
-      } catch (error) {
-        console.log(error);
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
+  const getInfo = async () => {
+    try {
+      const response = await getUserInfo(token);
+      console.log("response:::", response);
+      const { EM, EC, DT } = response;
+      if (EC === 0 && EM === "Success") {
+        user.current = DT;
       }
+    } catch (error) {
+      Alert.alert("Error", "Something went wrong");
+    }
+  };
+  useEffect(() => {
+    getMessagesGroup();
+    getInfo();
+  }, []);
+  // add socket id to room
+  useEffect(() => {
+    socket.current = io(URL_SERVER);
+    socket.current.emit("join-group", group._id);
+    return () => {
+      socket.current.disconnect();
     };
-    return (
-      <KeyboardAvoidingView
-        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-        style={styles.container}
-      >
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons
-              name="chevron-back-outline"
-              size={24}
-              color="black"
-              style={{ marginTop: 30 }}
-            />
-          </TouchableOpacity>
-  
-          <View style={styles.titleContainer}>
-            <Image source={{ uri: receiver?.avatar }} style={styles.avatar} />
-            <View style={{ flexDirection: "column", marginLeft: 10 }}>
-              <Text style={styles.headerText}>{receiver?.name}</Text>
-              <Text style={styles.statusText}>{status}</Text>
+  }, [group._id]);
+  // envent receive message
+  useEffect(() => {
+    if (socket.current) {
+      socket.current.on("group-msg-receive", (data) => {
+        console.log("Received group message:", data);
+        // Handle received message, e.g., update state to display the message
+        setMessages((prevMessages) => [...prevMessages, data]);
+        // getMessagesGroup();
+      });
+      socket.current.on("group-recall", (data) => {
+        getMessagesGroup();
+      });
+    }
+  }, []);
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: "",
+      headerLeft: () => (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+          <Ionicons
+            onPress={() => navigation.goBack()}
+            name="arrow-back"
+            size={24}
+            color="black"
+          />
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View>
+              <Text style={{ marginLeft: 5, fontSize: 15, fontWeight: "bold" }}>
+                {group?.name}
+              </Text>
+              <Text>{group?.members.length + 1} Thành viên</Text>
             </View>
           </View>
-          <View style={styles.rightIcons}>
-            <TouchableOpacity onPress={() => console.log("Call")}>
-              <Ionicons name="call-outline" size={24} color="#566573" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => console.log("Videocall")}
-              style={styles.videocallButton}
-            >
-              <Ionicons name="videocam-outline" size={24} color="#566573" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => console.log("Setting")}
-              style={styles.settingButton}
-            >
-              <Ionicons name="list-outline" size={24} color="#566573" />
-            </TouchableOpacity>
-          </View>
         </View>
-        <ScrollView
-          ref={scrollViewRef}
-          contentContainerStyle={{ flexGrow: 1 }}
-          onContentSizeChange={handleContentSizeChange}
+      ),
+      headerRight: () => (
+        <Pressable
+          onPress={() => {
+            navigation.navigate("GroupInfo", {
+              group: group,
+            });
+          }}
         >
-          {/* Header for user about image, name  */}
-  
-          <Modal
-            animationType="fade"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => setModalVisible(false)}
-          >
+          <AntDesign name="bars" size={24} color="black" />
+        </Pressable>
+      ),
+    });
+  }, []);
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior="padding"
+      keyboardVerticalOffset={1}
+    >
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <Pressable
+          style={styles.modalBackGround}
+          activeOpacity={1}
+          onPressOut={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            {/* xóa tin nhắn ở phía người gửi */}
             <Pressable
-              style={styles.modalBackGround}
-              activeOpacity={1}
-              onPressOut={() => setModalVisible(false)}
+              onPress={handleDeleteMessage}
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              <View style={styles.modalContainer}>
-                {/* xóa tin nhắn ở phía người gửi */}
-                <Pressable
-                  onPress={handleDeleteMessage}
-                  style={{
-                    flex: 1,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <EvilIcons name="trash" size={30} color="red" />
-                  <Text style={{ textAlign: "center", fontWeight: "400" }}>
-                    Xóa tin nhắn
-                  </Text>
-                </Pressable>
-                {/* Thu hồi tin nhắn ở hai phía */}
-                <Pressable
-                  disabled={selectMessage.receiverId !== receiver?._id}
-                  onPress={() => handleRecallMessage(message._id)}
-                  style={{
-                    flex: 1,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    display:
-                      selectMessage.receiverId !== receiver?._id
-                        ? "none"
-                        : "flex",
-                  }}
-                >
-                  <FontAwesome name="refresh" size={22} color="orange" />
-                  <Text style={{ textAlign: "center", fontWeight: "400" }}>
-                    Thu hồi tin nhắn
-                  </Text>
-                </Pressable>
-              </View>
+              <EvilIcons name="trash" size={30} color="red" />
+              <Text style={{ textAlign: "center", fontWeight: "400" }}>
+                Xóa tin nhắn
+              </Text>
             </Pressable>
-          </Modal>
-  
-          {messages.length > 0 &&
-            messages.map((message) => {
-              if (message.messageType === "text") {
-                return (
+            {/* Thu hồi tin nhắn ở hai phía */}
+            <Pressable
+              disabled={selectMessage.senderId?._id !== user.current?._id}
+              onPress={handleRecallMessage}
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+                display:
+                  selectMessage.senderId?._id === user.current?._id
+                    ? "flex"
+                    : "none",
+              }}
+            >
+              <FontAwesome name="refresh" size={22} color="orange" />
+              <Text style={{ textAlign: "center", fontWeight: "400" }}>
+                Thu hồi tin nhắn
+              </Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
+
+      <FlatList
+        data={messages}
+        renderItem={({ item }) => (
+          <MessageCard
+            message={item}
+            userId={user.current?._id}
+            setModalVisible={setModalVisible}
+            setSelectMessage={setSelectMessage}
+          />
+        )}
+        keyExtractor={(item) => item._id}
+        ref={scrollViewRef}
+        contentContainerStyle={{ flexGrow: 1 }}
+        onContentSizeChange={handleContentSizeChange}
+      />
+      {/* <ScrollView>
+        {messages.length > 0 &&
+          messages.map((message) => {
+            const isCurrentUser = message.senderId?._id === user.current?._id;
+            if (message.messageType === "text") {
+              return (
+                <View
+                  key={message._id}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: isCurrentUser ? "flex-end" : "flex-start",
+                    marginVertical: 10,
+                  }}
+                >
+                  {!isCurrentUser && (
+                    <Image
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 20,
+                        marginRight: 10,
+                      }}
+                      resizeMode="cover"
+                      source={{ uri: message.senderId?.avatar }}
+                    />
+                  )}
                   <Pressable
+                    key={message._id}
                     onPress={() => {
-                      setSetlectMessage(message);
                       setModalVisible(true);
                     }}
-                    key={message._id}
                     style={[
-                      message.senderId?._id === receiver?._id
-                        ? {
-                            alignSelf: "flex-start",
-                            backgroundColor: "white",
-                            padding: 8,
-                            margin: 10,
-                            borderRadius: 7,
-                            maxWidth: "60%",
-                          }
-                        : {
-                            alignSelf: "flex-end",
-                            backgroundColor: "#DCF8C6",
-                            padding: 8,
-                            maxWidth: "60%",
-                            borderRadius: 7,
-                            margin: 10,
-                          },
+                      {
+                        backgroundColor: isCurrentUser ? "#DCF8C6" : "white",
+                        padding: 8,
+                        borderRadius: 7,
+                        maxWidth: "60%",
+                        alignSelf: isCurrentUser ? "flex-end" : "flex-start",
+                      },
                     ]}
                   >
-                    <Text style={{ fontSize: 13, textAlign: "left" }}>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        textAlign: isCurrentUser ? "right" : "left",
+                      }}
+                    >
                       {message.content}
                     </Text>
                     <Text
                       style={{
-                        textAlign: "right",
+                        textAlign: isCurrentUser ? "right" : "left",
                         fontSize: 9,
                         color: "gray",
                         marginTop: 5,
@@ -386,249 +349,107 @@ import React, {
                       {formatDateOrTime(message?.createdAt)}
                     </Text>
                   </Pressable>
-                );
-              }
-              if (message.messageType === "image") {
-                return (
-                  <Pressable
-                    onPress={() => {
-                      setSetlectMessage(message);
-                      setModalVisible(true);
-                    }}
-                    key={message._id}
-                    style={[
-                      message?.senderId?._id !== recevierId
-                        ? {
-                            alignSelf: "flex-end",
-                            // backgroundColor: "#DCF8C6",
-                            padding: 8,
-                            maxWidth: "60%",
-                            borderRadius: 7,
-                            margin: 10,
-                          }
-                        : {
-                            alignSelf: "flex-start",
-                            // backgroundColor: "white",
-                            padding: 8,
-                            margin: 10,
-                            borderRadius: 7,
-                            maxWidth: "60%",
-                          },
-                    ]}
-                  >
-                    <View>
-                      <Image
-                        source={{ uri: message.content }}
-                        resizeMode="cover"
-                        style={{
-                          width: 200,
-                          height: 200,
-                          borderRadius: 7,
-                          alignItems: "flex-end",
-                        }}
-                      />
-                      <Pressable
-                        style={{
-                          width: 70,
-                          borderRadius: 35,
-                          backgroundColor: "gray",
-                          alignSelf: "flex-end",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          marginTop: 10,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            textAlign: "center",
-                            fontSize: 11,
-                            color: "white",
-                            paddingVertical: 5,
-                            paddingHorizontal: 2,
-                          }}
-                        >
-                          {formatDateOrTime(message?.createdAt)}
-                        </Text>
-                      </Pressable>
-                    </View>
-                  </Pressable>
-                );
-              }
-            })}
-        </ScrollView>
-  
+                </View>
+              );
+            }
+            // Return null for non-text messages
+          })}
+      </ScrollView> */}
+
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          paddingHorizontal: 10,
+          paddingVertical: 10,
+          borderTopWidth: 1,
+          borderTopColor: "#dddddd",
+          marginBottom: showEmojiSelector ? 0 : 1,
+        }}
+      >
+        <Entypo
+          onPress={handleEmojiPress}
+          style={{ marginRight: 5 }}
+          name="emoji-happy"
+          size={24}
+          color="gray"
+        />
+
+        <TextInput
+          ref={inputRef}
+          inputMode="text"
+          value={message}
+          onChangeText={setMessage}
+          onFocus={() => setShowEmojiSelector(false)}
+          style={{
+            flex: 1,
+            height: 40,
+            borderWidth: 1,
+            borderColor: "#dddddd",
+            borderRadius: 20,
+            paddingHorizontal: 10,
+          }}
+          placeholder="Type Your message..."
+        />
+
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
-            paddingHorizontal: 10,
-            paddingVertical: 10,
-            borderTopWidth: 1,
-            borderTopColor: "#dddddd",
-            marginBottom: showEmojiSelector ? 0 : 25,
+            gap: 7,
+            marginHorizontal: 8,
           }}
         >
           <Entypo
-            onPress={handleEmojiPress}
-            style={{ marginRight: 5 }}
-            name="emoji-happy"
+            onPress={() => {
+              console.log("camera");
+            }}
+            name="camera"
             size={24}
             color="gray"
           />
-  
-          <TextInput
-            inputMode="text"
-            value={message}
-            onChangeText={setMessage}
-            style={{
-              flex: 1,
-              height: 40,
-              borderWidth: 1,
-              borderColor: "#dddddd",
-              borderRadius: 20,
-              paddingHorizontal: 10,
-            }}
-            placeholder="Type Your message..."
-          />
-  
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 7,
-              marginHorizontal: 8,
-            }}
-          >
-            <Entypo onPress={pickImage} name="camera" size={24} color="gray" />
-  
-            <Feather name="mic" size={24} color="gray" />
-          </View>
-  
-          <Pressable onPress={() => handleSend()}>
-            {/* <Text style={{ color: "white", fontWeight: "bold" }}>Send</Text> */}
-            <Ionicons name="send" size={24} color="#33D1FF" />
-          </Pressable>
+
+          <Feather name="mic" size={24} color="gray" />
         </View>
-  
-        {showEmojiSelector && (
-          <EmojiSelector
-            onEmojiSelected={(emoji) => {
-              setMessage((prevMessage) => prevMessage + emoji);
-            }}
-            style={{ height: 320 }}
-          />
-        )}
-      </KeyboardAvoidingView>
-    );
-  };
-  
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "rgb(238, 240, 241)",
-      marginTop: 20,
-    },
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingHorizontal: 10,
-      paddingVertical: 8,
-      backgroundColor: "#eaeaea",
-      position: "sticky",
-      top: 0,
-    },
-    titleContainer: {
-      flex: 1,
-      marginTop: 30,
-      flexDirection: "row",
-      marginLeft: 10,
-    },
-    avatar: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-    },
-    headerText: {
-      fontSize: 18,
-      fontWeight: "bold",
-    },
-    statusText: {
-      fontSize: 14,
-      color: "#666",
-    },
-    rightIcons: {
-      flexDirection: "row",
-      marginLeft: "auto",
-      marginRight: 10,
-      marginTop: 30,
-    },
-    videocallButton: {
-      marginLeft: 15,
-    },
-    settingButton: {
-      marginLeft: 15,
-    },
-    chatContainer: {
-      flexGrow: 1,
-      padding: 10,
-    },
-    messageContainer: {
-      maxWidth: "80%",
-      marginBottom: 10,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 8,
-    },
-    userMessage: {
-      alignSelf: "flex-end",
-      backgroundColor: "#95E7FF",
-    },
-    otherMessage: {
-      alignSelf: "flex-start",
-      backgroundColor: "#E5E5EA",
-    },
-    messageText: {
-      fontSize: 16,
-    },
-    timestampText: {
-      fontSize: 12,
-      color: "#666",
-      marginTop: 4,
-      textAlign: "right",
-    },
-    inputContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      padding: 8,
-      borderTopWidth: 1,
-      borderTopColor: "#ccc",
-    },
-    input: {
-      flex: 1,
-      borderWidth: 1,
-      borderColor: "#ccc",
-      borderRadius: 20,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      marginRight: 8,
-    },
-    modalBackGround: {
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.5)",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    modalContainer: {
-      width: "80%",
-      backgroundColor: "white",
-      paddingHorizontal: 20,
-      paddingVertical: 30,
-      borderRadius: 20,
-      elevation: 20,
-      flexDirection: "row",
-      justifyContent: "space-around",
-    },
-  });
-  
-  export default ChatGroupScreen;
-  
+
+        <Pressable onPress={() => handleSendMessage()}>
+          {/* <Text style={{ color: "white", fontWeight: "bold" }}>Send</Text> */}
+          <Ionicons name="send" size={24} color="#33D1FF" />
+        </Pressable>
+      </View>
+
+      {showEmojiSelector && (
+        <EmojiSelector
+          onEmojiSelected={(emoji) => {
+            setMessage((prevMessage) => prevMessage + emoji);
+          }}
+          style={{ height: 320 }}
+        />
+      )}
+    </KeyboardAvoidingView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "rgb(238, 240, 241)",
+    marginTop: 20,
+  },
+  modalBackGround: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "80%",
+    backgroundColor: "white",
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+    borderRadius: 20,
+    elevation: 20,
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+});

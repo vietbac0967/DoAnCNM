@@ -26,20 +26,38 @@ io.on("connection", (socket) => {
     const sendUserSocket = onlineUsers.get(data.to._id);
     socket.to(sendUserSocket).emit("recall", data);
   });
-  
+
   socket.on("send-msg", (data) => {
+    const sendUserSocket = onlineUsers.get(data.to);
+    console.log("send-msg", data);
+    if (sendUserSocket) {
+      socket.to(sendUserSocket).emit("msg-recieve", data);
+    }
+  });
+  socket.on("send-image", (data) => {
     const sendUserSocket = onlineUsers.get(data.to);
     console.log("send-msg", data);
     if (sendUserSocket) {
       socket.to(sendUserSocket).emit("msg-recieve", data.msg);
     }
   });
-  socket.on("send-image", (data) => {
-    const sendUserSocket = onlineUsers.get(data.to);
-    console.log("send-image", data);
-    if (sendUserSocket) {
-      socket.to(sendUserSocket).emit("image-recieve", data);
-    }
+  socket.on("join-group", (groupId) => {
+    console.log("join-group", groupId);
+    socket.join(groupId);
+  });
+
+  socket.on("send-group-msg", (data) => {
+    // console.log("send-group-msg", data);
+    socket.to(data.groupId).emit("group-msg-receive", data.message);
+  });
+  socket.on("recall-group-msg", (data) => {
+    console.log("recall-group-msg", data);
+    socket.to(data.groupId).emit("group-recall", data);
+  });
+  // leave room
+  socket.on("leave-group", (groupId) => {
+    console.log("leave-group", groupId);
+    socket.leave(groupId);
   });
 });
 

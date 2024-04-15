@@ -191,3 +191,35 @@ export const updateUserImageService = async (userId, image) => {
     return { EC: 1, EM: error.message, DT: "" };
   }
 };
+
+export const getFriendsNotInGroupService = async (userId, groupId) => {
+  try {
+    // Find the user's friends
+    const user = await User.findById(userId).populate("friends");
+
+    // Get the list of friendIds
+    const friendIds = user.friends.map((friend) => friend._id);
+
+    // Get the list of groupIds
+    const groupIds = user.groups.map((group) => group._id);
+
+    // Find the friends who are not part of the specified group
+    const friendsNotInGroup = await User.find({
+      _id: { $in: friendIds },
+      groups: { $nin: groupIds },
+    }).select("-password");
+
+    return {
+      EC: 0,
+      EM: "Success",
+      DT: friendsNotInGroup,
+    };
+  } catch (error) {
+    console.error("Error:", error);
+    return {
+      EC: 0,
+      EM: error.message,
+      DT: "",
+    };
+  }
+};
