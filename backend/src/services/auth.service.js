@@ -13,7 +13,7 @@ import { insertOTP, validateOTP } from "../services/otp.service.js";
 import otpGenerator from "otp-generator";
 import bcrypt from "bcrypt";
 import OTP from "../models/otp.model.js";
-import { sendOTPForUser } from "./sendMail.service.js";
+import { sendOTPForUser, sendOTPForgotPassword } from "./sendMail.service.js";
 
 export const verifyOTPService = async ({ email, otp }) => {
   try {
@@ -244,7 +244,7 @@ export const forgotPasswordService = async (data) => {
       upperCaseAlphabets: false,
       specialChars: false,
     });
-    const { EC, EM, DT } = await sendOTPForUser(otp, email);
+    const { EC, EM, DT } = await sendOTPForgotPassword(otp, email);
     if (EC === 0 && EM === "Success") {
       await insertOTP(otp, email);
       return {

@@ -60,6 +60,19 @@ export default function RegisterScreen({ navigation }) {
         style={{ width: "100%", height: "100%" }}
         source={require("../assets/background.png")}
       >
+        <Ionicons
+          name="chevron-back-outline"
+          size={24}
+          color="black"
+          style={{
+            position: "absolute",
+            top: 20,
+            left: 20,
+            padding: 10,
+            borderRadius: 5,
+          }}
+          onPress={() => navigation.goBack()}
+        />
         <Text
           style={{
             textAlign: "center",
@@ -149,7 +162,9 @@ export default function RegisterScreen({ navigation }) {
             </KeyboardAvoidingView>
           </KeyboardAvoidingView>
 
-          <KeyboardAvoidingView style={[styles.input, { justifyContent: "space-between" }]}>
+          <KeyboardAvoidingView
+            style={[styles.input, { justifyContent: "space-between" }]}
+          >
             <Text style={{ width: 120, marginRight: 5 }}>Mật khẩu: </Text>
             <TextInput
               value={user.password}
@@ -167,7 +182,9 @@ export default function RegisterScreen({ navigation }) {
             </Pressable>
           </KeyboardAvoidingView>
 
-          <KeyboardAvoidingView style={[styles.input, { justifyContent: "space-between" }]}>
+          <KeyboardAvoidingView
+            style={[styles.input, { justifyContent: "space-between" }]}
+          >
             <Text style={{ width: 120, marginRight: 5 }}>
               Nhập lại mật khẩu:{" "}
             </Text>

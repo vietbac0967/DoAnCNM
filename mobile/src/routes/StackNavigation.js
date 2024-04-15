@@ -39,6 +39,7 @@ const StackNavigation = () => {
           name="ChatScreen"
           component={ChatScreen}
           // options={{ headerShown: false }}
+          options={{ headerStyle: { backgroundColor: "#F279A6" }}}
         />
         <Stack.Screen
           name="VerifyOTP"

@@ -67,9 +67,7 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <View
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <ImageBackground
         resizeMode="cover"
         style={{ width: "100%", height: "100%" }}
@@ -78,47 +76,12 @@ export default function LoginScreen({ navigation }) {
         {/* Info view */}
         <View
           style={{
-            flexDirection: "row",
-            justifyContent: "space-around",
+            alignItems: "center",
             paddingTop: 40,
+            // flex: 1,
           }}
         >
-          <View style={[styles.eclipse, {}]}>
-            <Image
-              style={styles.avatar}
-              source={require("../assets/men.png")}
-            ></Image>
-          </View>
-          <View style={[styles.eclipse, { padding: 10 }]}>
-            <Image
-              resizeMode="cover"
-              style={{ width: "100%", height: 150, borderRadius: 50 }}
-              source={require("../assets/girl.png")}
-            ></Image>
-          </View>
-        </View>
-        {/* Avatar two */}
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-around",
-            paddingTop: 20,
-          }}
-        >
-          <View style={[styles.eclipse]}>
-            <Image
-              style={styles.avatar}
-              resizeMode="cover"
-              source={require("../assets/smartphone.png")}
-            ></Image>
-          </View>
-          <View style={[styles.eclipse, { padding: 10 }]}>
-            <Image
-              style={{ width: "100%", height: 150, borderRadius: 50 / 2 }}
-              resizeMode="cover"
-              source={require("../assets/senior.png")}
-            ></Image>
-          </View>
+          <Image source={require("../assets/poster.png")} style={styles.logo} />
         </View>
 
         <KeyboardAvoidingView
@@ -226,10 +189,9 @@ const styles = StyleSheet.create({
     borderRadius: 87,
     backgroundColor: "#00ACEE",
   },
-  avatar: {
-    borderRadius: 167 / 2,
-    width: 167,
-    height: 165,
+  logo: {
+    width: 300,
+    height: 350,
   },
   panel: {
     flex: 1,
@@ -241,6 +203,14 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
     width: "100%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 5,
   },
   input: {
     flexDirection: "row",

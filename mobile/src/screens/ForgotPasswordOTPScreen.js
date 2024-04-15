@@ -78,7 +78,7 @@ const ForgotPasswordOTPScreen = ({ route, navigation }) => {
       >
         <View style={{ alignItems: "center" }}>
           <Text style={styles.text}>Surprise Message</Text>
-          <Text style={{ fontSize: 36, fontWeight: "600", color: "#111" }}>
+          <Text style={{ fontSize: 36, fontWeight: "600", color: "#111", alignItems: "center" }}>
             Xác nhận mã OTP để khôi phục mật khẩu
           </Text>
 

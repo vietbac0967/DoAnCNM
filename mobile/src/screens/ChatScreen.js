@@ -133,7 +133,8 @@ const ChatScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    socket.current = io(URL_SERVER);
+    // socket.current = io(URL_SERVER);
+    socket.current = io("http://192.168.0.6:5000");
     socket.current.emit("add-user", recevierId);
   }, []);
 
@@ -551,7 +552,6 @@ const ChatScreen = ({ navigation, route }) => {
         </View>
 
         <Pressable onPress={() => handleSend()}>
-          {/* <Text style={{ color: "white", fontWeight: "bold" }}>Send</Text> */}
           <Ionicons name="send" size={24} color="#33D1FF" />
         </Pressable>
       </View>
