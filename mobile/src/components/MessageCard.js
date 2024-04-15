@@ -89,7 +89,7 @@ export default function MessageCard({
           setModalVisible(true);
         }}
         style={[
-          !isCurrentUser
+          isCurrentUser
             ? {
                 alignSelf: "flex-end",
                 padding: 8,

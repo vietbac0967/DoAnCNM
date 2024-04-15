@@ -26,6 +26,7 @@ import {
   sendMessageGroupService,
 } from "../services/message.service";
 import formatDateOrTime from "../utils/formatDateOrTime";
+import * as ImagePicker from "expo-image-picker";
 import MessageCard from "../components/MessageCard";
 export default function ChatGroupScreen({ route, navigation }) {
   const token = useSelector((state) => state.token.token);
@@ -61,6 +62,51 @@ export default function ChatGroupScreen({ route, navigation }) {
   const handleEmojiPress = () => {
     setShowEmojiSelector(!showEmojiSelector);
     inputRef.current.blur();
+  };
+  const pickImage = async () => {
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        aspect: [4, 3],
+        quality: 1,
+      });
+      if (!result.canceled) {
+        let localUri = result.assets[0].uri;
+        let filename = localUri.split("/").pop();
+        let match = /\.(\w+)$/.exec(filename);
+        let type = match ? `image/${match[1]}` : "image";
+        const formData = new FormData();
+        formData.append("image", {
+          uri: localUri,
+          name: filename,
+          type,
+        });
+        formData.append("groupId", group._id);
+        const response = await baseURL.post(
+          "/message/sendImageGroup",
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        const { DT, EC, EM } = response.data;
+        if (EC === 0 && EM === "Success") {
+          socket.current.emit("send-group-msg", {
+            groupId: group._id,
+            message: DT,
+          });
+          setMessage("");
+          getMessagesGroup();
+          return;
+        }
+      }
+    } catch (error) {
+      console.error("Error while picking image and sending message:", error);
+      Alert.alert("Cảnh báo", "Kích thước ảnh quá lớn, vui lòng chọn ảnh khác");
+    }
   };
   const handleSendMessage = async () => {
     try {
@@ -402,7 +448,7 @@ export default function ChatGroupScreen({ route, navigation }) {
         >
           <Entypo
             onPress={() => {
-              console.log("camera");
+              pickImage();
             }}
             name="camera"
             size={24}
