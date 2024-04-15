@@ -8,7 +8,7 @@ import {
   verifyOTP,
   forgotPassword,
   changePassword,
-  account
+  account,
   resetPassword,
 
 } from "../controllers/auth.controller.js";
