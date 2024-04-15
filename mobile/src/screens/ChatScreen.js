@@ -312,7 +312,6 @@ const ChatScreen = ({ navigation, route }) => {
         onContentSizeChange={handleContentSizeChange}
       > */}
       {/* Header for user about image, name  */}
-
       <Modal
         animationType="fade"
         transparent={true}
@@ -359,190 +358,45 @@ const ChatScreen = ({ navigation, route }) => {
           </View>
         </Pressable>
       </Modal>
-      {/* 
-      {messages.length > 0 &&
-          <Pressable
-            style={styles.modalBackGround}
-            activeOpacity={1}
-            onPressOut={() => setModalVisible(false)}
-          >
-            <View style={styles.modalContainer}>
-              {/* xóa tin nhắn ở phía người gửi */}
-              <Pressable
-                onPress={handleDeleteMessage}
-                style={{
-                  flex: 1,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <EvilIcons name="trash" size={30} color="red" />
-                <Text style={{ textAlign: "center", fontWeight: "400" }}>
-                  Xóa tin nhắn
-                </Text>
-              </Pressable>
-              {/* Thu hồi tin nhắn ở hai phía */}
-              <Pressable
-                disabled={selectMessage.receiverId !== receiver?._id}
-                onPress={() => handleRecallMessage(message._id)}
-                style={{
-                  flex: 1,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  display:
-                    selectMessage.receiverId !== receiver?._id
-                      ? "none"
-                      : "flex",
-                }}
-              >
-                <FontAwesome name="refresh" size={22} color="orange" />
-                <Text style={{ textAlign: "center", fontWeight: "400" }}>
-                  Thu hồi tin nhắn
-                </Text>
-              </Pressable>
-            </View>
-          </Pressable>
-        </Modal>
 
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalImageVisible}
-          onRequestClose={() => setModalImageVisible(false)}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalImageVisible}
+        onRequestClose={() => setModalImageVisible(false)}
+      >
+        <Pressable
+          style={styles.modalBackGround}
+          onPressOut={() => setModalImageVisible(false)}
         >
-          <Pressable style={styles.modalBackGround} onPressOut={() => setModalImageVisible(false)}>
-            <View style={styles.modalImageContainer}>
-              <Image
+          <View style={styles.modalImageContainer}>
+            <Image
               source={require("../assets/loading.gif")}
-              style={{ width: 100, height: 100, position: "absolute", top: "50%", left: "50%", transform: [{translateX: -50}, {translateY: -50}] }}
-              />
-              <Image
-                source={{ uri: selectMessage.content }}
-                style={{ width: "100%", height: "100%", borderRadius: 20}}
-                resizeMode="contain"
-              />
-              <Feather name="x" size={25} color="#363636" style={{ position: "absolute", top: 50, right: 20 }} onPress={() => setModalImageVisible(false)} />
-            </View>
-          </Pressable>
-        </Modal>
+              style={{
+                width: 100,
+                height: 100,
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: [{ translateX: -50 }, { translateY: -50 }],
+              }}
+            />
+            <Image
+              source={{ uri: selectMessage.content }}
+              style={{ width: "100%", height: "100%", borderRadius: 20 }}
+              resizeMode="contain"
+            />
+            <Feather
+              name="x"
+              size={25}
+              color="#363636"
+              style={{ position: "absolute", top: 50, right: 20 }}
+              onPress={() => setModalImageVisible(false)}
+            />
+          </View>
+        </Pressable>
+      </Modal>
 
-        {messages.length > 0 &&
-          messages.map((message) => {
-            if (message.messageType === "text") {
-              return (
-                <Pressable
-                  onLongPress={() => {
-                    setSetlectMessage(message);
-                    setModalVisible(true);
-                  }}
-                  key={message._id}
-                  style={[
-                    message.senderId?._id === receiver?._id
-                      ? {
-                          alignSelf: "flex-start",
-                          backgroundColor: "white",
-                          padding: 8,
-                          margin: 10,
-                          borderRadius: 7,
-                          maxWidth: "60%",
-                        }
-                      : {
-                          alignSelf: "flex-end",
-                          backgroundColor: "#DCF8C6",
-                          padding: 8,
-                          maxWidth: "60%",
-                          borderRadius: 7,
-                          margin: 10,
-                        },
-                  ]}
-                >
-                  <Text style={{ fontSize: 13, textAlign: "left" }}>
-                    {message.content}
-                  </Text>
-                  <Text
-                    style={{
-                      textAlign: "right",
-                      fontSize: 9,
-                      color: "gray",
-                      marginTop: 5,
-                    }}
-                  >
-                    {formatDateOrTime(message?.createdAt)}
-                  </Text>
-                </Pressable>
-              );
-            }
-            if (message.messageType === "image") {
-              return (
-                <Pressable
-                  onLongPress={() => {
-                    setSetlectMessage(message);
-                    setModalVisible(true);
-                  }}
-                  onPress={() => {
-                    setSetlectMessage(message);
-                    setModalImageVisible(true);
-                  }}
-                  key={message._id}
-                  style={[
-                    message?.senderId?._id !== recevierId
-                      ? {
-                          alignSelf: "flex-end",
-                          // backgroundColor: "#DCF8C6",
-                          padding: 8,
-                          maxWidth: "60%",
-                          borderRadius: 7,
-                          margin: 10,
-                        }
-                      : {
-                          alignSelf: "flex-start",
-                          // backgroundColor: "white",
-                          padding: 8,
-                          margin: 10,
-                          borderRadius: 7,
-                          maxWidth: "60%",
-                        },
-                  ]}
-                >
-                  <View>
-                    <Image
-                      source={{ uri: message.content }}
-                      resizeMode="cover"
-                      style={{
-                        width: 200,
-                        height: 200,
-                        borderRadius: 7,
-                        alignItems: "flex-end",
-                      }}
-                    />
-                    <Pressable
-                      style={{
-                        width: 70,
-                        borderRadius: 35,
-                        backgroundColor: "gray",
-                        alignSelf: "flex-end",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginTop: 10,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          textAlign: "center",
-                          fontSize: 11,
-                          color: "white",
-                          paddingVertical: 5,
-                          paddingHorizontal: 2,
-                        }}
-                      >
-                        {formatDateOrTime(message?.createdAt)}
-                      </Text>
-                    </Pressable>
-                  </View>
-                </Pressable>
-              );
-            }
-          })} */}
       <FlatList
         data={messages}
         renderItem={({ item }) => (
@@ -560,7 +414,6 @@ const ChatScreen = ({ navigation, route }) => {
         onContentSizeChange={handleContentSizeChange}
       />
       {/* </ScrollView> */}
-
       <View
         style={{
           flexDirection: "row",
@@ -615,7 +468,6 @@ const ChatScreen = ({ navigation, route }) => {
           <Ionicons name="send" size={24} color="#33D1FF" />
         </Pressable>
       </View>
-
       {showEmojiSelector && (
         <EmojiSelector
           onEmojiSelected={(emoji) => {
