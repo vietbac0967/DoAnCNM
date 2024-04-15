@@ -27,12 +27,13 @@ import {
 } from "../services/message.service";
 import formatDateOrTime from "../utils/formatDateOrTime";
 import * as ImagePicker from "expo-image-picker";
-import MessageCard from "../components/MessageCard";
+import MessageGroupCard from "../components/MessageGroupCard";
 export default function ChatGroupScreen({ route, navigation }) {
   const token = useSelector((state) => state.token.token);
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalImageVisible, setModalImageVisible] = useState(false);
   const [selectMessage, setSelectMessage] = useState({});
   const inputRef = useRef(null);
   const socket = useRef();
@@ -319,14 +320,52 @@ export default function ChatGroupScreen({ route, navigation }) {
           </View>
         </Pressable>
       </Modal>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalImageVisible}
+        onRequestClose={() => setModalImageVisible(false)}
+      >
+        <Pressable
+          style={styles.modalBackGround}
+          onPressOut={() => setModalImageVisible(false)}
+        >
+          <View style={styles.modalImageContainer}>
+            <Image
+              source={require("../assets/loading.gif")}
+              style={{
+                width: 100,
+                height: 100,
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: [{ translateX: -50 }, { translateY: -50 }],
+              }}
+            />
+            <Image
+              source={{ uri: selectMessage.content }}
+              style={{ width: "100%", height: "100%", borderRadius: 20 }}
+              resizeMode="contain"
+            />
+            <Feather
+              name="x"
+              size={25}
+              color="#363636"
+              style={{ position: "absolute", top: 50, right: 20 }}
+              onPress={() => setModalImageVisible(false)}
+            />
+          </View>
+        </Pressable>
+      </Modal>
 
       <FlatList
         data={messages}
         renderItem={({ item }) => (
-          <MessageCard
+          <MessageGroupCard
             message={item}
             userId={user.current?._id}
             setModalVisible={setModalVisible}
+            setModalImageVisible={setModalImageVisible}
             setSelectMessage={setSelectMessage}
           />
         )}
@@ -480,7 +519,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "rgb(238, 240, 241)",
-    marginTop: 20,
   },
   modalBackGround: {
     flex: 1,
@@ -497,5 +535,12 @@ const styles = StyleSheet.create({
     elevation: 20,
     flexDirection: "row",
     justifyContent: "space-around",
+  },
+  modalImageContainer: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: "white",
+    elevation: 20,
+    flexDirection: "row",
   },
 });

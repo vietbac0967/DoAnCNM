@@ -43,6 +43,7 @@ const StackNavigation = () => {
           name="ChatScreen"
           component={ChatScreen}
           // options={{ headerShown: false }}
+          options={{ headerStyle: { backgroundColor: "#00B4EA" } }}
         />
         <Stack.Screen
           name="VerifyOTP"
@@ -74,7 +75,11 @@ const StackNavigation = () => {
           name="CreateGroup"
           component={CreateGroupScreen}
         ></Stack.Screen>
-        <Stack.Screen name="ChatGroup" component={ChatGroupScreen} />
+        <Stack.Screen
+          name="ChatGroup"
+          component={ChatGroupScreen}
+          options={{ headerStyle: { backgroundColor: "#00B4EA" } }}
+        />
         <Stack.Screen
           name="UserInfo"
           component={UserInfoScreen}
