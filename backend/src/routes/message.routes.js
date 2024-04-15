@@ -7,6 +7,7 @@ import {
   getMessagesGroup,
   recallMessage,
   sendImage,
+  sendImageGroup,
   sendMessage,
   sendMessageGroup,
 } from "../controllers/message.controller.js";
@@ -24,4 +25,10 @@ router.post("/message/deleteMessage", verifyAccount, deleteMessage);
 router.post("/message/recallMessage", verifyAccount, recallMessage);
 router.get("/message/messagesGroup", verifyAccount, getMessagesGroup);
 router.post("/message/sendMessageGroup", verifyAccount, sendMessageGroup);
+router.post(
+  "/message/sendImageGroup",
+  verifyAccount,
+  updoad.single("image"),
+  sendImageGroup
+);
 export default router;
