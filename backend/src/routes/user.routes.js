@@ -4,6 +4,7 @@ import {
   acceptFriendRequest,
   getFriendRequests,
   getFriends,
+  getFriendsInNotGroup,
   getSentFriendRequests,
   getUser,
   getUserByPhone,
@@ -22,6 +23,13 @@ router.post("/user/getByPhone", verifyAccount, getUserByPhone);
 router.post("/user/sendFriendRequest", verifyAccount, sendFriendRequest);
 router.post("/user/acceptFriendRequest", verifyAccount, acceptFriendRequest);
 router.get("/user/getSentFriendRequests", verifyAccount, getSentFriendRequests);
+router.post(
+  "/user/updateImage",
+  verifyAccount,
+  upload.single("image"),
+  updateUserImage
+);
+router.get("/user/getFriendsInNotGroup", verifyAccount, getFriendsInNotGroup);
 router.post("/update", verifyAccount, updatedUserInfo);
 router.post("/user/updateImage",verifyAccount,upload.single("image"),updateUserImage);
 export default router;

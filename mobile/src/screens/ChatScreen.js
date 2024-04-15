@@ -19,6 +19,7 @@ import {
   Alert,
   Modal,
   Animated,
+  FlatList,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import EmojiSelector from "react-native-emoji-selector";
@@ -40,6 +41,8 @@ import { useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import { URL_SERVER } from "@env";
 import { baseURL } from "../api/baseURL";
+import ChatMessageItem from "../components/ChatMessageItem";
+import MessageCard from "../components/MessageCard";
 const ChatScreen = ({ navigation, route }) => {
   const token = useSelector((state) => state.token.token);
   const [messages, setMessages] = useState([]);
@@ -47,7 +50,7 @@ const ChatScreen = ({ navigation, route }) => {
   const { recevierId } = route.params;
   const socket = useRef();
   const inputRef = useRef(null);
-  const [selectMessage, setSetlectMessage] = useState({});
+  const [selectMessage, setSelectMessage] = useState({});
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("Đang hoạt động"); // Trạng thái mặc định
   const [modalVisible, setModalVisible] = useState(false);
@@ -149,11 +152,12 @@ const ChatScreen = ({ navigation, route }) => {
         recevierId,
         message
       );
+      console.log("DT:::", DT);
       if (EC === 0 && EM === "Success") {
         socket.current.emit("send-msg", {
           from: DT.receiverId,
-          to: DT.senderId,
-          msg: DT.content,
+          to: DT.senderId._id,
+          msg: DT,
         });
         setMessage("");
         getMessages();
@@ -165,8 +169,9 @@ const ChatScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     if (socket.current) {
-      socket.current.on("msg-recieve", (msg) => {
-        getMessages();
+      socket.current.on("msg-recieve", (data) => {
+        console.log("data:::", data);
+        setMessages((prevMessages) => [...prevMessages, data.msg]);
       });
       socket.current.on("recall", (msg) => {
         // setMessages((prevMessages) => {
@@ -195,10 +200,6 @@ const ChatScreen = ({ navigation, route }) => {
     const formattedTime = new Date(date).toLocaleTimeString("vi-VN", options);
     return formattedTime;
   };
-  const formatTime = (time) => {
-    const options = { hour: "numeric", minute: "numeric" };
-    return new Date(time).toLocaleString("en-US", options);
-  };
   const formatDateOrTime = (updatedAt) => {
     const today = new Date();
     const updatedAtDate = new Date(updatedAt);
@@ -222,15 +223,15 @@ const ChatScreen = ({ navigation, route }) => {
         text: "Có",
         onPress: async () => {
           const response = await recallMessageService(token, selectMessage._id);
+          const { EC, EM, DT } = response;
           setModalVisible(false);
-          if (response) {
+          if (EC === 0 && EM === "Success") {
             socket.current.emit("recall-msg", {
               from: selectMessage.receiverId,
               to: selectMessage.senderId,
               msg: selectMessage.content,
             });
             getMessages();
-            return;
           }
         },
       },
@@ -299,209 +300,121 @@ const ChatScreen = ({ navigation, route }) => {
       ),
     });
   }, [navigation, receiver]);
+
   return (
     <KeyboardAvoidingView
       behavior="padding"
       keyboardVerticalOffset={100}
       style={styles.container}
     >
-      <ScrollView
+      {/* <ScrollView
         ref={scrollViewRef}
         contentContainerStyle={{ flexGrow: 1 }}
         onContentSizeChange={handleContentSizeChange}
+      > */}
+      {/* Header for user about image, name  */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
       >
-        {/* Header for user about image, name  */}
-
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
+        <Pressable
+          style={styles.modalBackGround}
+          activeOpacity={1}
+          onPressOut={() => setModalVisible(false)}
         >
-          <Pressable
-            style={styles.modalBackGround}
-            activeOpacity={1}
-            onPressOut={() => setModalVisible(false)}
-          >
-            <View style={styles.modalContainer}>
-              {/* xóa tin nhắn ở phía người gửi */}
-              <Pressable
-                onPress={handleDeleteMessage}
-                style={{
-                  flex: 1,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <EvilIcons name="trash" size={30} color="red" />
-                <Text style={{ textAlign: "center", fontWeight: "400" }}>
-                  Xóa tin nhắn
-                </Text>
-              </Pressable>
-              {/* Thu hồi tin nhắn ở hai phía */}
-              <Pressable
-                disabled={selectMessage.receiverId !== receiver?._id}
-                onPress={() => handleRecallMessage(message._id)}
-                style={{
-                  flex: 1,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  display:
-                    selectMessage.receiverId !== receiver?._id
-                      ? "none"
-                      : "flex",
-                }}
-              >
-                <FontAwesome name="refresh" size={22} color="orange" />
-                <Text style={{ textAlign: "center", fontWeight: "400" }}>
-                  Thu hồi tin nhắn
-                </Text>
-              </Pressable>
-            </View>
-          </Pressable>
-        </Modal>
+          <View style={styles.modalContainer}>
+            {/* xóa tin nhắn ở phía người gửi */}
+            <Pressable
+              onPress={handleDeleteMessage}
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <EvilIcons name="trash" size={30} color="red" />
+              <Text style={{ textAlign: "center", fontWeight: "400" }}>
+                Xóa tin nhắn
+              </Text>
+            </Pressable>
+            {/* Thu hồi tin nhắn ở hai phía */}
+            <Pressable
+              disabled={selectMessage.receiverId !== receiver?._id}
+              onPress={() => handleRecallMessage(message._id)}
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+                display:
+                  selectMessage.receiverId !== receiver?._id ? "none" : "flex",
+              }}
+            >
+              <FontAwesome name="refresh" size={22} color="orange" />
+              <Text style={{ textAlign: "center", fontWeight: "400" }}>
+                Thu hồi tin nhắn
+              </Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
 
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalImageVisible}
-          onRequestClose={() => setModalImageVisible(false)}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalImageVisible}
+        onRequestClose={() => setModalImageVisible(false)}
+      >
+        <Pressable
+          style={styles.modalBackGround}
+          onPressOut={() => setModalImageVisible(false)}
         >
-          <Pressable style={styles.modalBackGround} onPressOut={() => setModalImageVisible(false)}>
-            <View style={styles.modalImageContainer}>
-              <Image
+          <View style={styles.modalImageContainer}>
+            <Image
               source={require("../assets/loading.gif")}
-              style={{ width: 100, height: 100, position: "absolute", top: "50%", left: "50%", transform: [{translateX: -50}, {translateY: -50}] }}
-              />
-              <Image
-                source={{ uri: selectMessage.content }}
-                style={{ width: "100%", height: "100%", borderRadius: 20}}
-                resizeMode="contain"
-              />
-              <Feather name="x" size={25} color="#363636" style={{ position: "absolute", top: 50, right: 20 }} onPress={() => setModalImageVisible(false)} />
-            </View>
-          </Pressable>
-        </Modal>
+              style={{
+                width: 100,
+                height: 100,
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: [{ translateX: -50 }, { translateY: -50 }],
+              }}
+            />
+            <Image
+              source={{ uri: selectMessage.content }}
+              style={{ width: "100%", height: "100%", borderRadius: 20 }}
+              resizeMode="contain"
+            />
+            <Feather
+              name="x"
+              size={25}
+              color="#363636"
+              style={{ position: "absolute", top: 50, right: 20 }}
+              onPress={() => setModalImageVisible(false)}
+            />
+          </View>
+        </Pressable>
+      </Modal>
 
-        {messages.length > 0 &&
-          messages.map((message) => {
-            if (message.messageType === "text") {
-              return (
-                <Pressable
-                  onLongPress={() => {
-                    setSetlectMessage(message);
-                    setModalVisible(true);
-                  }}
-                  key={message._id}
-                  style={[
-                    message.senderId?._id === receiver?._id
-                      ? {
-                          alignSelf: "flex-start",
-                          backgroundColor: "white",
-                          padding: 8,
-                          margin: 10,
-                          borderRadius: 7,
-                          maxWidth: "60%",
-                        }
-                      : {
-                          alignSelf: "flex-end",
-                          backgroundColor: "#DCF8C6",
-                          padding: 8,
-                          maxWidth: "60%",
-                          borderRadius: 7,
-                          margin: 10,
-                        },
-                  ]}
-                >
-                  <Text style={{ fontSize: 13, textAlign: "left" }}>
-                    {message.content}
-                  </Text>
-                  <Text
-                    style={{
-                      textAlign: "right",
-                      fontSize: 9,
-                      color: "gray",
-                      marginTop: 5,
-                    }}
-                  >
-                    {formatDateOrTime(message?.createdAt)}
-                  </Text>
-                </Pressable>
-              );
-            }
-            if (message.messageType === "image") {
-              return (
-                <Pressable
-                  onLongPress={() => {
-                    setSetlectMessage(message);
-                    setModalVisible(true);
-                  }}
-                  onPress={() => {
-                    setSetlectMessage(message);
-                    setModalImageVisible(true);
-                  }}
-                  key={message._id}
-                  style={[
-                    message?.senderId?._id !== recevierId
-                      ? {
-                          alignSelf: "flex-end",
-                          // backgroundColor: "#DCF8C6",
-                          padding: 8,
-                          maxWidth: "60%",
-                          borderRadius: 7,
-                          margin: 10,
-                        }
-                      : {
-                          alignSelf: "flex-start",
-                          // backgroundColor: "white",
-                          padding: 8,
-                          margin: 10,
-                          borderRadius: 7,
-                          maxWidth: "60%",
-                        },
-                  ]}
-                >
-                  <View>
-                    <Image
-                      source={{ uri: message.content }}
-                      resizeMode="cover"
-                      style={{
-                        width: 200,
-                        height: 200,
-                        borderRadius: 7,
-                        alignItems: "flex-end",
-                      }}
-                    />
-                    <Pressable
-                      style={{
-                        width: 70,
-                        borderRadius: 35,
-                        backgroundColor: "gray",
-                        alignSelf: "flex-end",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginTop: 10,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          textAlign: "center",
-                          fontSize: 11,
-                          color: "white",
-                          paddingVertical: 5,
-                          paddingHorizontal: 2,
-                        }}
-                      >
-                        {formatDateOrTime(message?.createdAt)}
-                      </Text>
-                    </Pressable>
-                  </View>
-                </Pressable>
-              );
-            }
-          })}
-      </ScrollView>
-
+      <FlatList
+        data={messages}
+        renderItem={({ item }) => (
+          <MessageCard
+            message={item}
+            receiverId={recevierId}
+            setModalVisible={setModalVisible}
+            setSelectMessage={setSelectMessage}
+            key={item._id}
+          />
+        )}
+        keyExtractor={(item) => item._id}
+        ref={scrollViewRef}
+        contentContainerStyle={{ flexGrow: 1 }}
+        onContentSizeChange={handleContentSizeChange}
+      />
+      {/* </ScrollView> */}
       <View
         style={{
           flexDirection: "row",
@@ -555,7 +468,6 @@ const ChatScreen = ({ navigation, route }) => {
           <Ionicons name="send" size={24} color="#33D1FF" />
         </Pressable>
       </View>
-
       {showEmojiSelector && (
         <EmojiSelector
           onEmojiSelected={(emoji) => {

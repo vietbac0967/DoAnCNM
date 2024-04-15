@@ -24,6 +24,10 @@ const groupSchema = new mongoose.Schema(
         default: [],
       },
     ],
+    deputyLeader: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   { timestamps: true }
 );

@@ -15,6 +15,10 @@ import CreateGroupScreen from "../screens/CreateGroupScreen";
 import ChatGroupScreen from "../screens/ChatGroupScreen";
 import UserInfoScreen from "../screens/UserInfoScreen";
 import UpdateUserInfoScreen from "../screens/UpdateUserInfoScreen";
+import SearchScreen from "../screens/SearchScreen";
+import GroupInfoScreen from "../screens/GroupInfoScreen";
+import AddMemberScreen from "../screens/AddMemberScreen";
+import MemberInfoScreen from "../screens/MemberInfoScreen";
 const Stack = createNativeStackNavigator();
 const StackNavigation = () => {
   return (
@@ -71,11 +75,7 @@ const StackNavigation = () => {
           name="CreateGroup"
           component={CreateGroupScreen}
         ></Stack.Screen>
-        <Stack.Screen
-          name="ChatGroupScreen"
-          component={ChatGroupScreen}
-          options={{ headerShown: false }}
-        />
+        <Stack.Screen name="ChatGroup" component={ChatGroupScreen} />
         <Stack.Screen
           name="UserInfo"
           component={UserInfoScreen}
@@ -86,6 +86,21 @@ const StackNavigation = () => {
           component={UpdateUserInfoScreen}
           options={{ headerShown: false }}
         ></Stack.Screen>
+        <Stack.Screen
+          options={{
+            headerStyle: {
+              backgroundColor: "#00ACED",
+            },
+          }}
+          name="Search"
+          component={SearchScreen}
+        />
+        <Stack.Screen
+          name="GroupInfo"
+          component={GroupInfoScreen}
+        ></Stack.Screen>
+        <Stack.Screen name="AddMember" component={AddMemberScreen} />
+        <Stack.Screen name="MemberInfo" component={MemberInfoScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
