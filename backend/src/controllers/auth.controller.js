@@ -1,9 +1,10 @@
 import User from "../models/user.model.js";
 import {
-  changePasswordService,
+  resetPasswordService,
   loginService,
   registerService,
   verifyOTPService,
+  changePasswordService,
 } from "../services/auth.service.js";
 import otpGenerator from "otp-generator";
 import { generateRefreshToken } from "../utils/generateToken.js";
@@ -140,9 +141,26 @@ export const forgotPassword = async (req, res) => {
 //   }
 // };
 // endpoint to change password
+export const resetPassword = async (req, res) => {
+  try {
+    const email = req.body.email;
+    const newPassword = req.body.newPassword;
+    const confirmPassword = req.body.confirmPassword;
+    const response = await resetPasswordService(email, newPassword, confirmPassword);
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(500).json({
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    });
+  }
+};
+
 export const changePassword = async (req, res) => {
   try {
     const email = req.body.email;
+    const oldPassword = req.body.oldPassword;
     const newPassword = req.body.newPassword;
     const confirmPassword = req.body.confirmPassword;
     const response = await changePasswordService(
@@ -159,6 +177,7 @@ export const changePassword = async (req, res) => {
     });
   }
 };
+
 export const account = (req, res) => {
   try {
     if (req.user) {

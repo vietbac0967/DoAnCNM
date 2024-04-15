@@ -1,5 +1,5 @@
 import User from "../models/user.model.js";
-
+import bcrypt from "bcrypt";
 //endpoint to find a user by phone number
 export const findUserByPhone = async (phone, senderId) => {
   try {
@@ -178,6 +178,22 @@ export const getUserInfoService = async (userId) => {
     return { EC: 1, EM: error.message, DT: "" };
   }
 };
+
+export const updateUserInfoService = async (userId, updatedUserInfo) => {
+  try {
+    const user = await User.findOne({ _id: userId })
+    user.name = updatedUserInfo.name;
+    user.gender = updatedUserInfo.gender;
+    user.phoneNumber = updatedUserInfo.phoneNumber;
+    user.email = updatedUserInfo.email;
+    await user.save();
+    return { EC: 0, EM: "Success", DT: user };
+  }
+  catch (error) {
+    return { EC: 1, EM: error.message, DT: "" };
+  }
+}
+
 export const updateUserImageService = async (userId, image) => {
   try {
     const user = await User.findOne({ _id: userId });

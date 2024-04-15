@@ -129,6 +129,9 @@ export default function ProfileScreen({ navigation }) {
           <TouchableOpacity onPress={() => setModalVisible(true)}>
             <Image style={styles.avatar} source={{ uri: user?.avatar }} />
           </TouchableOpacity>
+          {/* <View style={styles.updateAvatarBtn}>
+            <Feather name="camera" size={15} color="#fff" />
+          </View> */}
           <Text style={styles.username}>{user?.name}</Text>
           {/* <Text style={styles.email}>{user?.email}</Text> */}
           <Text style={styles.username}>{username}</Text>
@@ -148,12 +151,18 @@ export default function ProfileScreen({ navigation }) {
             onPressOut={() => setModalVisible(false)}
           >
             <View style={styles.modalContent}>
-              <Image style={styles.modalAvatar} source={{ uri: user?.avatar }} />
+              <Image
+                style={styles.modalAvatar}
+                source={{ uri: user?.avatar }}
+              />
             </View>
           </TouchableOpacity>
         </Modal>
         <View style={styles.bottomContainer}>
-          <Pressable style={styles.bottomButton} onPress={() => navigation.navigate("UserInfo")}>
+          <Pressable
+            style={styles.bottomButton}
+            onPress={() => navigation.navigate("UserInfo")}
+          >
             <Feather name="shield" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Tài khoản và bảo mật</Text>
           </Pressable>
@@ -198,6 +207,7 @@ export default function ProfileScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
   },
   profileContainer: {
     alignItems: "center",
@@ -210,6 +220,16 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: "#fff",
     marginTop: 30,
+  },
+  updateAvatarBtn: {
+    position: "absolute",
+    bottom: "32%",
+    right: "38%",
+    backgroundColor: "#B5B5B5",
+    padding: 5,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: "#fff",
   },
   username: {
     marginTop: 10,

@@ -9,6 +9,8 @@ import {
   forgotPassword,
   changePassword,
   account
+  resetPassword,
+
 } from "../controllers/auth.controller.js";
 import { verifyAccount } from "../middlewares/verifyAccount.js";
 const router = express.Router();
@@ -19,6 +21,7 @@ router.post("/verifyAccount", verifyAccount);
 router.post("/login", login);
 router.post("/logout",verifyAccount, logout);
 router.post("/forgotPassword", forgotPassword);
+router.post("/resetPassword", resetPassword);
 router.post("/changePassword", changePassword);
 router.get("/verifyAccount", verifyAccount, account);
 // router.post("/refreshToken", refreshToken);

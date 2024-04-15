@@ -58,7 +58,22 @@ const UpdateUserInfoScreen = ({ navigation }) => {
 
   const handleSaveChanges = async () => {
     try {
-      // Gửi yêu cầu cập nhật thông tin
+      const response = await baseURL.post("/update", updatedUserInfo, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const { EC, EM, DT } = response.data;
+      if (EC === 0 && EM === "Success") {
+        setUserInfo(DT);
+        alert("Cập nhật thông tin thành công!");
+        navigation.goBack();
+      } else {
+        console.log("Error updating user info:", EM);
+      }
+
+
+      
       console.log("Updated user info:", updatedUserInfo);
       setIsChanged(false);
     } catch (error) {

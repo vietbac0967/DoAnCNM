@@ -296,7 +296,7 @@ export const forgotPasswordService = async (data) => {
 //   }
 // };
 
-export const changePasswordService = async (
+export const resetPasswordService = async (
   email,
   password,
   confirmPassword
@@ -317,6 +317,7 @@ export const changePasswordService = async (
         DT: "",
       };
     }
+    
     const user = await User.findOne({ email });
     const passwordExist = await bcrypt.compare(password, user.password);
     if (passwordExist) {
@@ -328,6 +329,57 @@ export const changePasswordService = async (
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    console.log("HashPassword::::", hashedPassword);
+    user.password = hashedPassword;
+    await user.save();
+    return {
+      EC: 0,
+      EM: "Success",
+      DT: user,
+    };
+  } catch (err) {
+    return {
+      EC: 1,
+      EM: err.message,
+      DT: "",
+    };
+  }
+};
+
+export const changePasswordService = async (
+  email,
+  oldPassword,
+  newPassword,
+  confirmPassword
+) => {
+  try {
+    if (newPassword !== confirmPassword) {
+      return {
+        EC: 1,
+        EM: "Password does not match",
+        DT: "",
+      };
+    }
+
+    if (!validatePassword(newPassword)) {
+      return {
+        EC: 1,
+        EM: "Weak password",
+        DT: "",
+      };
+    }
+    
+    const user = await User.findOne({ email });
+    const comparePassword = await bcrypt.compare(oldPassword, user.password);
+    if (!comparePassword) {
+      return {
+        EC: 1,
+        EM: "Old password is incorrect",
+        DT: "",
+      };
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
     console.log("HashPassword::::", hashedPassword);
     user.password = hashedPassword;
     await user.save();

@@ -10,6 +10,7 @@ import {
   getUserByPhone,
   getUserInfo,
   sendFriendRequest,
+  updatedUserInfo,
   updateUserImage,
 } from "../controllers/user.controller.js";
 import upload from "../middlewares/uploadImage.js";
@@ -29,4 +30,6 @@ router.post(
   updateUserImage
 );
 router.get("/user/getFriendsInNotGroup", verifyAccount, getFriendsInNotGroup);
+router.post("/update", verifyAccount, updatedUserInfo);
+router.post("/user/updateImage",verifyAccount,upload.single("image"),updateUserImage);
 export default router;
