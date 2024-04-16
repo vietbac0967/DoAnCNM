@@ -277,7 +277,7 @@ export default function ChatGroupScreen({ route, navigation }) {
     <KeyboardAvoidingView
       style={styles.container}
       behavior="padding"
-      keyboardVerticalOffset={1}
+      keyboardVerticalOffset={100}
     >
       <Modal
         animationType="fade"

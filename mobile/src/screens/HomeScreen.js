@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getFriends } from "../services/user.service";
@@ -26,10 +26,53 @@ export default function HomeScreen({ navigation, route }) {
   useEffect(() => {
     getListFriend();
   }, [isLoading]);
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: "",
+      headerLeft: () => (
+        <View style={{ flexDirection: "row", marginLeft: 20 }}>
+          <Ionicons
+            style={{ paddingTop: 8 }}
+            name="search"
+            size={24}
+            color="#fff"
+          />
+          <Pressable
+            onPress={() => navigation.navigate("Search")}
+            style={{ width: 200 }}
+          >
+            <Text
+              style={{
+                paddingTop: 10,
+                paddingLeft: 20,
+                fontSize: 12,
+                color: "#fff",
+              }}
+            >
+              Tìm kiếm
+            </Text>
+          </Pressable>
+        </View>
+      ),
+      headerRight: () => (
+        <Pressable
+          style={{ marginRight: 20 }}
+          onPress={() => navigation.navigate("AddFriend")}
+        >
+          <Ionicons
+            style={{ paddingTop: 5 }}
+            name="person-add-outline"
+            size={24}
+            color="#fff"
+          />
+        </Pressable>
+      ),
+    });
+  }, []);
   return (
     <View style={styles.container}>
       {/* Search bar */}
-      <View style={styles.search}>
+      {/* <View style={styles.search}>
         <Ionicons
           style={{ paddingTop: 8 }}
           name="search"
@@ -48,7 +91,7 @@ export default function HomeScreen({ navigation, route }) {
             color="black"
           />
         </Pressable>
-      </View>
+      </View> */}
 
       {/* Chat list */}
       {friends.map((friend) => (
@@ -62,7 +105,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f1f1f1",
-    marginTop: 30,
   },
   search: {
     marginTop: 25,

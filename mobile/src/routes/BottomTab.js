@@ -5,8 +5,6 @@ import HomeScreen from "../screens/HomeScreen";
 import ContactScreen from "../screens/ContactScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import GroupScreen from "../screens/GroupScreen";
-import { AntDesign } from "@expo/vector-icons";
-import { SimpleLineIcons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 const Tab = createBottomTabNavigator();
 
@@ -16,10 +14,18 @@ export default function BottomTab({ navigation }) {
       screenOptions={{
         tabBarStyle: {
           backgroundColor: "#fff",
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
+          // position: "absolute",
+          // bottom: 0,
+          // left: 0,
+          // right: 0,
+          elevation: 5,
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           borderBottomLeftRadius: 0,
@@ -31,14 +37,23 @@ export default function BottomTab({ navigation }) {
         name="Message"
         component={HomeScreen}
         options={{
-          headerShown: false,
           tabBarLabel: "Tin nhắn",
-
+          headerStyle: {
+            backgroundColor: "#00ACED",
+          },
           tabBarIcon: ({ focused }) =>
             focused ? (
-              <AntDesign name="message1" size={24} color="#00ACED" />
+              <MaterialCommunityIcons
+                name="message-processing"
+                size={24}
+                color="#00ACED"
+              />
             ) : (
-              <AntDesign name="message1" size={24} color="black" />
+              <MaterialCommunityIcons
+                name="message-processing-outline"
+                size={24}
+                color="gray"
+              />
             ),
         }}
       />
@@ -46,14 +61,24 @@ export default function BottomTab({ navigation }) {
         name="Contact"
         component={ContactScreen}
         options={{
-          headerShown: false,
+          // headerShown: false,
           tabBarLabel: "Liên hệ",
-
+          headerStyle: {
+            backgroundColor: "#00ACED",
+          },
           tabBarIcon: ({ focused }) =>
             focused ? (
-              <AntDesign name="contacts" size={24} color="#00ACED" />
+              <MaterialCommunityIcons
+                name="contacts"
+                size={24}
+                color="#00ACED"
+              />
             ) : (
-              <AntDesign name="contacts" size={24} color="black" />
+              <MaterialCommunityIcons
+                name="contacts-outline"
+                size={24}
+                color="gray"
+              />
             ),
         }}
       />
@@ -69,7 +94,7 @@ export default function BottomTab({ navigation }) {
           tabBarIcon: ({ focused }) =>
             focused ? (
               <MaterialCommunityIcons
-                name="account-group-outline"
+                name="account-group"
                 size={24}
                 color="#00ACED"
               />
@@ -77,7 +102,7 @@ export default function BottomTab({ navigation }) {
               <MaterialCommunityIcons
                 name="account-group-outline"
                 size={24}
-                color="black"
+                color="gray"
               />
             ),
         }}
@@ -89,11 +114,19 @@ export default function BottomTab({ navigation }) {
           headerShown: false,
           tabBarLabel: "Cá nhân",
           tabBarIcon: ({ focused }) =>
-            focused ? (
-              <SimpleLineIcons name="user" size={24} color="#00ACED" />
-            ) : (
-              <SimpleLineIcons name="user" size={24} color="black" />
-            ),
+          focused ? (
+            <MaterialCommunityIcons
+              name="account-circle"
+              size={24}
+              color="#00ACED"
+            />
+          ) : (
+            <MaterialCommunityIcons
+              name="account-circle-outline"
+              size={24}
+              color="gray"
+            />
+          ),
         }}
       />
     </Tab.Navigator>

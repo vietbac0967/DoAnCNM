@@ -57,6 +57,7 @@ const StackNavigation = () => {
         <Stack.Screen
           name="FriendRequest"
           component={FriendRequestScreen}
+          options={{ headerShown: false }}
         ></Stack.Screen>
         <Stack.Screen
           name="ForgotPassword"
