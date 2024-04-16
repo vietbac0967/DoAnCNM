@@ -8,7 +8,7 @@ const insertOTP = async (otp, email) => {
     return Otp ? 1 : 0;
   } catch (error) {
     return { message: error.message };
-  }
+  } 
 };
 const validateOTP = async ({ otp, hashOTP }) => {
   try {
