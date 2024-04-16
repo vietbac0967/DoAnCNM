@@ -109,6 +109,7 @@ export const updatNameGroup = async (req, res) => {
 export const addMemberToGroup = async (req, res) => {
   try {
     const { groupId, members } = req.body;
+    
     const response = await addMemberToGroupService(groupId, members);
     res.status(200).json(response);
   } catch (error) {

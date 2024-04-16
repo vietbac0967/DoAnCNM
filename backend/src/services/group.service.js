@@ -159,6 +159,9 @@ export const deleteMemberFromGroupService = async (groupId, userId) => {
     group.members = group.members.filter(
       (member) => member.toString() !== userId
     );
+    if (group.deputyLeader && group.deputyLeader.toString() === userId) {
+      group.deputyLeader = null;
+    }
     const user = await User.findById(userId);
     user.groups = user.groups.filter((group) => group.toString() !== groupId);
     await user.save();
@@ -216,6 +219,9 @@ export const leaveGroupService = async (userId, groupId) => {
     group.members = group.members.filter(
       (member) => member.toString() !== userId
     );
+    if(group.deputyLeader.toString() === userId) {
+      group.deputyLeader = "";
+    }
     const user = await User.findById(userId);
     user.groups = user.groups.filter((group) => group.toString() !== groupId);
     await user.save();

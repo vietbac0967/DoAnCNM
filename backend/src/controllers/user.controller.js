@@ -215,7 +215,7 @@ export const updateUserImage = async (req, res) => {
 // endpoint to get friends not in a group
 export const getFriendsInNotGroup = async (req, res) => {
   try {
-    const groupId = req.params.groupId;
+    const groupId = req.query.groupId;
     const userId = req.user._id;
     const users = await getFriendsNotInGroupService(userId, groupId);
     return res.status(200).json(users);

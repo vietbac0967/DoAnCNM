@@ -33,8 +33,7 @@ export default function CreateGroupScreen({ navigation }) {
 
   useEffect(() => {
     getListFriend();
-  }, [token]);
-
+  }, []);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -54,7 +53,7 @@ export default function CreateGroupScreen({ navigation }) {
         </View>
       ),
     });
-  }, [members]);
+  }, [navigation]);
 
   const handleSelectMember = (friendId) => {
     // Check if the friendId is already in the members list
@@ -127,12 +126,10 @@ export default function CreateGroupScreen({ navigation }) {
       const { EC, EM } = res.data;
       if (EC === 0) {
         Alert.alert("Thông báo", "Tạo nhóm thành công");
-        navigation.navigate("Group");
-        return;
+        navigation.navigate("Group", { isLoading: true });
       }
     } catch (error) {
       Alert.alert("Thông báo", "Tạo nhóm thất bại");
-      return;
     }
   };
 

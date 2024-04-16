@@ -17,7 +17,8 @@ import {
 } from "../services/group.service";
 import { Button, RadioButton } from "react-native-paper";
 export default function AddMemberScreen({ navigation, route }) {
-  const groupId = route.params.groupId;
+  const groupId = route.params?.groupId;
+  console.log("groupId:::", groupId);
   const token = useSelector((state) => state.token.token);
 
   const [phone, setPhone] = useState("");
@@ -37,7 +38,7 @@ export default function AddMemberScreen({ navigation, route }) {
   const handleAddMember = async () => {
     try {
       const membersCast = members.map((member) => member._id);
-      const response = await addMemberToGroup(token, groupId, membersCast);
+      const response = await addMemberToGroup(token,groupId, membersCast);
       const { EC, EM } = response;
       if (EC === 0) {
         navigation.goBack();
