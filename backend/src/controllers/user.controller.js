@@ -14,7 +14,7 @@ import {
   deleteFriendService,
 } from "../services/user.service.js";
 import s3 from "../utils/UploadCloud.js";
-// endpoint to get user
+import cloud from "../utils/cloudinary.js";
 export const getUser = async (req, res) => {
   try {
     const { userId } = req.body;
@@ -197,33 +197,19 @@ export const updatedUserInfo = async (req, res) => {
 export const updateUserImage = async (req, res) => {
   try {
     const userId = req.user._id;
-    const image = req.file?.originalname;
-    console.log("image::::", image);
-    const fileType = image.split(".").pop();
-    const filePath = `${userId}_${Date.now()}.${fileType}`;
-    console.log("filePath::::", filePath);
-    s3.upload(
-      {
-        Bucket: process.env.S3_BUCKET_NAME,
-        Key: filePath,
-        Body: req.file.buffer,
-        ContentType: req.file.mimetype,
-      },
-      async (err, data) => {
-        if (err) {
-          res.status(500).json({ EC: 1, EM: "Error", DT: "" });
-        } else {
-          const result = await updateUserImageService(userId, data.Location);
-          res.status(200).json(result);
-        }
+
+    cloud.uploader.upload_stream({ resource_type: "auto" }, async (error, result) => {
+      if (error) {
+        res.status(500).json({ EC: 1, EM: "Error", DT: "" });
+      } else {
+        const imageUrl = result.secure_url;
+        const result1 = await updateUserImageService(userId, imageUrl);
+        res.status(200).json(result1);
       }
-    );
+    }).end(req.file.buffer);
+
   } catch (error) {
-    res.status(500).json({
-      EC: 1,
-      EM: error.message,
-      DT: "",
-    });
+    res.status(500).json({ EC: 1, EM: error.message, DT: "" });
   }
 };
 // endpoint to get friends not in a group

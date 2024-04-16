@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View, Image } from "react-native";
 import React, { useEffect } from "react";
 import formatDateOrTime from "../utils/formatDateOrTime";
 
-export default function MessageCard({
+export default function MessageGroupCard({
   message,
   receiverId,
   setModalVisible,
@@ -24,6 +24,7 @@ export default function MessageCard({
           flexDirection: "row",
           justifyContent: isCurrentUser ? "flex-end" : "flex-start",
           marginVertical: 5,
+        
         }}
         key={message._id}
       >
@@ -68,7 +69,12 @@ export default function MessageCard({
                 },
           ]}
         >
-          <Text style={{ fontSize: 13, textAlign: "left" }}>
+          {!isCurrentUser && (
+          <Text style={{ fontSize: 10, textAlign: "left", fontWeight: "bold", color: "#1C2932" }}>
+          {message.senderId?.name}
+        </Text>
+        )}          
+          <Text style={{ fontSize: 13, textAlign: "left", marginTop: 5 }}>
             {message.content}
           </Text>
           <Text
@@ -87,11 +93,12 @@ export default function MessageCard({
   }
   if (message.messageType === "image") {
     return (
-      <View
+        <View
         style={{
           flexDirection: "row",
           justifyContent: isCurrentUser ? "flex-end" : "flex-start",
           marginVertical: 5,
+        
         }}
         key={message._id}
       >
@@ -101,7 +108,6 @@ export default function MessageCard({
               width: 25,
               height: 25,
               borderRadius: 20,
-              marginRight: 2,
               marginLeft: 10,
             }}
             resizeMode="cover"
@@ -109,64 +115,72 @@ export default function MessageCard({
             defaultSource={require("../assets/avt.jpg")}
           />
         )}
+      <Pressable
+        onLongPress={() => {
+          setSelectMessage(message);
+          setModalVisible(true);
+        }}
+        onPress={() => {
+          setSelectMessage(message);
+          setModalImageVisible(true);
+        }}
+        style={[
+          isCurrentUser
+            ? {
+                alignSelf: "flex-end",
+                maxWidth: "60%",
+                borderRadius: 7,
+                marginRight: 10,
+                // margin: 10,
+              }
+            : {
+                alignSelf: "flex-start",
+                paddingHorizontal: 8,
+                borderRadius: 7,
+                maxWidth: "60%",
+              },
+        ]}
+      >
+        {!isCurrentUser && (
+          <View style={{ backgroundColor: "#fff", alignSelf: "flex-start", borderRadius: 15, marginBottom: 5 }}>
+          <Text style={{ fontSize: 10, textAlign: "left", fontWeight: "bold", color: "#1C2932", paddingHorizontal: 8, paddingVertical: 5 }}>
+            {message.senderId?.name}
+          </Text>
+        </View>
+        
+        )} 
+        <Image
+          source={{ uri: message.content }}
+          resizeMode="cover"
+          style={{
+            width: 200,
+            height: 200,
+            borderRadius: 7,
+          }}
+          defaultSource={require("../assets/nopicture.jpg")}
+        />
         <Pressable
-          onLongPress={() => {
+          onPress={() => {
             setSelectMessage(message);
             setModalVisible(true);
           }}
-          onPress={() => {
-            setSelectMessage(message);
-            setModalImageVisible(true);
-          }}
-          style={[
-            isCurrentUser
-              ? {
-                  alignSelf: "flex-end",
-                  maxWidth: "60%",
-                  borderRadius: 7,
-                  marginRight: 10,
-                }
-              : {
-                  alignSelf: "flex-start",
-                  paddingHorizontal: 8,
-                  borderRadius: 7,
-                  maxWidth: "60%",
-                },
-          ]}
-        >
-          <Image
-            source={{ uri: message.content }}
-            resizeMode="cover"
-            style={{
-              width: 200,
-              height: 200,
-              borderRadius: 7,
-              alignItems: "flex-end",
-            }}
-            defaultSource={require("../assets/nopicture.jpg")}
-          />
-          <Pressable
-            onPress={() => {
-              setSelectMessage(message);
-              setModalVisible(true);
-            }}
-            style={{
+          style={{
               alignSelf: "flex-end",
-            }}
-          >
-            <Text
-              style={{
+          }}
+        >
+          <Text
+            style={{
                 textAlign: "center",
                 fontSize: 9,
                 color: "gray",
                 paddingTop: 5,
                 paddingHorizontal: 8,
-              }}
-            >
-              {formatDateOrTime(message?.createdAt)}
-            </Text>
-          </Pressable>
+            }}
+          >
+            {formatDateOrTime(message?.createdAt)}
+          </Text>
         </Pressable>
+      </Pressable>
       </View>
     );
   }

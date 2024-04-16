@@ -14,12 +14,28 @@ const transporter = nodemailer.createTransport({
 export const sendOTPForUser = async (otp, toEmail) => {
   try {
     transporter.sendMail({
-      from: { name: "Suprise Message", address: "thanhthang2808@gmail.com" }, // sender address
+      from: { name: "Surprise Message", address: "testingmtt2808@gmail.com" }, // sender address
       to: toEmail, // list of receivers
       subject:
-        "Bạn đã đăng ký thành công vui lòng xác nhận để sử dụng tài khoản", // Subject line
-      text: "Mã OTP của bạn là", // plain text body
-      html: `<p>OTP của bạn là <b>${otp}<b></p>`, // html body
+        "Xác nhận đăng ký tài khoản thành công!", // Subject line
+      text: `Bạn đã tạo tài khoản thành công trên Surprise Message. Dưới đây là mã OTP để hoàn tất quá trình đăng ký. \n\nMã OTP của bạn là ${otp}`, // plain text body
+      html: `<p>Bạn đã tạo tài khoản thành công trên Surprise Message. Dưới đây là mã OTP để hoàn tất quá trình đăng ký. <br/><br/>Mã OTP của bạn là <b>${otp}</b></p>`, // html body
+    });
+    return { EC: 0, EM: "Success", DT: otp };
+  } catch (error) {
+    return { EC: 1, EM: error.message, DT: "" };
+  }
+};
+
+export const sendOTPForgotPassword = async (otp, toEmail) => {
+  try {
+    transporter.sendMail({
+      from: { name: "Surprise Message", address: "testingmtt2808@gmail.com" }, // sender address
+      to: toEmail, // list of receivers
+      subject:
+        "Yêu cầu khôi phục mật khẩu thành công!", // Subject line
+      text: `Chúng tôi đã nhận được yêu cầu khôi phục mật khẩu cho tài khoản của bạn trên Surprise Message. Để tiếp tục quá trình này, vui lòng sử dụng mã OTP bên dưới. \n\nMã OTP của bạn là ${otp}\n\nNếu bạn không thực hiện yêu cầu này, vui lòng liên hệ cho chúng tôi ngay lập tức.`, // plain text body
+      html: `<p>Chúng tôi đã nhận được yêu cầu khôi phục mật khẩu cho tài khoản của bạn trên Surprise Message. Để tiếp tục quá trình này, vui lòng sử dụng mã OTP bên dưới. <br/><br/>Mã OTP của bạn là <b>${otp}</b><br/><br/>Nếu bạn không thực hiện yêu cầu này, vui lòng liên hệ cho chúng tôi ngay lập tức.</p>`, // html body
     });
     return { EC: 0, EM: "Success", DT: otp };
   } catch (error) {

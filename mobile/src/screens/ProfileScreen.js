@@ -70,6 +70,8 @@ export default function ProfileScreen({ navigation }) {
       }
     } catch (error) {
       console.log("Error getting user:", error);
+      await AsyncStorage.removeItem("token");
+        navigation.navigate("Login");
     }
   };
 
