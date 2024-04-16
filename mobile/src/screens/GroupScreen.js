@@ -16,12 +16,14 @@ import { useIsFocused } from "@react-navigation/native";
 export default function GroupScreen({ navigation, route }) {
   const token = useSelector((state) => state.token.token);
   const [groups, setGroups] = useState([]);
-  const [isLoading, setIsLoading] = useState(route.params?.isLoading || false);
-  const [hasLoaded, setHasLoaded] = useState(false);
+
   const isFocused = useIsFocused();
+
   useEffect(() => {
-    getGroups();
-  }, []);
+    if (isFocused) {
+      getGroups();
+    }
+  }, [isFocused]);
   const getGroups = async () => {
     try {
       const response = await getGroupsService(token);

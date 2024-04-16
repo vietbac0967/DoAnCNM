@@ -139,9 +139,8 @@ export default function MemberInfoScreen({ navigation, route }) {
                 <Text style={{ color: "red" }}>Xóa</Text>
               </Pressable>
             ) : null}
-            {item?._id !== author._id &&
-            deputyLeader._id &&
-            item._id != deputyLeader._id ? (
+            {item?._id !== author._id ?
+            (
               <Pressable
                 style={{ flexDirection: "row" }}
                 onPress={() => {
