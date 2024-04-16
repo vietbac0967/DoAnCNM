@@ -137,14 +137,14 @@ export const rejectFriendRequestToUser = async (senderId, receiverId) => {
     if (!sender || !receiver) {
       return { EC: 1, EM: "User not found", DT: "" };
     }
-    if (!sender.friendRequests.includes(receiverId)) {
+    if (!receiver.friendRequests.includes(senderId)) {
       return { EC: 1, EM: "Friend request not found", DT: "" };
     }
-    receiver.friendRequests = sender.friendRequests.filter(
-      (friend) => friend !== receiverId
+    receiver.friendRequests = receiver.friendRequests.filter(
+      (friend) => friend.toString() !== senderId
     );
     sender.sentFriendRequests = sender.sentFriendRequests.filter(
-      (friend) => friend !== receiverId
+      (friend) => friend.toString() !== receiverId.toString()
     );
     await sender.save();
     await receiver.save();
@@ -153,7 +153,6 @@ export const rejectFriendRequestToUser = async (senderId, receiverId) => {
     return { EC: 1, EM: error.message, DT: "" };
   }
 };
-
 export const showSentFriendRequests = async (userId) => {
   try {
     const user = await User.findById(userId)
@@ -181,18 +180,17 @@ export const getUserInfoService = async (userId) => {
 
 export const updateUserInfoService = async (userId, updatedUserInfo) => {
   try {
-    const user = await User.findOne({ _id: userId })
+    const user = await User.findOne({ _id: userId });
     user.name = updatedUserInfo.name;
     user.gender = updatedUserInfo.gender;
     user.phoneNumber = updatedUserInfo.phoneNumber;
     user.email = updatedUserInfo.email;
     await user.save();
     return { EC: 0, EM: "Success", DT: user };
-  }
-  catch (error) {
+  } catch (error) {
     return { EC: 1, EM: error.message, DT: "" };
   }
-}
+};
 
 export const updateUserImageService = async (userId, image) => {
   try {
@@ -234,6 +232,26 @@ export const getFriendsNotInGroupService = async (userId, groupId) => {
     console.error("Error:", error);
     return {
       EC: 0,
+      EM: error.message,
+      DT: "",
+    };
+  }
+};
+
+export const deleteFriendService = async (userId, friendId) => {
+  try {
+    // Remove the friend from the user's friends list
+    await User.findByIdAndUpdate(userId, {
+      $pull: { friends: friendId },
+    });
+    return {
+      EC: 0,
+      EM: "Success",
+      DT: "",
+    };
+  } catch (error) {
+    return {
+      EC: 1,
       EM: error.message,
       DT: "",
     };

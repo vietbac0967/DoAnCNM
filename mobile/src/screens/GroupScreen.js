@@ -1,30 +1,27 @@
 import {
   StyleSheet,
   Text,
-  TextInput,
   View,
-  Button,
   Pressable,
   Alert,
   FlatList,
 } from "react-native";
-import { getFriends } from "../services/user.service";
-import UserChat from "../components/UserChat";
 import { AntDesign } from "@expo/vector-icons";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import Feather from "react-native-vector-icons/Feather";
 import { getGroupsService } from "../services/group.service";
 import GroupCard from "../components/GroupCard";
 import { Ionicons } from "@expo/vector-icons";
-export default function GroupScreen({ navigation }) {
-  const [groupName, setGroupName] = useState("");
-  const [members, setMembers] = useState([]);
+import { useIsFocused } from "@react-navigation/native";
+export default function GroupScreen({ navigation, route }) {
   const token = useSelector((state) => state.token.token);
-  const [friends, setFriends] = useState([]);
-  const [selectedFriends, setSelectedFriends] = useState([]);
   const [groups, setGroups] = useState([]);
-
+  const [isLoading, setIsLoading] = useState(route.params?.isLoading || false);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    getGroups();
+  }, []);
   const getGroups = async () => {
     try {
       const response = await getGroupsService(token);
@@ -39,39 +36,10 @@ export default function GroupScreen({ navigation }) {
     }
   };
 
-  useEffect(() => {
-    // const getListFriend = async () => {
-    //   try {
-    //     const friends = await getFriends(token);
-    //     setFriends(friends);
-    //   } catch (error) {
-    //     console.log("error:::", error);
-    //   }
-    // };
-    // getListFriend();
-    getGroups();
-  }, []);
-  console.log(groups);
-  // const handleSelectFriend = (friendId) => {
-  //   if (!selectedFriends.includes(friendId)) {
-  //     setSelectedFriends([...selectedFriends, friendId]);
-  //   } else {
-  //     setSelectedFriends(selectedFriends.filter((id) => id !== friendId));
-  //   }
-  // };
+  // useEffect(() => {
+  //   getGroups();
+  // }, []);
 
-  // Hàm xử lý thêm thành viên vào nhóm
-  // const addMember = () => {
-  //   if (selectedFriends.length === 0) {
-  //     return; // Không thêm nếu không có thành viên nào được chọn
-  //   }
-  //   setMembers([...members, ...selectedFriends]);
-  //   setSelectedFriends([]); // Reset danh sách thành viên đã chọn
-  // };
-  // Hàm xử lý tạo nhóm chat
-  // const createGroupChat = () => {
-  //   // Thực hiện logic tạo nhóm chat và chuyển đến màn hình chat nhóm
-  // };
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: "",
@@ -83,7 +51,10 @@ export default function GroupScreen({ navigation }) {
             size={24}
             color="#fff"
           />
-          <Pressable onPress={() => navigation.navigate("Search")} style={{width:200}}>
+          <Pressable
+            onPress={() => navigation.navigate("Search")}
+            style={{ width: 200 }}
+          >
             <Text
               style={{
                 paddingTop: 10,

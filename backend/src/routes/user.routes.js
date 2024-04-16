@@ -2,6 +2,7 @@ import express from "express";
 import { verifyAccount } from "../middlewares/verifyAccount.js";
 import {
   acceptFriendRequest,
+  deleteFriend,
   getFriendRequests,
   getFriends,
   getFriendsInNotGroup,
@@ -9,6 +10,7 @@ import {
   getUser,
   getUserByPhone,
   getUserInfo,
+  rejectFriendRequest,
   sendFriendRequest,
   updatedUserInfo,
   updateUserImage,
@@ -22,6 +24,8 @@ router.get("/user/getFriends", verifyAccount, getFriends);
 router.post("/user/getByPhone", verifyAccount, getUserByPhone);
 router.post("/user/sendFriendRequest", verifyAccount, sendFriendRequest);
 router.post("/user/acceptFriendRequest", verifyAccount, acceptFriendRequest);
+router.post("/user/rejectFriendRequest", verifyAccount, rejectFriendRequest);
+router.post("/user/deleteFriend", verifyAccount, deleteFriend);
 router.get("/user/getSentFriendRequests", verifyAccount, getSentFriendRequests);
 router.post(
   "/user/updateImage",
@@ -31,5 +35,10 @@ router.post(
 );
 router.get("/user/getFriendsInNotGroup", verifyAccount, getFriendsInNotGroup);
 router.post("/update", verifyAccount, updatedUserInfo);
-router.post("/user/updateImage",verifyAccount,upload.single("image"),updateUserImage);
+router.post(
+  "/user/updateImage",
+  verifyAccount,
+  upload.single("image"),
+  updateUserImage
+);
 export default router;
