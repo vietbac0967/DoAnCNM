@@ -1,5 +1,8 @@
+import { SchemaTypes } from "mongoose";
+import Group from "../models/group.model.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
+import mongoose from "mongoose";
 //endpoint to find a user by phone number
 export const findUserByPhone = async (phone, senderId) => {
   try {
@@ -209,18 +212,28 @@ export const updateUserImageService = async (userId, image) => {
 export const getFriendsNotInGroupService = async (userId, groupId) => {
   try {
     // Find the user's friends
+    console.log("groupId backend is:::",groupId);
     const user = await User.findById(userId).populate("friends");
 
     // Get the list of friendIds
     const friendIds = user.friends.map((friend) => friend._id);
 
-    // Get the list of groupIds
-    const groupIds = user.groups.map((group) => group._id);
+    // Find the group
+    const group = await Group.findById(groupId);
+    console.log("Group is:::",group);
+    if (!group) {
+      return { EC: 1, EM: "Group not found", DT: "" };
+    }
 
-    // Find the friends who are not part of the specified group
+    // Exclude the deputy leader from the list of friendIds
+    const friendIdsWithoutDeputy = friendIds.filter(
+      (id) => !id.equals(group.deputyLeader)
+    );
+
+    // Find the friends who are not part of the specified group and not the deputy leader
     const friendsNotInGroup = await User.find({
-      _id: { $in: friendIds },
-      groups: { $nin: groupIds },
+      _id: { $in: friendIdsWithoutDeputy },
+      groups: { $nin: [groupId] }, // Exclude friends who are part of the specified group
     }).select("-password");
 
     return {
@@ -237,12 +250,15 @@ export const getFriendsNotInGroupService = async (userId, groupId) => {
     };
   }
 };
-
 export const deleteFriendService = async (userId, friendId) => {
   try {
     // Remove the friend from the user's friends list
     await User.findByIdAndUpdate(userId, {
       $pull: { friends: friendId },
+    });
+    // Remove the friend from the friend's friends list
+    await User.findByIdAndUpdate(friendId, {
+      $pull: { friends: userId },
     });
     return {
       EC: 0,
