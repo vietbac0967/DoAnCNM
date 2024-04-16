@@ -44,7 +44,7 @@ export default function GroupScreen({ navigation, route }) {
     navigation.setOptions({
       headerTitle: "",
       headerLeft: () => (
-        <View style={{ flexDirection: "row", marginLeft: 5 }}>
+        <View style={{ flexDirection: "row", marginLeft: 20 }}>
           <Ionicons
             style={{ paddingTop: 8 }}
             name="search"
@@ -70,7 +70,7 @@ export default function GroupScreen({ navigation, route }) {
       ),
       headerRight: () => (
         <Pressable
-          style={{ marginRight: 10 }}
+          style={{ marginRight: 20 }}
           onPress={() => navigation.navigate("AddFriend")}
         >
           <Ionicons

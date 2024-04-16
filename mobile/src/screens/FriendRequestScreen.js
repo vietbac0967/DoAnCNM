@@ -15,8 +15,9 @@ import {
   getFriends,
   getSendFriendRequests,
 } from "../services/user.service";
-export default function FriendRequestScreen() {
-  const [activeTab, setActiveTab] = useState("friends");
+import { Ionicons } from "@expo/vector-icons";
+export default function FriendRequestScreen( {navigation} ) {
+  const [activeTab, setActiveTab] = useState("friendsRequest");
   const [friendRequests, setFriendRequests] = useState([]);
   const [sendFriendRequests, setSendFriendRequests] = useState([]);
   useEffect(() => {
@@ -50,7 +51,11 @@ export default function FriendRequestScreen() {
 
   return (
     <View style={styles.container}>
+      <Pressable onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back-outline" size={24} color="#444444" style={{ position: "absolute",  padding: 10 }}/>
+        </Pressable>
       <View style={styles.tabContainer}>
+        
         <Pressable
           style={[styles.tab, activeTab === "friendsRequest" && styles.activeTab]}
           onPress={() => setActiveTab("friendsRequest")}
@@ -98,15 +103,17 @@ export default function FriendRequestScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: 10,
+    marginTop: 40,
   },
   tabContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     marginBottom: 10,
+    paddingHorizontal: 40,
   },
   tab: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 5,
     paddingVertical: 10,
   },
   activeTab: {

@@ -45,7 +45,6 @@ export default function ProfileScreen({ navigation }) {
   useEffect(() => {
     getUser();
   }, []);
-  console.log("Avatar:", avatar);
   const backgroundImage = require("../assets/bg.jpg");
 
   const handleLogout = async () => {
@@ -129,13 +128,13 @@ export default function ProfileScreen({ navigation }) {
       >
         <View style={styles.profileContainer}>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
-            <Image style={styles.avatar} source={{ uri: user?.avatar }} />
+            <Image style={styles.avatar} source={{ uri: user?.avatar }} defaultSource={require("../assets/avt.jpg")}/>
           </TouchableOpacity>
           {/* <View style={styles.updateAvatarBtn}>
             <Feather name="camera" size={15} color="#fff" />
           </View> */}
           <Text style={styles.username}>{user?.name}</Text>
-          {/* <Text style={styles.email}>{user?.email}</Text> */}
+          {/* <Text style={styles.email}>{"@"+extractUsername(user?.email)}</Text> */}
           <Text style={styles.username}>{username}</Text>
         </View>
         <Pressable style={styles.logoutButton} onPress={handleUpdateImage}>
@@ -156,6 +155,7 @@ export default function ProfileScreen({ navigation }) {
               <Image
                 style={styles.modalAvatar}
                 source={{ uri: user?.avatar }}
+                defaultSource={require("../assets/avt.jpg")}
               />
             </View>
           </TouchableOpacity>
