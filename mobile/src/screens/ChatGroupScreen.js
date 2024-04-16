@@ -229,6 +229,13 @@ export default function ChatGroupScreen({ route, navigation }) {
       socket.current.on("group-recall", (data) => {
         getMessagesGroup();
       });
+      // change name
+      socket.current.on("group-rename", (data) => {
+        console.log("group-rename", data);
+        if (data.groupId === group._id) {
+          group.name = data.name;
+        }
+      });
     }
   }, []);
   useLayoutEffect(() => {

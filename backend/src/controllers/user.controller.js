@@ -11,10 +11,10 @@ import {
   showSentFriendRequests,
   updateUserInfoService,
   updateUserImageService,
+  deleteFriendService,
 } from "../services/user.service.js";
 import s3 from "../utils/UploadCloud.js";
 import cloud from "../utils/cloudinary.js";
-
 export const getUser = async (req, res) => {
   try {
     const { userId } = req.body;
@@ -36,6 +36,7 @@ export const getUser = async (req, res) => {
     });
   }
 };
+// endpoint to get user info
 export const getUserInfo = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -50,7 +51,7 @@ export const getUserInfo = async (req, res) => {
     });
   }
 };
-
+// endpoint to get user by phone
 export const getUserByPhone = async (req, res) => {
   try {
     const { phone } = req.body;
@@ -66,6 +67,7 @@ export const getUserByPhone = async (req, res) => {
     });
   }
 };
+// endpoint to send friend request
 export const sendFriendRequest = async (req, res) => {
   try {
     const sender = req.user._id;
@@ -81,8 +83,7 @@ export const sendFriendRequest = async (req, res) => {
     });
   }
 };
-
-// Path: backend/src/services/friendRequest.service.js
+// endpoint to get friend requests
 export const getFriendRequests = async (req, res) => {
   try {
     const user = req.user;
@@ -97,6 +98,7 @@ export const getFriendRequests = async (req, res) => {
     });
   }
 };
+// endpoint to accept a friend request
 export const acceptFriendRequest = async (req, res) => {
   try {
     const senderId = req.body.senderId;
@@ -112,11 +114,28 @@ export const acceptFriendRequest = async (req, res) => {
     });
   }
 };
+// endpoint to reject a friend request
 export const rejectFriendRequest = async (req, res) => {
   try {
     const senderId = req.body.senderId;
     const receiverId = req.user._id;
     const result = await rejectFriendRequestToUser(senderId, receiverId);
+    res.status(200).json(result);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    });
+  }
+};
+// endpoint to delete a friend
+export const deleteFriend = async (req,res) => {
+  try {
+    const userId = req.user._id;
+    const friendId = req.body.friendId;
+    const result = await deleteFriendService(userId, friendId);
     res.status(200).json(result);
   } catch (error) {
     console.log(error.message);
@@ -172,7 +191,7 @@ export const updatedUserInfo = async (req, res) => {
       DT: "",
     });
   }
-}
+};
 
 // endpoint to update user image
 export const updateUserImage = async (req, res) => {
@@ -193,7 +212,7 @@ export const updateUserImage = async (req, res) => {
     res.status(500).json({ EC: 1, EM: error.message, DT: "" });
   }
 };
-
+// endpoint to get friends not in a group
 export const getFriendsInNotGroup = async (req, res) => {
   try {
     const groupId = req.params.groupId;
@@ -208,4 +227,3 @@ export const getFriendsInNotGroup = async (req, res) => {
     });
   }
 };
-

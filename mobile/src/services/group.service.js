@@ -159,3 +159,21 @@ export const leaveGroupService = async (token, groupId) => {
     return {};
   }
 };
+
+export const updateNameGroupService = async (token, groupId, name) => {
+  try {
+    const response = await baseURL.post(
+      "/group/updateNameGroup",
+      { groupId, name },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error:::", error);
+    return {};
+  }
+};

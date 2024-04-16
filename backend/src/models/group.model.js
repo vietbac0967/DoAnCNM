@@ -28,6 +28,10 @@ const groupSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    avatar: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true }
 );

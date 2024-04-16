@@ -59,6 +59,16 @@ io.on("connection", (socket) => {
     console.log("leave-group", groupId);
     socket.leave(groupId);
   });
+  // rename group
+  socket.on("rename-group", (data) => {
+    console.log("rename-group", data);
+    socket.to(data.groupId).emit("group-rename", data);
+  });
+  // update avatar
+  socket.on("update-avatar", (data) => {
+    console.log("update-avatar", data);
+    socket.to(data.groupId).emit("group-avatar", data);
+  });
 });
 
 export { io, server };

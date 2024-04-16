@@ -1,20 +1,45 @@
 import { StyleSheet, Text, View, Image, Pressable } from "react-native";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigation } from "@react-navigation/native";
-
+import formatDateOrTime from "../utils/formatDateOrTime";
+import { URL_SERVER } from "@env";
+import { io } from "socket.io-client";
 export default function GroupCard({ item }) {
   const navigation = useNavigation();
+  const socket = useRef(null);
+  useEffect(() => {
+    socket.current = io(URL_SERVER);
+    socket.current.emit("join-group", item._id);
+    return () => {
+      socket.current.disconnect();
+    };
+  }, [item._id]);
+  // update group when receive message
+  useEffect(() => {
+    if (socket.current) {
+      socket.current.on("group-rename", (data) => {
+        if (data.groupId === item._id) {
+          item.name = data.name;
+        }
+      });
+      socket.current.on("group-avatar", (data) => {
+        if (data.groupId === item._id) {
+          item.avatar = data.avatar;
+        }
+      });
+    }
+  }, []);
   return (
     <Pressable
       style={styles.container}
       onPress={() => {
-        navigation.navigate("ChatGroup", { group : item });
+        navigation.navigate("ChatGroup", { group: item });
       }}
     >
       <View style={{}}>
         <Image
           style={{ width: 50, height: 50 }}
-          source={{ uri: item.author.avatar }}
+          source={{ uri: item?.avatar || item?.author.avatar }}
         ></Image>
       </View>
       <View style={{ marginLeft: 20 }}>
@@ -25,7 +50,8 @@ export default function GroupCard({ item }) {
           </Text>
         ) : (
           <Text style={styles.text}>
-            Nhóm được tạo bởi {item?.author.name} lúc {item?.createdAt}
+            Nhóm được tạo bởi {item?.author.name} lúc{" "}
+            {formatDateOrTime(item?.createdAt)}
           </Text>
         )}
       </View>

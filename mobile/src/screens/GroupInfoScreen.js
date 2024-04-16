@@ -1,5 +1,14 @@
-import { StyleSheet, Text, View, Image, Pressable, Alert } from "react-native";
-import React, { useEffect, useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Pressable,
+  Alert,
+  Modal,
+  TextInput,
+} from "react-native";
+import React, { useEffect, useRef, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
@@ -8,14 +17,21 @@ import { FontAwesome } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import { EvilIcons } from "@expo/vector-icons";
 import { baseURL } from "../api/baseURL";
+import * as ImagePicker from "expo-image-picker";
 import {
   deleteGroupService,
   leaveGroupService,
+  updateNameGroupService,
 } from "../services/group.service";
+import { io } from "socket.io-client";
+import { URL_SERVER } from "@env";
 export default function GroupInfoScreen({ navigation, route }) {
   const group = route.params?.group;
   const token = useSelector((state) => state.token.token);
   const [user, setUser] = useState({});
+  const [modalVisible, setModalVisible] = useState(false);
+  const socket = useRef(null);
+  const [name, setName] = useState(group?.name);
   const getUser = async () => {
     try {
       // const token = await AsyncStorage.getItem("token");
@@ -36,9 +52,30 @@ export default function GroupInfoScreen({ navigation, route }) {
   };
   useEffect(() => {
     getUser();
+    socket.current = io(URL_SERVER);
+    socket.current.emit("join-group", group._id);
+  }, [group._id]);
+
+  useEffect(() => {
+    if (socket.current) {
+      socket.current.on("group-rename", (data) => {
+        if (data.groupId === group._id) {
+          group.name = data.name;
+        }
+      });
+      socket.current.on("group-avatar", (data) => {
+        if (data.groupId === group._id) {
+          group.avatar = data.avatar;
+        }
+      });
+      socket.current.on("group-avatar", (data) => {
+        if (data.groupId === group._id) {
+          group.avatar = data.avatar;
+        }
+      });
+    }
   }, []);
-  console.log("user:::", user._id);
-  console.log("author:::", group.author._id);
+
   const handleDeleteGroup = async () => {
     try {
       const response = await deleteGroupService(token, group._id);
@@ -65,8 +102,8 @@ export default function GroupInfoScreen({ navigation, route }) {
           onPress: async () => {
             try {
               const groupId = group._id;
-              console.log("groupId:::", groupId)
-              const response = await leaveGroupService(token,groupId);
+              console.log("groupId:::", groupId);
+              const response = await leaveGroupService(token, groupId);
               console.log("response:::", response);
               const { EM, EC } = response;
               if (EC === 0 && EM === "Success") {
@@ -85,6 +122,71 @@ export default function GroupInfoScreen({ navigation, route }) {
       Alert.alert("Thông báo", error.message);
     }
   };
+
+  const handleUpdateImage = async () => {
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        aspect: [4, 3],
+        quality: 1,
+      });
+      if (!result.canceled) {
+        let localUri = result.assets[0].uri;
+        let filename = localUri.split("/").pop();
+        let match = /\.(\w+)$/.exec(filename);
+        let type = match ? `image/${match[1]}` : "image";
+        const formData = new FormData();
+        formData.append("image", {
+          uri: localUri,
+          name: filename,
+          type,
+        });
+        formData.append("groupId", group._id);
+        const response = await baseURL.post(
+          "/group/updateImageGroup",
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        console.log("respone image::::", response.data);
+        const { DT, EC, EM } = response.data;
+        if (EC === 0 && EM === "Success") {
+          Alert.alert("Thông báo", "Cập nhật ảnh đại diện thành công");
+          socket.current.emit("update-avatar", {
+            groupId: group._id,
+            avatar: DT.avatar,
+          });
+          navigation.goBack();
+        } else {
+          Alert.alert("Cảnh báo", EM);
+        }
+      }
+    } catch (error) {
+      Alert.alert("Cảnh báo", "Hình ảnh quá lớn, vui lòng chọn hình khác");
+      console.error("Error while picking image and sending message:", error);
+    }
+  };
+
+  const handleUpdateGroupName = async () => {
+    try {
+      const groupId = group._id;
+      const response = await updateNameGroupService(token, groupId, name);
+      const { EM, EC } = response;
+      if (EC === 0 && EM === "Success") {
+        Alert.alert("Thông báo", "Đổi tên nhóm thành công");
+        setModalVisible(false);
+        socket.current.emit("rename-group", { groupId, name });
+        navigation.goBack();
+      }
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View
@@ -94,10 +196,20 @@ export default function GroupInfoScreen({ navigation, route }) {
           marginTop: 15,
         }}
       >
-        <Image
-          style={{ width: 60, height: 60, borderRadius: 30 }}
-          source={{ uri: group?.author.avatar }}
-        ></Image>
+        <View style={{ flexDirection: "row" }}>
+          <Image
+            style={{ width: 60, height: 60, borderRadius: 30 }}
+            source={{ uri: group?.avatar || group?.author.avatar }}
+          ></Image>
+          <Pressable onPress={handleUpdateImage}>
+            <EvilIcons
+              style={{ alignSelf: "flex-end" }}
+              name="camera"
+              size={24}
+              color="black"
+            />
+          </Pressable>
+        </View>
       </View>
 
       <View
@@ -111,8 +223,11 @@ export default function GroupInfoScreen({ navigation, route }) {
         <Text style={{ textAlign: "center", fontSize: 22, fontWeight: "bold" }}>
           {group.name}
         </Text>
-        <AntDesign name="edit" size={22} color="black" />
+        <Pressable onPress={() => setModalVisible(true)}>
+          <AntDesign name="edit" size={22} color="black" />
+        </Pressable>
       </View>
+
       <View
         style={{
           flexDirection: "row",
@@ -135,6 +250,81 @@ export default function GroupInfoScreen({ navigation, route }) {
           </View>
           <Text style={{ textAlign: "center" }}>Tìm {"\n"} tin nhắn</Text>
         </View>
+
+        <Modal
+          visible={modalVisible}
+          animationType="fade"
+          transparent={true}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <Pressable
+            style={styles.modalBackGround}
+            activeOpacity={1}
+            onPressOut={() => setModalVisible(false)}
+          >
+            <View style={styles.modalContainer}>
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontSize: 15,
+                  fontWeight: "bold",
+                  paddingBottom: 10,
+                }}
+              >
+                Đổi tên nhóm
+              </Text>
+              {/* xóa tin nhắn ở phía người gửi */}
+              <TextInput
+                style={{
+                  borderRadius: 20,
+                  borderWidth: 1,
+                  borderColor: "blue",
+                  padding: 10,
+                  textAlign: "center",
+                }}
+                value={name}
+                onChangeText={setName}
+              ></TextInput>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignSelf: "flex-end",
+                  marginTop: 10,
+                }}
+              >
+                <Pressable
+                  onPress={() => setModalVisible(false)}
+                  style={{
+                    borderRadius: 10,
+                    backgroundColor: "rgb(234,237,240)",
+                    marginRight: 10,
+                  }}
+                >
+                  <Text
+                    style={{ fontSize: 13, fontWeight: "bold", padding: 10 }}
+                  >
+                    Hủy
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={handleUpdateGroupName}
+                  style={{ backgroundColor: "blue", borderRadius: 10 }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      fontWeight: "bold",
+                      padding: 10,
+                      color: "#fff",
+                    }}
+                  >
+                    Xác nhận
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          </Pressable>
+        </Modal>
 
         <Pressable
           style={{ alignItems: "center" }}
@@ -175,6 +365,7 @@ export default function GroupInfoScreen({ navigation, route }) {
           <FontAwesome name="group" size={24} color="black" />
           <Text style={{ paddingLeft: 5 }}>Thành viên nhóm</Text>
         </Pressable>
+
         <Pressable
           style={{ flexDirection: "row", marginBottom: 5, paddingLeft: 10 }}
         >
@@ -216,5 +407,21 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
+  },
+  modalBackGround: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "80%",
+    backgroundColor: "white",
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+    borderRadius: 20,
+    elevation: 20,
+    // flexDirection: "row",
+    // justifyContent: "space-around",
   },
 });

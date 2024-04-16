@@ -1,3 +1,4 @@
+import Group from "../models/group.model.js";
 import {
   addMemberToGroupService,
   createGroupService,
@@ -10,6 +11,7 @@ import {
   updateDeputyLeaderService,
   updateNameGroupService,
 } from "../services/group.service.js";
+import cloud from "../utils/cloudinary.js";
 
 export const createGroup = async (req, res) => {
   try {
@@ -160,5 +162,34 @@ export const updateDeputyLeader = async (req, res) => {
       EM: error.message,
       DT: "",
     };
+  }
+};
+// enpoint update image group
+export const updateImageGroup = async (req, res) => {
+  try {
+    const groupId = req.body.groupId;
+    console.log("groupId:::", groupId);
+    if (!req.file) {
+      return res.status(400).json({ EC: 1, EM: "No file provided", DT: "" });
+    }
+    cloud.uploader
+      .upload_stream({ resource_type: "auto" }, async (error, result) => {
+        if (error) {
+          res.status(500).json({ EC: 1, EM: "Error", DT: error.message });
+        } else {
+          const group = await Group.findById(groupId);
+          if (!group) {
+            return res
+              .status(404)
+              .json({ EC: 1, EM: "Group not found", DT: "" });
+          }
+          group.avatar = result.secure_url;
+          await group.save();
+          res.status(200).json({ EC: 0, EM: "Success", DT: group });
+        }
+      })
+      .end(req.file.buffer);
+  } catch (error) {
+    res.status(500).json({ EC: 1, EM: error.message, DT: "" });
   }
 };
