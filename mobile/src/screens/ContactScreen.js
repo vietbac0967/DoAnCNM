@@ -15,6 +15,7 @@ import {
   getFriends,
   getSendFriendRequests,
 } from "../services/user.service";
+import Loading from "../components/Loading";
 export default function ContactScreen({ navigation }) {
   const [activeTab, setActiveTab] = useState("friends");
   const [friendRequests, setFriendRequests] = useState([]);
@@ -40,9 +41,7 @@ export default function ContactScreen({ navigation }) {
 
   useEffect(() => {
     // Sắp xếp danh sách bạn bè theo tên
-    const sortedFriends = friends.sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
+    const sortedFriends = friends.sort((a, b) => a.name.localeCompare(b.name));
 
     // Tạo danh sách mới với mỗi chữ cái đầu tiên
     const alphabetList = {};
@@ -58,6 +57,8 @@ export default function ContactScreen({ navigation }) {
     // Cập nhật state với danh sách bạn bè đã sắp xếp theo thứ tự alphabet
     setSortedFriends(alphabetList);
   }, [friends]);
+
+ 
   const renderFriendItem = ({ item }) => (
     <View style={styles.friendItem}>
       <Image source={{ uri: item.avatar }} style={styles.avatar} />
@@ -83,7 +84,7 @@ export default function ContactScreen({ navigation }) {
   );
 
   const renderFriendGroupItem = ({ item }) => (
-    <View style={{ borderBottomWidth: 1, borderBottomColor: "#ccc"}}>
+    <View style={{ borderBottomWidth: 1, borderBottomColor: "#ccc" }}>
       <Text style={styles.alphabet}>{item.title}</Text>
       <FlatList
         data={item.data}
@@ -235,7 +236,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 10,
-    
   },
   avatar: {
     width: 50,

@@ -4,6 +4,7 @@ import authRoutes from "./src/routes/auth.routes.js";
 import userRoutes from "./src/routes/user.routes.js";
 import messageRoutes from "./src/routes/message.routes.js";
 import groupRoutes from "./src/routes/group.routes.js";
+import converstationRoutes from "./src/routes/converstation.routes.js";
 import morgan from "morgan";
 import helmet from "helmet";
 import compression from "compression";
@@ -22,6 +23,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/", userRoutes);
 app.use("/api/", messageRoutes);
 app.use("/api/group/", groupRoutes);
+app.use("/api/conversation/", converstationRoutes);
 
 // export default app;
 export default app;

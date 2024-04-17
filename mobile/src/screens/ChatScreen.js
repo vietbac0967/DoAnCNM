@@ -48,6 +48,7 @@ const ChatScreen = ({ navigation, route }) => {
   const [messages, setMessages] = useState([]);
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
   const { recevierId } = route.params;
+  console.log("params:::",route.params);
   const socket = useRef();
   const inputRef = useRef(null);
   const [selectMessage, setSelectMessage] = useState({});

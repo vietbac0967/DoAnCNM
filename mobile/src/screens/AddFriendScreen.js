@@ -17,6 +17,7 @@ import { searchUser, sendFriendRequest } from "../services/user.service";
 import { useSelector } from "react-redux";
 export default function AddFriendScreen({ navigation }) {
   const token = useSelector((state) => state.token.token);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     navigation.setOptions({
       headerTitle: "Thêm bạn bè",
@@ -69,7 +70,7 @@ export default function AddFriendScreen({ navigation }) {
       Alert.alert("Thông báo", error, [{ text: "OK" }]);
     }
   };
-
+  
   return (
     <View style={styles.container}>
       <View style={{ flexDirection: "row", marginTop: 20 }}>

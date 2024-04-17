@@ -1,17 +1,32 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  ActivityIndicator,
+  SafeAreaView,
+  StatusBar,
+  FlatList,
+  Alert,
+} from "react-native";
 import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getFriends } from "../services/user.service";
 import UserChat from "../components/UserChat";
+import { useIsFocused } from "@react-navigation/native";
+import ConversationCard from "../components/ConversationCard";
+import { getConversationsService } from "../services/converstation.service";
 // import { URL_SERVER } from "@env";
 export default function HomeScreen({ navigation, route }) {
   const token = useSelector((state) => state.token.token);
   // console.log("token:::", token);
-  const isLoading = route.params?.isLoading;
   // console.log("isLoading:::", isLoading ? "true" : "false");
   const [friends, setFriends] = useState([]);
+  const [conversations, setConversations] = useState([]);
   // console.log("URL_SERVER:::", URL_SERVER);
+  const isFocused = useIsFocused();
   const getListFriend = async () => {
     try {
       const friends = await getFriends(token);
@@ -20,12 +35,31 @@ export default function HomeScreen({ navigation, route }) {
       console.log("error:::", error);
     }
   };
+  const getConversations = async () => {
+    try {
+      const conversations = await getConversationsService(token);
+      const { EM, EC, DT } = conversations;
+      if (EC === 0 && EM === "Success") {
+        setConversations(DT);
+      } else {
+        Alert.alert("Error", EM);
+      }
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
   useEffect(() => {
-    getListFriend();
+    getConversations();
   }, []);
   useEffect(() => {
-    getListFriend();
-  }, [isLoading]);
+    if (isFocused) {
+      getConversations();
+    }
+    // getListFriend();
+    // getListFriend();
+  }, [isFocused]);
+
+  console.log("conversations:::", conversations.length);
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: "",
@@ -71,32 +105,16 @@ export default function HomeScreen({ navigation, route }) {
   }, []);
   return (
     <View style={styles.container}>
-      {/* Search bar */}
-      {/* <View style={styles.search}>
-        <Ionicons
-          style={{ paddingTop: 8 }}
-          name="search"
-          size={24}
-          color="#85B6FF"
-        />
-        <TextInput
-          placeholder="Tìm kiếm"
-          placeholderTextColor={"#B1B1B1"}
-        ></TextInput>
-        <Pressable onPress={() => navigation.navigate("AddFriend")}>
-          <Ionicons
-            style={{ paddingTop: 5 }}
-            name="person-add-outline"
-            size={24}
-            color="black"
-          />
-        </Pressable>
-      </View> */}
-
-      {/* Chat list */}
-      {friends.map((friend) => (
+      <FlatList
+        data={conversations}
+        renderItem={({ item }) => (
+          <ConversationCard item={item} navigation={navigation} />
+        )}
+        keyExtractor={(item, index) => index.toString()}
+      />
+      {/* {friends.map((friend) => (
         <UserChat key={friend._id} navigation={navigation} item={friend} />
-      ))}
+      ))} */}
     </View>
   );
 }

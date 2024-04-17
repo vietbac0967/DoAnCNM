@@ -1,6 +1,6 @@
+import Conversation from "../models/converstation.model.js";
 import Group from "../models/group.model.js";
 import User from "../models/user.model.js";
-import mongoose from "mongoose";
 export const createGroupService = async (author, members, groupName) => {
   try {
     if (!groupName) {
@@ -11,10 +11,11 @@ export const createGroupService = async (author, members, groupName) => {
       };
     }
     // Check if the members list is empty
-    if (members.length === 0) {
+    console.log("Length of members:::", members.length);
+    if (members.length < 2) {
       return {
         EC: 1,
-        EM: "Group members are required",
+        EM: "Group must have at least 3 members",
         DT: "",
       };
     }
@@ -23,6 +24,7 @@ export const createGroupService = async (author, members, groupName) => {
       author,
       members,
       name: groupName,
+      avatar: "https://avatar.iran.liara.run/public/job/astronomer/male",
     });
 
     // add the group to the user's groups
@@ -33,8 +35,14 @@ export const createGroupService = async (author, members, groupName) => {
       user.groups.push(group._id);
       await user.save();
     });
+
+    // create conversation for group
+    const conversation = new Conversation({
+      participantsGroup: [group._id, ...members],
+    });
     await group.save();
     await user.save();
+    await conversation.save();
     return {
       EC: 0,
       EM: "Create group successfully",
@@ -219,7 +227,7 @@ export const leaveGroupService = async (userId, groupId) => {
     group.members = group.members.filter(
       (member) => member.toString() !== userId
     );
-    if(group.deputyLeader.toString() === userId) {
+    if (group.deputyLeader.toString() === userId) {
       group.deputyLeader = "";
     }
     const user = await User.findById(userId);
