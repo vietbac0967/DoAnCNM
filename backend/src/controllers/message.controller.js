@@ -1,4 +1,5 @@
 import upload from "../middlewares/uploadImage.js";
+import Conversation from "../models/converstation.model.js";
 import {
   deleteMessageService,
   getMessagesGroupService,
@@ -72,6 +73,19 @@ export const sendImage = async (req, res) => {
             result.secure_url,
             "image"
           );
+          // push message to conversation
+          const converstation = await Conversation.findOne({
+            participants: { $all: [req.body.receiverId, senderId] },
+          });
+          if (!converstation) {
+            res.status(500).json({
+              EC: 1,
+              EM: "Error",
+              DT: "Conversation not found",
+            });
+          }
+          converstation.messages.push(sendMessage.DT._id);
+          await converstation.save();
           res.status(200).json(sendMessage);
         }
       })
@@ -106,6 +120,19 @@ export const sendImageGroup = async (req, res) => {
             result.secure_url,
             "image"
           );
+          // push message to conversation
+          const converstation = await Conversation.findOne({
+            participantsGroup: { $all: [req.body.groupId, senderId] },
+          });
+          if (!converstation) {
+            res.status(500).json({
+              EC: 1,
+              EM: "Error",
+              DT: "Conversation not found",
+            });
+          }
+          converstation.messages.push(sendMessage.DT._id);
+          await converstation.save();
           res.status(200).json(sendMessage);
         }
       })

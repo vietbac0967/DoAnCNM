@@ -13,7 +13,6 @@ import {
   updateUserImageService,
   deleteFriendService,
 } from "../services/user.service.js";
-import s3 from "../utils/UploadCloud.js";
 import cloud from "../utils/cloudinary.js";
 export const getUser = async (req, res) => {
   try {

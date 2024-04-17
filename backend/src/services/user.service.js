@@ -3,6 +3,7 @@ import Group from "../models/group.model.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+import Conversation from "../models/converstation.model.js";
 //endpoint to find a user by phone number
 export const findUserByPhone = async (phone, senderId) => {
   try {
@@ -125,8 +126,13 @@ export const acceptFriendRequestToUser = async (senderId, receiverId) => {
     sender.sentFriendRequests = sender.sentFriendRequests.filter(
       (friend) => friend.toString() !== receiverId.toString()
     );
+    // create conversation between the two users
+    const conversation = new Conversation({
+      participants: [senderId, receiverId],
+    });
     await sender.save();
     await receiver.save();
+    await conversation.save();
     return { EC: 0, EM: "Success", DT: "" };
   } catch (error) {
     return { EC: 1, EM: error.message, DT: "" };
@@ -212,7 +218,7 @@ export const updateUserImageService = async (userId, image) => {
 export const getFriendsNotInGroupService = async (userId, groupId) => {
   try {
     // Find the user's friends
-    console.log("groupId backend is:::",groupId);
+    console.log("groupId backend is:::", groupId);
     const user = await User.findById(userId).populate("friends");
 
     // Get the list of friendIds
@@ -220,7 +226,7 @@ export const getFriendsNotInGroupService = async (userId, groupId) => {
 
     // Find the group
     const group = await Group.findById(groupId);
-    console.log("Group is:::",group);
+    console.log("Group is:::", group);
     if (!group) {
       return { EC: 1, EM: "Group not found", DT: "" };
     }

@@ -1,4 +1,6 @@
+import Conversation from "../models/converstation.model.js";
 import Message from "../models/message.model.js";
+import User from "../models/user.model.js";
 
 export const sendMessageService = async (
   receiverId,
@@ -7,6 +9,17 @@ export const sendMessageService = async (
   messageType
 ) => {
   try {
+    // find conversation
+    const conversation = await Conversation.findOne({
+      participants: { $all: [receiverId, senderId] },
+    });
+    if (!conversation) {
+      return {
+        EC: 1,
+        EM: "Conversation not found",
+        DT: "",
+      };
+    }
     const newMessage = new Message({
       senderId,
       receiverId,
@@ -18,6 +31,8 @@ export const sendMessageService = async (
       "senderId",
       "_id name avatar"
     );
+    conversation.messages.push(newMessage._id);
+    await conversation.save();
     return {
       EC: 0,
       EM: "Success",
@@ -89,6 +104,7 @@ export const deleteMessageService = async (messageId, senderID) => {
 export const recallMessageService = async (messageId) => {
   try {
     const messages = await Message.findByIdAndDelete(messageId);
+
     if (!messages) {
       return {
         EC: 1,
@@ -96,6 +112,12 @@ export const recallMessageService = async (messageId) => {
         DT: "",
       };
     }
+    // remove message from conversation
+    const conversation = await Conversation.findOne({
+      messages: { $in: [messageId] },
+    });
+    conversation.messages.pull(messageId);
+    await conversation.save();
     return {
       EC: 0,
       EM: "Success",
@@ -129,6 +151,20 @@ export const sendMessageGroupService = async (
       "senderId",
       "_id name avatar"
     );
+    // find conversation
+    let conversation;
+    conversation = await Conversation.findOne({
+      participantsGroup: { $all: [groupId] },
+    });
+    if (!conversation) {
+      return {
+        EC: 1,
+        EM: "Conversation not found",
+        DT: "",
+      };
+    }
+    conversation.messages.push(newMessage._id);
+    await conversation.save();
     return {
       EC: 0,
       EM: "Success",

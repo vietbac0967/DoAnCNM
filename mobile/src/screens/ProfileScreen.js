@@ -15,6 +15,7 @@ import { Feather } from "@expo/vector-icons";
 import { baseURL } from "../api/baseURL";
 import { useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
+import Loading from "../components/Loading";
 export default function ProfileScreen({ navigation }) {
   const token = useSelector((state) => state.token.token);
   const [modalVisible, setModalVisible] = useState(false);
@@ -70,7 +71,7 @@ export default function ProfileScreen({ navigation }) {
     } catch (error) {
       console.log("Error getting user:", error);
       await AsyncStorage.removeItem("token");
-        navigation.navigate("Login");
+      navigation.navigate("Login");
     }
   };
 
@@ -118,7 +119,6 @@ export default function ProfileScreen({ navigation }) {
       return email; // Trả về toàn bộ email nếu không tìm thấy kí tự '@'
     }
   };
-
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -128,7 +128,11 @@ export default function ProfileScreen({ navigation }) {
       >
         <View style={styles.profileContainer}>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
-            <Image style={styles.avatar} source={{ uri: user?.avatar }} defaultSource={require("../assets/avt.jpg")}/>
+            <Image
+              style={styles.avatar}
+              source={{ uri: user?.avatar }}
+              defaultSource={require("../assets/avt.jpg")}
+            />
           </TouchableOpacity>
           {/* <View style={styles.updateAvatarBtn}>
             <Feather name="camera" size={15} color="#fff" />

@@ -1,5 +1,4 @@
 import express from "express";
-import multer from "multer";
 import { verifyAccount } from "../middlewares/verifyAccount.js";
 import {
   deleteMessage,

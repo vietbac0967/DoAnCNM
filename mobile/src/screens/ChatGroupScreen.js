@@ -28,6 +28,7 @@ import {
 import formatDateOrTime from "../utils/formatDateOrTime";
 import * as ImagePicker from "expo-image-picker";
 import MessageGroupCard from "../components/MessageGroupCard";
+import Loading from "../components/Loading";
 export default function ChatGroupScreen({ route, navigation }) {
   const token = useSelector((state) => state.token.token);
   const [messages, setMessages] = useState([]);
@@ -35,6 +36,7 @@ export default function ChatGroupScreen({ route, navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageVisible, setModalImageVisible] = useState(false);
   const [selectMessage, setSelectMessage] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
   const inputRef = useRef(null);
   const socket = useRef();
   const user = useRef({});
@@ -54,6 +56,7 @@ export default function ChatGroupScreen({ route, navigation }) {
       const { EM, EC, DT } = response.data;
       if (EC === 0 && EM === "Success") {
         setMessages(DT);
+        // setIsLoading(false);
       }
     } catch (error) {
       console.log(error);
@@ -109,6 +112,9 @@ export default function ChatGroupScreen({ route, navigation }) {
       Alert.alert("Cảnh báo", "Kích thước ảnh quá lớn, vui lòng chọn ảnh khác");
     }
   };
+  // if (isLoading) {
+  //   return <Loading />;
+  // }
   const handleSendMessage = async () => {
     try {
       const response = await sendMessageGroupService(token, group._id, message);
