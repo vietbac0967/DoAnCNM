@@ -373,6 +373,7 @@ const ChatScreen = ({ navigation, route }) => {
                 navigation.navigate("ForwardMessage", {
                   messageId: selectMessage._id,
                 });
+                setModalVisible(false);
               }}
               style={{
                 flex: 1,
@@ -454,10 +455,10 @@ const ChatScreen = ({ navigation, route }) => {
           marginBottom: showEmojiSelector ? 0 : 1,
         }}
       >
-        <Entypo
+        <Ionicons
           onPress={handleEmojiPress}
           style={{ marginRight: 5 }}
-          name="emoji-happy"
+          name="happy-outline"
           size={24}
           color="gray"
         />
@@ -487,12 +488,12 @@ const ChatScreen = ({ navigation, route }) => {
             marginHorizontal: 8,
           }}
         >
-          <Entypo onPress={pickImage} name="camera" size={24} color="gray" />
+          <Ionicons name="image" size={24} color="gray" onPress={pickImage} />
 
-          <Feather name="mic" size={24} color="gray" />
+          <Ionicons name="mic" size={24} color="gray" />
         </View>
 
-        <Pressable onPress={() => handleSend()}>
+        <Pressable onPress={() => handleSend()} style={({pressed}) => ({opacity: pressed ? 0.5 : 1 })}>
           <Ionicons name="send" size={24} color="#33D1FF" />
         </Pressable>
       </View>

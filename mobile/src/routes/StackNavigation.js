@@ -20,6 +20,7 @@ import GroupInfoScreen from "../screens/GroupInfoScreen";
 import AddMemberScreen from "../screens/AddMemberScreen";
 import MemberInfoScreen from "../screens/MemberInfoScreen";
 import ForwardMessageScreen from "../screens/ForwardMessageScreen";
+import FunctionUnavailableScreen from "../screens/FunctionUnavailableScreen";
 const Stack = createNativeStackNavigator();
 const StackNavigation = () => {
   return (
@@ -58,7 +59,7 @@ const StackNavigation = () => {
         <Stack.Screen
           name="FriendRequest"
           component={FriendRequestScreen}
-          options={{ headerShown: false }}
+          options={{ headerStyle: { backgroundColor: "#00B4EA" }, headerTintColor: "#fff" }}
         ></Stack.Screen>
         <Stack.Screen
           name="ForgotPassword"
@@ -108,6 +109,7 @@ const StackNavigation = () => {
         <Stack.Screen name="AddMember" component={AddMemberScreen} />
         <Stack.Screen name="MemberInfo" component={MemberInfoScreen} />
         <Stack.Screen name="ForwardMessage" component={ForwardMessageScreen} />
+        <Stack.Screen name="FunctionUnavailable" component={FunctionUnavailableScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

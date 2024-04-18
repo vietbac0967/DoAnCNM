@@ -58,7 +58,6 @@ export default function ContactScreen({ navigation }) {
     setSortedFriends(alphabetList);
   }, [friends]);
 
- 
   const renderFriendItem = ({ item }) => (
     <View style={styles.friendItem}>
       <Image source={{ uri: item.avatar }} style={styles.avatar} />
@@ -84,7 +83,7 @@ export default function ContactScreen({ navigation }) {
   );
 
   const renderFriendGroupItem = ({ item }) => (
-    <View style={{ borderBottomWidth: 1, borderBottomColor: "#ccc" }}>
+    <View style={{ borderBottomWidth: 1, borderBottomColor: "#ddd" }}>
       <Text style={styles.alphabet}>{item.title}</Text>
       <FlatList
         data={item.data}
@@ -128,7 +127,7 @@ export default function ContactScreen({ navigation }) {
           onPress={() => navigation.navigate("AddFriend")}
         >
           <Ionicons
-            style={{ paddingTop: 5 }}
+            style={{ paddingTop: 8 }}
             name="person-add-outline"
             size={24}
             color="#fff"
@@ -141,19 +140,18 @@ export default function ContactScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.tabContainer}>
-        <Pressable
-          style={[styles.tab, activeTab === "friends" && styles.activeTab]}
-          onPress={() => setActiveTab("friends")}
-        >
-          <View style={{ flexDirection: "row" }}>
-            <Feather name="users" size={25} color="#444444" />
-            <Text style={styles.tabText}>Danh sách bạn bè</Text>
-          </View>
-        </Pressable>
+        <Text style={styles.title}>Danh sách bạn bè</Text>
 
         <Pressable
           onPress={() => navigation.navigate("FriendRequest")}
-          style={styles.friendRequestBtn}
+          style={({ pressed }) => ({
+            opacity: pressed ? 0.5 : 1,
+            paddingHorizontal: 15,
+            paddingVertical: 5,
+            backgroundColor: "#ddd",
+            marginLeft: 10,
+            borderRadius: 7,
+          })}
         >
           <Feather name="user-check" size={25} color="#444444" />
           {friendRequests.length > 0 && (
@@ -202,23 +200,23 @@ const styles = StyleSheet.create({
   },
   tabContainer: {
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-around",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
     marginBottom: 10,
-    borderBottomWidth: 2,
-    borderBottomColor: "#00B4EA",
-    paddingVertical: 10,
+    paddingTop: 10,
+    paddingHorizontal: 10,
+    paddingBottom: 10,
     marginHorizontal: 20,
+    alignItems: "center",
   },
-  tab: {
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-  },
-  friendRequestBtn: {
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-    backgroundColor: "#ddd",
-    marginLeft: 10,
-    borderRadius: 7,
+  // tab: {
+  //   paddingHorizontal: 20,
+  //   paddingVertical: 5,
+  // },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
   },
   activeTab: {},
   tabText: {

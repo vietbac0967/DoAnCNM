@@ -19,12 +19,13 @@ import { useSelector } from "react-redux";
 import { Entypo } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { baseURL } from "../api/baseURL";
-
+import { sendMessageGroupService } from "../services/message.service";
 export default function MemberInfoScreen({ navigation, route }) {
   const token = useSelector((state) => state.token.token);
   const groupId = route.params?.groupId;
   const [members, setMembers] = useState([]);
   const [status, setStaus] = useState(false);
+  const [announce, setAnnounce] = useState("");
   const [author, setAuthor] = useState({});
   const [deputyLeader, setDeputyLeader] = useState({});
   const [user, setUser] = useState({});
@@ -77,13 +78,27 @@ export default function MemberInfoScreen({ navigation, route }) {
       Alert.alert("Error", error.message);
     }
   };
+  const handleSendMessage = async (message) => {
+    try {
+      const response = await sendMessageGroupService(token, groupId, message);
+      const { EM, EC } = response;
+      if (EC === 0 && EM === "Success") {
+        console.log("send noti success");
+      }
+    }
+    catch (error) {
+      console.log("Error sending message:", error);
+    }
+  };
   const handleDeleteUserForGroup = async (userId) => {
     try {
       const response = await deleteMemeberFromGroup(token, groupId, userId);
       const { EM, EC } = response;
       if (EC === 0 && EM === "Success") {
         Alert.alert("Success", "Xóa thành công");
-        getUserForGroup();
+        const announceMessage = `##TB##: Trưởng nhóm đã xóa một thành viên ra khỏi nhóm`;
+      setAnnounce(announceMessage);
+      handleSendMessage(announceMessage);
       }
     } catch (error) {
       Alert.alert("Error", error.message);

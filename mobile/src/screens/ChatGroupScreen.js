@@ -63,6 +63,7 @@ export default function ChatGroupScreen({ route, navigation }) {
       Alert.alert("Error", "Something went wrong");
     }
   };
+  console.log("Group:::", group);
   const handleEmojiPress = () => {
     setShowEmojiSelector(!showEmojiSelector);
     inputRef.current.blur();
@@ -251,16 +252,23 @@ export default function ChatGroupScreen({ route, navigation }) {
         <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
           <Ionicons
             onPress={() => navigation.goBack()}
-            name="arrow-back"
+            name="chevron-back"
             size={24}
-            color="black"
+            color="#fff"
           />
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <View>
-              <Text style={{ marginLeft: 5, fontSize: 15, fontWeight: "bold" }}>
+              <Text
+                style={{
+                  marginLeft: 10,
+                  fontSize: 15,
+                  fontWeight: "bold",
+                  color: "#fff",
+                }}
+              >
                 {group?.name}
               </Text>
-              <Text>{group?.members.length + 1} Thành viên</Text>
+              <Text style={{ marginLeft: 10, color: "#fff" }}>{group?.members.length + 1} Thành viên</Text>
             </View>
           </View>
         </View>
@@ -273,7 +281,7 @@ export default function ChatGroupScreen({ route, navigation }) {
             });
           }}
         >
-          <AntDesign name="bars" size={24} color="black" />
+          <AntDesign name="bars" size={24} color="#fff" />
         </Pressable>
       ),
     });
@@ -336,6 +344,7 @@ export default function ChatGroupScreen({ route, navigation }) {
                 navigation.navigate("ForwardMessage", {
                   messageId: selectMessage._id,
                 });
+                setModalVisible(false);
               }}
               style={{
                 flex: 1,
@@ -481,10 +490,10 @@ export default function ChatGroupScreen({ route, navigation }) {
           marginBottom: showEmojiSelector ? 0 : 1,
         }}
       >
-        <Entypo
+        <Ionicons
           onPress={handleEmojiPress}
           style={{ marginRight: 5 }}
-          name="emoji-happy"
+          name="happy-outline"
           size={24}
           color="gray"
         />
@@ -503,7 +512,7 @@ export default function ChatGroupScreen({ route, navigation }) {
             borderRadius: 20,
             paddingHorizontal: 10,
           }}
-          placeholder="Type Your message..."
+          placeholder="Nhập tin nhắn..."
         />
 
         <View
@@ -514,19 +523,15 @@ export default function ChatGroupScreen({ route, navigation }) {
             marginHorizontal: 8,
           }}
         >
-          <Entypo
-            onPress={() => {
-              pickImage();
-            }}
-            name="camera"
-            size={24}
-            color="gray"
-          />
+          <Ionicons name="image" size={24} color="gray" onPress={pickImage} />
 
-          <Feather name="mic" size={24} color="gray" />
+          <Ionicons name="mic" size={24} color="gray" />
         </View>
 
-        <Pressable onPress={() => handleSendMessage()}>
+        <Pressable
+          onPress={() => handleSendMessage()}
+          style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}
+        >
           {/* <Text style={{ color: "white", fontWeight: "bold" }}>Send</Text> */}
           <Ionicons name="send" size={24} color="#33D1FF" />
         </Pressable>

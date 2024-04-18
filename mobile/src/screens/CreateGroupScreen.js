@@ -47,13 +47,13 @@ export default function CreateGroupScreen({ navigation }) {
             color="black"
           />
           <View>
-            <Text>Nhóm mới</Text>
-            <Text>{members.length}</Text>
+            <Text style={{ fontSize: 16, fontWeight: "bold" }}>Nhóm mới</Text>
+            <Text style={{ color: "gray" }}>Đã chọn: {members.length}</Text>
           </View>
         </View>
       ),
     });
-  }, [navigation]);
+  }, [navigation, members]);
 
   const handleSelectMember = (friendId) => {
     // Check if the friendId is already in the members list
@@ -154,7 +154,7 @@ export default function CreateGroupScreen({ navigation }) {
         renderItem={renderFriendItem}
         keyExtractor={(item) => item._id}
       />
-      <Text>Members:</Text>
+      <Text>Thành viên:</Text>
       <FlatList
         data={members}
         contentContainerStyle={{ flexDirection: "row" }}
@@ -167,9 +167,26 @@ export default function CreateGroupScreen({ navigation }) {
         mode="contained"
         buttonColor="#00ACEE"
       ></Button> */}
-      <Pressable onPress={handleCreateGroup}>
-        <Text style={{ fontSize: 15, fontWeight: "bold", textAlign: "center" }}>
-          Tao nhom
+      <Pressable
+        onPress={handleCreateGroup}
+        style={({ pressed }) => [
+          {
+            backgroundColor: pressed ? "gray" : "#00B4EA", // Màu nền thay đổi khi nhấn
+            opacity: pressed ? 0.5 : 1, // Độ mờ thay đổi khi nhấn
+            borderRadius: 10, // Bo góc
+            padding: 10, 
+          }
+        ]}
+      >
+        <Text
+          style={{
+            fontSize: 15,
+            color: "#fff",
+            fontWeight: "bold",
+            textAlign: "center",
+          }}
+        >
+          Tạo nhóm
         </Text>
       </Pressable>
     </View>

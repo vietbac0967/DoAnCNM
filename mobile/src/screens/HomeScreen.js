@@ -27,14 +27,6 @@ export default function HomeScreen({ navigation, route }) {
   const [conversations, setConversations] = useState([]);
   // console.log("URL_SERVER:::", URL_SERVER);
   const isFocused = useIsFocused();
-  const getListFriend = async () => {
-    try {
-      const friends = await getFriends(token);
-      setFriends(friends);
-    } catch (error) {
-      console.log("error:::", error);
-    }
-  };
   const getConversations = async () => {
     try {
       const conversations = await getConversationsService(token);
@@ -94,7 +86,7 @@ export default function HomeScreen({ navigation, route }) {
           onPress={() => navigation.navigate("AddFriend")}
         >
           <Ionicons
-            style={{ paddingTop: 5 }}
+            style={{ paddingTop: 8 }}
             name="person-add-outline"
             size={24}
             color="#fff"
