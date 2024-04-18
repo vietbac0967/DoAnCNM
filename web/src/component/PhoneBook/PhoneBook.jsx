@@ -8,6 +8,7 @@ import ListAction from './listAction/ListAction';
 import ListFrient from './directory/listfrient/ListFrient';
 import ListGroup from './directory/listgroup/ListGroup';
 import ListSendFrient from './directory/listsendfrient/ListSendFrient';
+import _ from 'lodash';
 
 const PhoneBook = () => {
 
@@ -48,6 +49,19 @@ const PhoneBook = () => {
         }
     }, [])
 
+    const handleClick = (id) => {
+        let cplistaction = _.cloneDeep(defaultInput);
+        let index = cplistaction.findIndex(item => +item.id === +id);
+        if (index !== -1) {
+            cplistaction[index].action = true;
+        }
+
+        setlistaction(cplistaction)
+        if (!mdup) {
+            setshowchat(true)
+        }
+    }
+
     return (
         <Grid className='home-container' container spacing={0} columns={12}>
             <Grid className='home-frient' item xs={12} sm={12} md={3} display={showchat ? "none" : { md: "block" }}>
@@ -55,14 +69,24 @@ const PhoneBook = () => {
                     listaction={listaction}
                     setlistaction={setlistaction}
                     defaultInput={defaultInput}
+                    handleClick={handleClick}
                 />
             </Grid>
             <Grid className='home-message' item xs={12} sm={12} md={9} display={showchat ? "block" : { sm: "none", md: "block", xs: "none" }}>
                 {
                     listaction && listaction.length > 0
-                        ? listaction[0].action ? <ListFrient />
-                            : listaction[1].action ? <ListGroup />
-                                : listaction[2].action ? <ListSendFrient />
+                        ? listaction[0].action ?
+                            <ListFrient
+                                setshowchat={setshowchat}
+                            />
+                            : listaction[1].action ?
+                                <ListGroup
+                                    setshowchat={setshowchat}
+                                />
+                                : listaction[2].action ?
+                                    <ListSendFrient
+                                        setshowchat={setshowchat}
+                                    />
                                     : <></>
                         : <></>
                 }

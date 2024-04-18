@@ -39,12 +39,14 @@ export const SocketSetup = (server) => {
         })
 
         socket.on("sendtest", (data) => {
+            console.log(data)
             let sender = data.sender;
             let receiver = data.receiver;
 
 
             if (clients && clients.length > 0) {
                 let index = clients.findIndex((item) => item.customId.localeCompare(receiver) === 0)
+                console.log(index)
                 if (index !== -1) {
                     socket.to(clients[index].clientId).emit("refresh", () => {
                         console.log("test success");
@@ -59,7 +61,6 @@ export const SocketSetup = (server) => {
         socket.on("sendmessange", (data) => {
             let sender = data.sender;
             let receiver = data.receiver;
-            console.log("check data", sender)
 
             if (clients && clients.length > 0) {
                 let index = clients.findIndex((item) => item.customId.localeCompare(receiver) === 0)
@@ -74,6 +75,61 @@ export const SocketSetup = (server) => {
             }
 
         })
+
+        socket.on('joinRoom', (data) => {
+            socket.join(data.groupId);
+            if (data && data.user && data.namegroup && data.groupId) {
+                console.log(`User ${data.user} joined room: ${data.namegroup}`);
+            } else {
+                console.log(`User ${data.user} is ready`);
+            }
+
+        });
+
+        socket.on('leaveRoom', (data) => {
+            socket.leave(data.groupId);
+            if (data && data.user && data.namegroup && data.groupId) {
+                console.log(`User ${data.user} left room: ${data.namegroup}`);
+            } else {
+                console.log(`User ${data.user} is ready`);
+            }
+        });
+
+        socket.on("sendmessangeingroup", (data) => {
+            console.log(data)
+            io.to(data.groupId).emit("refreshmessangeingroup", { groupId: data.groupId })
+        })
+
+        socket.on("typing", () => {
+            socket.broadcast.emit("typing")
+        })
+
+        socket.on("sendaddgroup", () => {
+            io.emit("sendaddgroup")
+        })
+
+        socket.on('logout', (data) => {
+            console.log("check data", data)
+            if (clients && clients.length > 0) {
+                const index = clients.findIndex(client => client.customId === data.customId);
+                console.log(index)
+                if (index !== -1) {
+                    clients.splice(index, 1);
+                    console.log(`Người dùng ${data.customId} đã đăng xuất.`);
+                }
+                // let index = clients.filter((item) => item.clientId.localeCompare(socket.id) !== 0)
+                // clients = [...index];
+                console.log(clients)
+            }
+        });
+
+        socket.on('disconnect', () => {
+            if (clients && clients.length > 0) {
+                let index = clients.filter((item) => item.clientId.localeCompare(socket.id) !== 0)
+                clients = [...index];
+                console.log(clients)
+            }
+        });
 
     })
 

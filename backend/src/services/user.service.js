@@ -17,7 +17,6 @@ export const findUserByPhone = async (phone) => {
 
 export const showFriends = async (userId) => {
     try {
-        console.log(userId);
         const user = await User.findById(userId)
             .populate("friends", "_id name avatar phoneNumber")
             .lean();
@@ -88,7 +87,6 @@ export const showFriendRequests = async (userId) => {
         if (!user) {
             return { EC: 1, EM: "User not found", DT: "" };
         }
-        console.log(user.friendRequests);
         return { EC: 0, EM: "Success", DT: user.friendRequests };
     } catch (error) {
         return { EC: 1, EM: error.message, DT: "" };
@@ -135,14 +133,14 @@ export const rejectFriendRequestToUser = async (senderId, receiverId) => {
         if (!sender || !receiver) {
             return { EC: 1, EM: "User not found", DT: "" };
         }
-        if (!sender.friendRequests.includes(receiverId)) {
+        if (!receiver.friendRequests.includes(senderId)) {
             return { EC: 1, EM: "Friend request not found", DT: "" };
         }
-        receiver.friendRequests = sender.friendRequests.filter(
-            (friend) => friend !== receiverId
+        receiver.friendRequests = receiver.friendRequests.filter(
+            (friend) => friend.toString() !== senderId
         );
         sender.sentFriendRequests = sender.sentFriendRequests.filter(
-            (friend) => friend !== receiverId
+            (friend) => friend.toString() !== receiverId.toString()
         );
         await sender.save();
         await receiver.save();
@@ -174,5 +172,25 @@ export const getUserInfoService = async (userId) => {
         return { EC: 0, EM: "Success", DT: user };
     } catch (error) {
         return { EC: 1, EM: error.message, DT: "" };
+    }
+};
+
+export const deleteFriendService = async (userId, friendId) => {
+    try {
+        // Remove the friend from the user's friends list
+        await User.findByIdAndUpdate(userId, {
+            $pull: { friends: friendId },
+        });
+        return {
+            EC: 0,
+            EM: "Success",
+            DT: "",
+        };
+    } catch (error) {
+        return {
+            EC: 1,
+            EM: error.message,
+            DT: "",
+        };
     }
 };

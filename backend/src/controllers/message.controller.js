@@ -1,7 +1,9 @@
 import {
-    // deleteMessageService,
+    deleteMessageService,
+    getMessagesGroupService,
     getMessagesService,
-    // recallMessageService,
+    recallMessageService,
+    sendMessageGroupService,
     sendMessageService,
 } from "../services/message.service.js";
 //   import AWS from "aws-sdk";
@@ -59,30 +61,57 @@ export const getMessages = async (req, res) => {
     try {
         const senderId = req.user._id;
         const receiverId = req.body.receiverId;
-        console.log("receiverID::::", receiverId);
-        console.log("senderID::::", senderId);
+
         const messages = await getMessagesService(senderId, receiverId);
         res.status(200).json(messages);
     } catch (error) {
         res.status(500).json({ EC: 1, EM: error.message, DT: "" });
     }
 };
-// export const deleteMessage = async (req, res) => {
-//     try {
-//         const messageId = req.body.messageId;
-//         const senderId = req.user._id;
-//         const message = await deleteMessageService(messageId, senderId);
-//         res.status(200).json(message);
-//     } catch (error) {
-//         res.status(500).json({ EC: 1, EM: error.message, DT: "" });
-//     }
-// };
-// export const recallMessage = async (req, res) => {
-//     try {
-//         const messageId = req.body.messageId;
-//         const response = await recallMessageService(messageId);
-//         res.status(200).json(response);
-//     } catch (error) {
-//         res.status(500).json({ EC: 1, EM: error.message, DT: "" });
-//     }
-// };
+export const deleteMessage = async (req, res) => {
+    try {
+        const messageId = req.body.messageId;
+        const senderId = req.user._id;
+        const message = await deleteMessageService(messageId, senderId);
+        res.status(200).json(message);
+    } catch (error) {
+        res.status(500).json({ EC: 1, EM: error.message, DT: "" });
+    }
+};
+export const recallMessage = async (req, res) => {
+    try {
+        const messageId = req.body.messageId;
+        const response = await recallMessageService(messageId);
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ EC: 1, EM: error.message, DT: "" });
+    }
+};
+
+
+export const getMessagesGroup = async (req, res) => {
+    try {
+        const senderId = req.user._id;
+        const groupId = req.query.groupId;
+        const messages = await getMessagesGroupService(groupId, senderId);
+        res.status(200).json(messages);
+    } catch (error) {
+        res.status(500).json({ EC: 1, EM: error.message, DT: "" });
+    }
+};
+
+export const sendMessageGroup = async (req, res) => {
+    try {
+        const senderId = req.user._id;
+        const { groupId, content } = req.body;
+        const sendMessage = await sendMessageGroupService(
+            senderId,
+            groupId,
+            content,
+            "text"
+        );
+        res.status(200).json(sendMessage);
+    } catch (error) {
+        res.status(500).json({ EC: 1, EM: error.message, DT: "" });
+    }
+};

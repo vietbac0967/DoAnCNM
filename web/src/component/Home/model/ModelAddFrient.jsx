@@ -8,6 +8,7 @@ import TextField from '@mui/material/TextField';
 import ChildAddFrient from './child/ChildAddFrient';
 import { getuserbyPhone } from '../../../service/UserService';
 import _ from 'lodash';
+import { useDispatch, useSelector } from 'react-redux';
 
 // import exampleAvatar from '../../assets/Ellipse_191.png';
 const style = {
@@ -24,9 +25,11 @@ const style = {
 
 function ModelAddFrient(props) {
 
-    const { open, handleClose } = props;
+    const { open, handleClose, phoneNumber, setPhoneNumber } = props;
 
-    const [phoneNumber, setPhoneNumber] = useState('');
+    const dispatch = useDispatch();
+    const dataredux = useSelector((state) => state.userisaccess.account)
+
     const [user, setuser] = useState({});
 
     const handleChange = (event) => {
@@ -55,8 +58,8 @@ function ModelAddFrient(props) {
             <Modal
                 open={open}
                 onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
+            // aria-labelledby="modal-modal-title"
+            // aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
                     <Box sx={{ borderBottom: 1, flexDirection: 'row', justifyContent: 'space-between', width: "100%" }}>
@@ -68,7 +71,6 @@ function ModelAddFrient(props) {
                             edge="end"
                             color="inherit"
                             onClick={handleClose}
-                            aria- label="close"
                         >
                             <CloseIcon />
                         </IconButton>

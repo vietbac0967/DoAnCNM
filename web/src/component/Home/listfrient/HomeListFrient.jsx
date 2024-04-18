@@ -13,7 +13,8 @@ const HomeListFrient = (props) => {
     const [model, setmodel] = useState(false)
 
 
-    const { dataredux, listfrient, handleClick } = props;
+    const { dataredux, listfrient, handleClick,
+        currentMessange } = props;
 
 
     return (
@@ -34,6 +35,7 @@ const HomeListFrient = (props) => {
                                 dataredux={dataredux}
                                 listfrient={listfrient}
                                 handleClick={handleClick}
+                                currentMessange={currentMessange}
                             />
                             :
                             <SearchModel />

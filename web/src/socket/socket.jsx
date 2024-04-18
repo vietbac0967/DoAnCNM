@@ -29,7 +29,32 @@ const handlerefreshMessangesennder = (callback) => {
     socket.on("refreshmessangesender", callback)
 }
 
+const handlesendaddgroup = () => {
+    socket.emit("sendaddgroup")
+}
+
+const handleactionaddgroup = (callback) => {
+    socket.on("sendaddgroup", callback)
+}
+
+const handlsendmessangeingroup = (data) => {
+    socket.emit("sendmessangeingroup", data)
+}
+
+const handlerefreshMessangeingroup = (callback) => {
+    socket.on("refreshmessangeingroup", callback)
+}
+
+const handleuserjoingroup = (data) => {
+    socket.emit("joinRoom", data)
+}
+
+const handleuserleavegroup = (data) => {
+    socket.emit("leaveRoom", data)
+}
+
 export {
     handleCusttomClient, handlerefreshAccount, handlesendtext, handlsendmessange,
-    handlerefreshMessange, handlerefreshMessangesennder
+    handlerefreshMessange, handlerefreshMessangesennder, handlesendaddgroup, handleactionaddgroup,
+    handlsendmessangeingroup, handlerefreshMessangeingroup, handleuserjoingroup, handleuserleavegroup
 }

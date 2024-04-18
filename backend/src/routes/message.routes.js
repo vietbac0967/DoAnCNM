@@ -3,11 +3,13 @@ import express from "express";
 import { verifyAccount } from "../middlewares/verifyAccount.js";
 import {
     getMessages,
-    //   deleteMessage,
+    deleteMessage,
     //   getMessages,
-    //   recallMessage,
+    recallMessage,
     //   sendImage,
     sendMessage,
+    getMessagesGroup,
+    sendMessageGroup,
 } from "../controllers/message.controller.js";
 // import path from "path";
 // import AWS from "aws-sdk";
@@ -39,6 +41,9 @@ const router = express.Router();
 router.post("/message/sendMessage", verifyAccount, sendMessage);
 // router.post("/message/sendImage",verifyAccount,upload.single("image"),sendImage);
 router.post("/message/getMessages", verifyAccount, getMessages);
-// router.post("/message/deleteMessage", verifyAccount, deleteMessage);
-// router.post("/message/recallMessage", verifyAccount, recallMessage);
+router.post("/message/deleteMessage", verifyAccount, deleteMessage);
+router.post("/message/recallMessage", verifyAccount, recallMessage);
+router.get("/message/messagesGroup", verifyAccount, getMessagesGroup);
+router.post("/message/sendMessageGroup", verifyAccount, sendMessageGroup);
+
 export default router;

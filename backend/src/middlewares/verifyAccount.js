@@ -2,12 +2,27 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import { decodetoken, generateRefreshToken } from "../utils/generateToken.js";
 import { Types } from "mongoose";
+import Group from "../models/group.model.js";
 
 const getinfobyId = async (arr) => {
   let list = [];
   if (arr && arr.length > 0) {
     for (let i = 0; i < arr.length; i++) {
       let user = await User.findById(arr[i], "_id name email gender is_online avatar phoneNumber").exec();
+      list.push(user)
+    }
+  }
+  return list
+}
+
+const getinfoGroupbyId = async (arr) => {
+  let list = [];
+  if (arr && arr.length > 0) {
+    for (let i = 0; i < arr.length; i++) {
+      let user = await Group.findById(arr[i], "_id name members author avatar")
+        .populate("members", "_id name email avatar")
+        .populate("author", "_id name email avatar")
+        .exec();
       list.push(user)
     }
   }
@@ -24,6 +39,8 @@ export const verifyAccount = async (req, res, next) => {
         let listfriend = await getinfobyId(user.friends)
         let listfriendRequests = await getinfobyId(user.friendRequests)
         let listsentFriendRequests = await getinfobyId(user.sentFriendRequests)
+        let listgroup = await getinfoGroupbyId(user.groups)
+
 
         req.user = {
           _id: user._id,
@@ -35,7 +52,8 @@ export const verifyAccount = async (req, res, next) => {
           phoneNumber: user.phoneNumber,
           friends: listfriend,
           friendRequests: listfriendRequests,
-          sentFriendRequests: listsentFriendRequests
+          sentFriendRequests: listsentFriendRequests,
+          groups: listgroup
         }
         next();
       }

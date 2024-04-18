@@ -12,7 +12,9 @@ const ListSendInvitation = () => {
     const dataredux = useSelector((state) => state.userisaccess.account)
 
     useEffect(() => {
-        handlerefreshAccount(dispatch(fechUserToken()))
+        handlerefreshAccount(() => {
+            dispatch(fechUserToken())
+        })
     }, [])
 
     return (
@@ -26,7 +28,7 @@ const ListSendInvitation = () => {
                         dataredux && dataredux.friendRequests && dataredux.friendRequests.length > 0
                         && dataredux.friendRequests.map((item, index) => {
                             return (
-                                <Grid item xs={6} sm={4} md={4} key={`list-frient-${index}`}>
+                                <Grid item xs={6} sm={6} md={4} key={`list-frient-${index}`}>
                                     <ChildSendInvitation
                                         avatar={item.avatar}
                                         name={item.name}

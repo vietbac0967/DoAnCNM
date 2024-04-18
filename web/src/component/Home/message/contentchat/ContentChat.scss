@@ -3,8 +3,34 @@
     width: 100%;
     display: flex;
 
-    .chat-infor-bottom-child-text {
+    .div-input-and-emo {
         height: 100%;
         width: 100%;
+        position: relative;
+
+        .chat-infor-bottom-child-text {
+            height: 100%;
+            width: 100%;
+
+
+        }
+
+        .btn-emoij {
+            position: absolute;
+            top: 20%;
+            right: 20px;
+
+        }
+
+        .div-emoij {
+            width: 352px;
+            position: absolute;
+            top: -650%;
+            right: 20px;
+        }
+
+
     }
+
+
 }

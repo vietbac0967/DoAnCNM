@@ -1,6 +1,7 @@
 .chat-info-container {
     padding: 5px;
     display: flex;
+    height: 50px;
 
     // &:hover {
     //     cursor: pointer;
@@ -36,5 +37,9 @@
             line-height: 12.1px;
             color: #8A8A8A;
         }
+    }
+
+    &.active {
+        background-color: #e5efff;
     }
 }

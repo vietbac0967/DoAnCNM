@@ -3,7 +3,7 @@ import { Box, IconButton } from '@mui/material'
 import './ChildSendInvitation.scss'
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import { acceptRequestFrient } from '../../../../../../service/UserService';
+import { acceptRequestFrient, rejectRequestFriend } from '../../../../../../service/UserService';
 import { handlesendtext } from '../../../../../../socket/socket';
 import { fechUserToken } from '../../../../../../redux/UserSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,7 +18,15 @@ const ChildSendInvitation = (props) => {
         let res = await acceptRequestFrient({ senderId: _id })
         if (res && res.EC === 0) {
             await dispatch(fechUserToken())
-            handlesendtext({ receiver: _id })
+            handlesendtext({ receiver: phoneNumber })
+        }
+    }
+
+    const handlerejectRequestSendfriend = async () => {
+        let res = await rejectRequestFriend({ senderId: _id })
+        if (res && res.EC === 0) {
+            await dispatch(fechUserToken())
+            handlesendtext({ receiver: phoneNumber })
         }
     }
 
@@ -38,7 +46,9 @@ const ChildSendInvitation = (props) => {
                 <Button className='btn-access' variant="contained"
                     onClick={() => handleacceptFrient()}
                 >Xác Nhận</Button>
-                <Button className='btn-cancel' variant="outlined">Hủy</Button>
+                <Button className='btn-cancel' variant="outlined"
+                    onClick={() => handlerejectRequestSendfriend()}
+                >Hủy</Button>
             </Box>
         </Box>
     );

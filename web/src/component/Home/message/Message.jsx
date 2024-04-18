@@ -5,16 +5,15 @@ import Divider from '@mui/material/Divider';
 import InfoChat from './infochat/InfoChat'
 import ContentChat from './contentchat/ContentChat';
 import HeaderChat from './headerchat/HeaderChat';
-import { handlerefreshMessange, handlerefreshMessangesennder } from '../../../socket/socket';
-import { getAllMessage } from '../../../service/MessageService';
+import { handlerefreshMessange, handlerefreshMessangeingroup, handlerefreshMessangesennder } from '../../../socket/socket';
+import { getAllMessage, getMessagesGroup } from '../../../service/MessageService';
 import _ from 'lodash';
 
 const Message = (props) => {
 
-    const { listfrient } = props;
+    const { listfrient, setshowchat } = props;
 
     const user = useRef({});
-
 
     useEffect(() => {
         if (user.current && user.current.length > 0) {
@@ -30,7 +29,7 @@ const Message = (props) => {
             } else {
                 handlerefreshMessangeingroup(async (data) => {
                     if (data.groupId === user.current[0]._id) {
-                        await handlegetAllchatgroup()
+                        await handleGetAllMessage()
                     }
                 })
 
@@ -39,6 +38,7 @@ const Message = (props) => {
         }
     }, [user.current[0]])
 
+
     useEffect(() => {
         if (listfrient && listfrient.length > 0) {
             let data = listfrient.filter((item) => item.click === true)
@@ -46,25 +46,39 @@ const Message = (props) => {
         }
     }, [listfrient])
 
+    useEffect(() => {
+        handleGetAllMessage()
+    }, [listfrient])
 
     const [listmessage, setlistmessage] = useState([])
 
     const handleGetAllMessage = async () => {
         if (listfrient && listfrient.length > 0) {
-            let res = await getAllMessage({ receiverId: listfrient[0]._id })
-            if (res && res.EC === 0) {
-                setlistmessage(res.DT)
-            } else {
-                setlistmessage([])
+            let index = listfrient.findIndex(item => item.click === true);
+            if (index !== -1) {
+                let res = null;
+                if (listfrient[index].phoneNumber) {
+                    res = await getAllMessage({ receiverId: listfrient[index]._id })
+                } else {
+                    res = await getMessagesGroup(listfrient[index]._id)
+                }
+                if (res && res.EC === 0) {
+                    setlistmessage(res.DT)
+                } else {
+                    setlistmessage([])
+                }
             }
+
         }
     }
+
 
     return (
         <Box className='message-container'>
             <Box className="message-header">
                 <HeaderChat
                     listfrient={listfrient}
+                    setshowchat={setshowchat}
                 />
             </Box>
             <Divider orientation="horizontal" />
@@ -73,7 +87,10 @@ const Message = (props) => {
                 <InfoChat
                     listfrient={listfrient}
                     handleGetAllMessage={handleGetAllMessage}
+                    setlistmessage={setlistmessage}
                     listmessage={listmessage}
+                    user={user.current}
+
                 />
             </Box>
             <Divider orientation="horizontal" />

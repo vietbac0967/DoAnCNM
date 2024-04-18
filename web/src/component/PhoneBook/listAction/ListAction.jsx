@@ -11,7 +11,7 @@ import ChooseAction from './action/ChooseAction';
 
 const ListAction = (props) => {
 
-    const { listaction, setlistaction, defaultInput } = props
+    const { listaction, setlistaction, defaultInput, handleClick } = props
 
 
     const [model, setmodel] = useState(false)
@@ -36,6 +36,7 @@ const ListAction = (props) => {
                                 listaction={listaction}
                                 setlistaction={setlistaction}
                                 defaultInput={defaultInput}
+                                handleClick={handleClick}
                             />
                             :
                             <SearchModel />

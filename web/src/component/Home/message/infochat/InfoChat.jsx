@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const InfoChat = (props) => {
 
-    const { listfrient, handleGetAllMessage, listmessage } = props;
+    const { listfrient, handleGetAllMessage, listmessage, setlistmessage, user } = props;
 
     const dispatch = useDispatch();
     const dataredux = useSelector((state) => state.userisaccess.account)
@@ -32,6 +32,11 @@ const InfoChat = (props) => {
                                         <Box key={`chat-private-sender-${index}`}>
                                             <Sender
                                                 item={item}
+                                                listfrient={listfrient}
+                                                setlistmessage={setlistmessage}
+                                                handleGetAllMessage={handleGetAllMessage}
+                                                user={user}
+
                                             />
                                         </Box>
                                         :
@@ -39,6 +44,9 @@ const InfoChat = (props) => {
                                             <Receiver
                                                 item={item}
                                                 listfrient={listfrient}
+                                                setlistmessage={setlistmessage}
+                                                handleGetAllMessage={handleGetAllMessage}
+
                                             />
                                         </Box>
 
@@ -53,6 +61,11 @@ const InfoChat = (props) => {
                                         <Box key={`chat-private-sender-${index}`}>
                                             <Sender
                                                 item={item}
+                                                listfrient={listfrient}
+                                                setlistmessage={setlistmessage}
+                                                handleGetAllMessage={handleGetAllMessage}
+                                                user={user}
+
                                             />
                                         </Box>
                                         :
@@ -60,6 +73,7 @@ const InfoChat = (props) => {
                                             <Receiver
                                                 item={item}
                                                 user={user}
+                                                handleGetAllMessage={handleGetAllMessage}
                                             />
                                         </Box>
 

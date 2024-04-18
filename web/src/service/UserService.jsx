@@ -34,7 +34,20 @@ const acceptRequestFrient = (data) => {
 
 }
 
+const rejectRequestFriend = (data) => {
+    return axios.post("/api/user/rejectFriendRequest", data)
+}
+
+const deleteFriend = (data) => {
+    return axios.post("/api/user/deleteFriend", data)
+}
+
+const getAllFriend = () => {
+    return axios.get("/api/user/getFriends")
+}
+
 export {
     register, accountUser, login, verifyOTP, resendEmail, getuserbyPhone,
-    sendRequestFrient, acceptRequestFrient
+    sendRequestFrient, acceptRequestFrient, rejectRequestFriend, deleteFriend,
+    getAllFriend
 }

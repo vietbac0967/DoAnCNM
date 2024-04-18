@@ -1,5 +1,8 @@
 import User from "../models/user.model.js";
-import { acceptFriendRequestToUser, findUserByPhone, rejectFriendRequestToUser, sendFriendRequestToUser, showFriendRequests, showFriends, showSentFriendRequests } from "../services/user.service.js";
+import {
+  acceptFriendRequestToUser, findUserByPhone, rejectFriendRequestToUser, sendFriendRequestToUser,
+  showFriendRequests, showFriends, showSentFriendRequests, deleteFriendService
+} from "../services/user.service.js";
 
 export const getUsers = async (req, res) => {
   try {
@@ -39,7 +42,6 @@ export const getUser = async (req, res) => {
 export const getUserByPhone = async (req, res) => {
   try {
     const { phone } = req.body;
-    console.log(req.body)
     // const senderId = req.user._id;
     const user = await findUserByPhone(phone);
     return res.status(200).json(user);
@@ -117,7 +119,6 @@ export const rejectFriendRequest = async (req, res) => {
 export const getFriends = async (req, res) => {
   try {
     const user = req.user;
-    console.log("UserID:::::", user._id);
     const friends = await showFriends(user._id);
     res.status(200).json(friends);
   } catch (error) {
@@ -134,6 +135,22 @@ export const getSentFriendRequests = async (req, res) => {
     const user = req.user;
     const sentFriendRequests = await showSentFriendRequests(user._id);
     res.status(200).json(sentFriendRequests);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    });
+  }
+};
+
+export const deleteFriend = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const friendId = req.body.friendId;
+    const result = await deleteFriendService(userId, friendId);
+    res.status(200).json(result);
   } catch (error) {
     console.log(error.message);
     res.status(500).json({

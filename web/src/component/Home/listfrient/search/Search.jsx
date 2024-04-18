@@ -9,16 +9,36 @@ import './Search.scss'
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import CancelIcon from '@mui/icons-material/Cancel';
 import ModelAddFrient from '../../model/ModelAddFrient'
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import ModuleGroup from '../../../model/moduleaddgroup/ModuleGroup';
 
 const Search = (props) => {
 
     const { model, setmodel } = props;
 
     const [open, setOpen] = useState(false);
-    const handleClose = () => setOpen(false);
+    const [openAddGroup, setOpenAddGroup] = useState(false);
+
+    const [phoneNumber, setPhoneNumber] = useState('');
+
+
+    const handleClose = () => {
+        setPhoneNumber("")
+        setOpen(false);
+    }
+
 
     const handleOpen = () => {
+        setPhoneNumber("")
         setOpen(true)
+    }
+
+    const handleOpenAddGroup = () => {
+        setOpenAddGroup(true)
+    }
+
+    const handleCloseAddGroup = () => {
+        setOpenAddGroup(false)
     }
 
     return (
@@ -41,11 +61,19 @@ const Search = (props) => {
                 {
                     !model
                         ?
-                        <IconButton color="primary" sx={{ p: '10px' }} aria-label="directions"
-                            onClick={() => handleOpen()}
-                        >
-                            <PersonAddAltIcon />
-                        </IconButton>
+                        <>
+                            <IconButton color="primary" sx={{ p: '10px' }} aria-label="directions"
+                                onClick={() => handleOpen()}
+                            >
+                                <PersonAddAltIcon />
+                            </IconButton>
+                            <IconButton color="primary" sx={{ p: '10px' }} aria-label="directions"
+                                onClick={() => handleOpenAddGroup()}
+                            >
+                                <GroupAddIcon />
+                            </IconButton>
+                        </>
+
                         :
                         <IconButton color="primary" sx={{ p: '10px' }} aria-label="directions"
                             onClick={() => setmodel(false)}
@@ -59,6 +87,12 @@ const Search = (props) => {
                 handleClose={handleClose}
                 open={open}
                 handleOpen={handleOpen}
+                phoneNumber={phoneNumber}
+                setPhoneNumber={setPhoneNumber}
+            />
+            <ModuleGroup
+                open={openAddGroup}
+                handleClose={handleCloseAddGroup}
             />
         </Box>
     );
