@@ -82,7 +82,7 @@ export default function GroupInfoScreen({ navigation, route }) {
       console.log("response:::", response);
       const { EM, EC } = response;
       if (EC === 0 && EM === "Success") {
-        Alert.alert("Thông báo", "Gải tán nhóm thành công");
+        Alert.alert("Thông báo", "Giải tán nhóm thành công");
         navigation.navigate("Group", { isLoading: true });
       }
     } catch (err) {
