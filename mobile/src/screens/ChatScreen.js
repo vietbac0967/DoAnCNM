@@ -48,7 +48,7 @@ const ChatScreen = ({ navigation, route }) => {
   const [messages, setMessages] = useState([]);
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
   const { recevierId } = route.params;
-  console.log("params:::",route.params);
+  console.log("params:::", route.params);
   const socket = useRef();
   const inputRef = useRef(null);
   const [selectMessage, setSelectMessage] = useState({});
@@ -275,7 +275,14 @@ const ChatScreen = ({ navigation, route }) => {
               defaultSource={require("../assets/avt.jpg")}
             />
 
-            <Text style={{ marginLeft: 10, fontSize: 15, fontWeight: "bold", color:"#fff" }}>
+            <Text
+              style={{
+                marginLeft: 10,
+                fontSize: 15,
+                fontWeight: "bold",
+                color: "#fff",
+              }}
+            >
               {receiver?.name && receiver.name.length > 17
                 ? receiver.name.substring(0, 17) + "..."
                 : receiver.name}
@@ -359,6 +366,21 @@ const ChatScreen = ({ navigation, route }) => {
               <Text style={{ textAlign: "center", fontWeight: "400" }}>
                 Thu hồi tin nhắn
               </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                navigation.navigate("ForwardMessage", {
+                  messageId: selectMessage._id,
+                });
+              }}
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Entypo name="forward" size={24} color="#9AC8CD" />
+              <Text>Chuyển tiếp</Text>
             </Pressable>
           </View>
         </Pressable>

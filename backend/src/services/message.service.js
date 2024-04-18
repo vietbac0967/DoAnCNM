@@ -211,3 +211,74 @@ export const getMessagesGroupService = async (groupId, senderId) => {
     };
   }
 };
+
+export const forwardMessageService = async (
+  messageId,
+  senderId,
+  receiverId,
+  groupId
+) => {
+  try {
+    const message = await Message.findById(messageId);
+    if (!message) {
+      return {
+        EC: 1,
+        EM: "Message not found",
+        DT: "",
+      };
+    }
+    const newMessage = new Message({
+      senderId,
+      receiverId,
+      groupId, // add this line
+      content: message.content,
+      messageType: message.messageType,
+    });
+    await newMessage.save();
+    const populatedMessage = await Message.findById(newMessage._id).populate(
+      "senderId",
+      "_id name avatar"
+    );
+    // if groupId exist
+    if (groupId) {
+      const conversation = await Conversation.findOne({
+        participantsGroup: { $all: [groupId] },
+      });
+      if (!conversation) {
+        return {
+          EC: 1,
+          EM: "Conversation not found",
+          DT: "",
+        };
+      }
+      conversation.messages.push(newMessage._id);
+      await conversation.save();
+    }
+    // if receiverId exist
+    if (receiverId) {
+      const conversation = await Conversation.findOne({
+        participants: { $all: [receiverId, senderId] },
+      });
+      if (!conversation) {
+        return {
+          EC: 1,
+          EM: "Conversation not found",
+          DT: "",
+        };
+      }
+      conversation.messages.push(newMessage._id);
+      await conversation.save();
+    }
+    return {
+      EC: 0,
+      EM: "Success",
+      DT: populatedMessage,
+    };
+  } catch (error) {
+    return {
+      EC: 1,
+      EM: "Error",
+      DT: error,
+    };
+  }
+};

@@ -1,9 +1,25 @@
-import { getConverstationService } from "../services/conversation.service.js";
+import {
+  getConversationForwardsService,
+  getConversationService,
+} from "../services/conversation.service.js";
 
 export const getConverstations = async (req, res) => {
   try {
     const userId = req.user._id;
-    const response = await getConverstationService(userId);
+    const response = await getConversationService(userId);
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(500).json({ EC: 1, EM: error.message, DT: "" });
+  }
+};
+export const getConversationForward = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const messageId = req.query.messageId;
+    const response = await getConversationForwardsService(
+      userId,
+      messageId
+    );
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ EC: 1, EM: error.message, DT: "" });

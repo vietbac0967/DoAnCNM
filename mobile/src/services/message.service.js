@@ -95,3 +95,28 @@ export const recallMessageService = async (token, messageId) => {
   }
 };
 
+export const forwardMessageService = async (
+  token,
+  messageId,
+  receiverId,
+  groupId
+) => {
+  try {
+    const response = await baseURL.post(
+      "/message/forwardMessage",
+      {
+        messageId,
+        receiverId,
+        groupId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error:::", error);
+  }
+};

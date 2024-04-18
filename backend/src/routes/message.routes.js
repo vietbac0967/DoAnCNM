@@ -2,6 +2,7 @@ import express from "express";
 import { verifyAccount } from "../middlewares/verifyAccount.js";
 import {
   deleteMessage,
+  forwardMessage,
   getMessages,
   getMessagesGroup,
   recallMessage,
@@ -30,4 +31,5 @@ router.post(
   updoad.single("image"),
   sendImageGroup
 );
+router.post("/message/forwardMessage", verifyAccount, forwardMessage);
 export default router;

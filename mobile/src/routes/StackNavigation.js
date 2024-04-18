@@ -19,6 +19,7 @@ import SearchScreen from "../screens/SearchScreen";
 import GroupInfoScreen from "../screens/GroupInfoScreen";
 import AddMemberScreen from "../screens/AddMemberScreen";
 import MemberInfoScreen from "../screens/MemberInfoScreen";
+import ForwardMessageScreen from "../screens/ForwardMessageScreen";
 const Stack = createNativeStackNavigator();
 const StackNavigation = () => {
   return (
@@ -106,6 +107,7 @@ const StackNavigation = () => {
         ></Stack.Screen>
         <Stack.Screen name="AddMember" component={AddMemberScreen} />
         <Stack.Screen name="MemberInfo" component={MemberInfoScreen} />
+        <Stack.Screen name="ForwardMessage" component={ForwardMessageScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
