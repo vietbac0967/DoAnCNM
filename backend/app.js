@@ -10,6 +10,8 @@ import helmet from "helmet";
 import compression from "compression";
 import express from "express";
 import { configCORS } from "./src/config/configCORS.js";
+import swaggerSpec from "./src/helpers/swagger.js";
+import swaggerUi from "swagger-ui-express";
 const app = express();
 configCORS(app);
 app.use(express.json());
@@ -24,6 +26,11 @@ app.use("/api/", userRoutes);
 app.use("/api/", messageRoutes);
 app.use("/api/group/", groupRoutes);
 app.use("/api/conversation/", converstationRoutes);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get("/docs.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerSpec);
+});
 
 // export default app;
 export default app;

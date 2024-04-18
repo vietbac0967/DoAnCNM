@@ -147,7 +147,6 @@ export const getConversationForwardsService = async (userId, messageId) => {
   try {
     const user = await User.findById(userId);
     const groupIds = user.groups; // assuming 'groups' is an array of group IDs
-
     const conversations = await Conversation.find({
       $and: [
         {
