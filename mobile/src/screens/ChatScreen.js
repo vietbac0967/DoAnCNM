@@ -138,6 +138,7 @@ const ChatScreen = ({ navigation, route }) => {
   useEffect(() => {
     socket.current = io(URL_SERVER);
     // socket.current = io("http://192.168.0.6:5000");
+    console.log("URL_SERVER:::", URL_SERVER);
     socket.current.emit("add-user", recevierId);
   }, []);
 
