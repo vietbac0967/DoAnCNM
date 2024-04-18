@@ -13,3 +13,18 @@ export const getConversationsService = async (token) => {
     return [];
   }
 };
+export const getConversationForward = async (token, messageId) => {
+  try {
+    const response = await baseURL.get("/conversation/getForward", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        messageId,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.log("error:::", error);
+  }
+};

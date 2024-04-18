@@ -2,6 +2,7 @@ import upload from "../middlewares/uploadImage.js";
 import Conversation from "../models/converstation.model.js";
 import {
   deleteMessageService,
+  forwardMessageService,
   getMessagesGroupService,
   getMessagesService,
   recallMessageService,
@@ -203,6 +204,22 @@ export const getMessagesGroup = async (req, res) => {
     console.log("groupId::::", groupId);
     const messages = await getMessagesGroupService(groupId, senderId);
     res.status(200).json(messages);
+  } catch (error) {
+    res.status(500).json({ EC: 1, EM: error.message, DT: "" });
+  }
+};
+
+export const forwardMessage = async (req, res) => {
+  try {
+    const senderId = req.user._id;
+    const { messageId, receiverId, groupId } = req.body;
+    const response = await forwardMessageService(
+      messageId,
+      senderId,
+      receiverId,
+      groupId
+    );
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ EC: 1, EM: error.message, DT: "" });
   }

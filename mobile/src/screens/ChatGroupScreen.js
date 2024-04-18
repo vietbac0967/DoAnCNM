@@ -330,6 +330,22 @@ export default function ChatGroupScreen({ route, navigation }) {
                 Thu hồi tin nhắn
               </Text>
             </Pressable>
+            {/* Chuyển tiếp tin nhắn */}
+            <Pressable
+              onPress={() => {
+                navigation.navigate("ForwardMessage", {
+                  messageId: selectMessage._id,
+                });
+              }}
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Entypo name="forward" size={24} color="#9AC8CD" />
+              <Text>Chuyển tiếp</Text>
+            </Pressable>
           </View>
         </Pressable>
       </Modal>
