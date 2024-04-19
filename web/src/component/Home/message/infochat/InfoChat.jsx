@@ -10,14 +10,12 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const InfoChat = (props) => {
 
-    const { listfrient, handleGetAllMessage, listmessage, setlistmessage, user } = props;
+    const { listfrient, handleGetAllMessage, listmessage,
+        setlistmessage, user, reflistmessage, handleGetAllMessageinGroup
+    } = props;
 
     const dispatch = useDispatch();
     const dataredux = useSelector((state) => state.userisaccess.account)
-
-    useEffect(() => {
-        handleGetAllMessage()
-    }, [])
 
     return (
         <Box className="info-chat-container">
@@ -34,8 +32,10 @@ const InfoChat = (props) => {
                                                 item={item}
                                                 listfrient={listfrient}
                                                 setlistmessage={setlistmessage}
+                                                reflistmessage={reflistmessage}
                                                 handleGetAllMessage={handleGetAllMessage}
                                                 user={user}
+                                                handleGetAllMessageinGroup={handleGetAllMessageinGroup}
 
                                             />
                                         </Box>
@@ -45,8 +45,10 @@ const InfoChat = (props) => {
                                                 item={item}
                                                 listfrient={listfrient}
                                                 setlistmessage={setlistmessage}
+                                                reflistmessage={reflistmessage}
                                                 handleGetAllMessage={handleGetAllMessage}
-
+                                                handleGetAllMessageinGroup={handleGetAllMessageinGroup}
+                                                user={user}
                                             />
                                         </Box>
 
@@ -63,8 +65,10 @@ const InfoChat = (props) => {
                                                 item={item}
                                                 listfrient={listfrient}
                                                 setlistmessage={setlistmessage}
+                                                reflistmessage={reflistmessage}
                                                 handleGetAllMessage={handleGetAllMessage}
                                                 user={user}
+                                                handleGetAllMessageinGroup={handleGetAllMessageinGroup}
 
                                             />
                                         </Box>
@@ -74,6 +78,8 @@ const InfoChat = (props) => {
                                                 item={item}
                                                 user={user}
                                                 handleGetAllMessage={handleGetAllMessage}
+                                                handleGetAllMessageinGroup={handleGetAllMessageinGroup}
+
                                             />
                                         </Box>
 

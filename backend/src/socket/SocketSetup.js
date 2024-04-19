@@ -45,15 +45,29 @@ export const SocketSetup = (server) => {
 
 
             if (clients && clients.length > 0) {
-                let index = clients.findIndex((item) => item.customId.localeCompare(receiver) === 0)
-                console.log(index)
-                if (index !== -1) {
-                    socket.to(clients[index].clientId).emit("refresh", () => {
-                        console.log("test success");
-                    })
+                if (receiver && receiver.length > 0) {
+                    for (let i = 0; i < receiver.length; i++) {
+                        let index = clients.findIndex((item) => item.customId.localeCompare(receiver[i]) === 0)
+                        if (index !== -1) {
+                            socket.to(clients[index].clientId).emit("refresh", () => {
+                                console.log("test success");
+                            })
+                        } else {
+                            console.log("test error");
+                        }
+                    }
                 } else {
-                    console.log("test error");
+                    let index = clients.findIndex((item) => item.customId.localeCompare(receiver) === 0)
+                    console.log(index)
+                    if (index !== -1) {
+                        socket.to(clients[index].clientId).emit("refresh", () => {
+                            console.log("test success");
+                        })
+                    } else {
+                        console.log("test error");
+                    }
                 }
+
             }
         })
 
@@ -63,15 +77,15 @@ export const SocketSetup = (server) => {
             let receiver = data.receiver;
 
             if (clients && clients.length > 0) {
-                let index = clients.findIndex((item) => item.customId.localeCompare(receiver) === 0)
+                let index = clients.findIndex((item) => item.customId.localeCompare(receiver.phone) === 0)
+                let indexsender = clients.findIndex((item) => item.customId.localeCompare(sender.phone) === 0)
                 if (index !== -1) {
-                    socket.to(clients[index].clientId).emit("refreshmessange", { phone: sender });
-                    socket.emit("refreshmessangesender", () => {
-                    })
-                } else {
-                    socket.emit("refreshmessangesender", () => {
-                    })
+                    socket.to(clients[index].clientId).emit("refreshmessange", { phone: sender.phone, userId: sender.userId });
                 }
+                if (indexsender !== -1) {
+                    socket.emit("refreshmessangesender", { phone: receiver.phone, userId: receiver.userId });
+                }
+
             }
 
         })

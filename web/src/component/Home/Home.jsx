@@ -4,7 +4,7 @@ import './Home.scss'
 import HomeListFrient from './listfrient/HomeListFrient';
 import Message from './message/Message'
 import { useDispatch, useSelector } from 'react-redux';
-import { handleCusttomClient, handlerefreshAccount, handleuserjoingroup, handleuserleavegroup } from '../../socket/socket';
+import { handleCusttomClient, handlerefreshAccount, handlerefreshMessangesennder, handleuserjoingroup, handleuserleavegroup } from '../../socket/socket';
 import { fechUserToken } from '../../redux/UserSlice';
 import _ from 'lodash';
 import { getAllMessage, getMessagesGroup } from '../../service/MessageService';
@@ -53,6 +53,7 @@ const Home = () => {
             })
 
             handleGetAllFriend()
+
         }
     }, [])
 
@@ -70,16 +71,13 @@ const Home = () => {
     const handleGetAllFriend = async () => {
         if (dataredux && dataredux.friends && dataredux.groups
             && dataredux.friends.length > 0 && dataredux.groups.length > 0) {
-            // resetClickProperty(dataredux.friends)
-            // resetClickProperty(dataredux.groups);
+
             setlistfrient(dataredux.friends.concat(dataredux.groups));
         } else {
             if (dataredux && dataredux.friends && dataredux.friends.length > 0) {
-                // resetClickProperty(dataredux.friends)
 
                 setlistfrient(dataredux.friends);
             } else if (dataredux && dataredux.groups && dataredux.groups.length > 0) {
-                // resetClickProperty(dataredux.groups);
 
                 setlistfrient(dataredux.groups);
             }
@@ -100,16 +98,13 @@ const Home = () => {
                 if (currentgroup) {
                     if (item._id !== currentgroup._id) {
                         let data = { groupId: currentgroup._id, user: dataredux.phoneNumber, namegroup: currentgroup.name };
-                        await handleuserleavegroup(data)
+                        handleuserleavegroup(data)
                         setcurrentgroup({})
                     }
                 }
                 let listmessage = await handleGetAllMessage(cplistfrient[objIndex]._id);
                 listmessage.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                let closestData = listmessage[0];
-                if (closestData && closestData.length > 0) {
-                    cplistfrient[objIndex].current = closestData.content;
-                }
+
             } else {
                 if (!currentgroup) {
                     setcurrentMessange("group")
@@ -117,16 +112,13 @@ const Home = () => {
                 } else {
                     if (item._id !== currentgroup._id) {
                         let data = { groupId: currentgroup._id, user: dataredux.phoneNumber, namegroup: currentgroup.name };
-                        await handleuserleavegroup(data)
+                        handleuserleavegroup(data)
                         setcurrentgroup(item)
                     }
                 }
                 let listmessage = await handleGetAllMessagebyGroup(cplistfrient[objIndex]._id);
                 listmessage.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                let closestData = listmessage[0];
-                if (closestData && closestData.length > 0) {
-                    cplistfrient[objIndex].current = closestData.content;
-                }
+
             }
         }
         setlistfrient(cplistfrient)
@@ -144,7 +136,9 @@ const Home = () => {
     }, [currentMessange])
 
     useEffect(() => {
-        if (currentgroup) {
+        if (!currentgroup) {
+            return;
+        } else {
             handleuserjoingroup({ groupId: currentgroup._id, user: dataredux.phoneNumber, namegroup: currentgroup.name })
         }
     }, [currentgroup])

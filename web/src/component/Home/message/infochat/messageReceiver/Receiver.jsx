@@ -5,7 +5,7 @@ import MenuMessage from '../menuaction/MenuMessage';
 
 const Receiver = (props) => {
 
-    const { item, listfrient, handleGetAllMessage } = props;
+    const { item, listfrient, handleGetAllMessage, handleGetAllMessageinGroup, user } = props;
 
     const [anchorEl, setAnchorEl] = useState(null);
 
@@ -45,6 +45,8 @@ const Receiver = (props) => {
                 item={item}
                 listfrient={listfrient}
                 handleGetAllMessage={handleGetAllMessage}
+                handleGetAllMessageinGroup={handleGetAllMessageinGroup}
+                user={user}
             />
         </Box>
     );

@@ -20,16 +20,18 @@ const Message = (props) => {
             if (user.current[0].phoneNumber) {
                 handlerefreshMessange(async (data) => {
                     if (data.phone === user.current[0].phoneNumber) {
-                        await handleGetAllMessage()
+                        await handleGetAllMessage({ userId: data.userId })
                     }
+
                 })
-                handlerefreshMessangesennder(async () => {
-                    await handleGetAllMessage()
+                handlerefreshMessangesennder(async (data) => {
+                    await handleGetAllMessage({ userId: data.userId })
                 })
+
             } else {
                 handlerefreshMessangeingroup(async (data) => {
                     if (data.groupId === user.current[0]._id) {
-                        await handleGetAllMessage()
+                        await handleGetAllMessageinGroup({ groupId: data.groupId })
                     }
                 })
 
@@ -43,25 +45,26 @@ const Message = (props) => {
         if (listfrient && listfrient.length > 0) {
             let data = listfrient.filter((item) => item.click === true)
             user.current = data
-        }
-    }, [listfrient])
+            let index = listfrient.findIndex(item => item.click === true);
+            if (index !== -1) {
+                if (listfrient[index] && listfrient[index].phoneNumber) {
+                    handleGetAllMessage({ userId: listfrient[index]._id })
+                }
+                else {
+                    handleGetAllMessageinGroup({ groupId: listfrient[index]._id })
+                }
+            }
 
-    useEffect(() => {
-        handleGetAllMessage()
+        }
     }, [listfrient])
 
     const [listmessage, setlistmessage] = useState([])
 
-    const handleGetAllMessage = async () => {
+    const handleGetAllMessage = async (data) => {
         if (listfrient && listfrient.length > 0) {
             let index = listfrient.findIndex(item => item.click === true);
             if (index !== -1) {
-                let res = null;
-                if (listfrient[index].phoneNumber) {
-                    res = await getAllMessage({ receiverId: listfrient[index]._id })
-                } else {
-                    res = await getMessagesGroup(listfrient[index]._id)
-                }
+                let res = await getAllMessage({ receiverId: data.userId })
                 if (res && res.EC === 0) {
                     setlistmessage(res.DT)
                 } else {
@@ -72,6 +75,20 @@ const Message = (props) => {
         }
     }
 
+    const handleGetAllMessageinGroup = async (data) => {
+        if (listfrient && listfrient.length > 0) {
+            let index = listfrient.findIndex(item => item.click === true);
+            if (index !== -1) {
+                let res = await getMessagesGroup(data.groupId);
+                if (res && res.EC === 0) {
+                    setlistmessage(res.DT)
+                } else {
+                    setlistmessage([])
+                }
+            }
+
+        }
+    }
 
     return (
         <Box className='message-container'>
@@ -90,6 +107,7 @@ const Message = (props) => {
                     setlistmessage={setlistmessage}
                     listmessage={listmessage}
                     user={user.current}
+                    handleGetAllMessageinGroup={handleGetAllMessageinGroup}
 
                 />
             </Box>

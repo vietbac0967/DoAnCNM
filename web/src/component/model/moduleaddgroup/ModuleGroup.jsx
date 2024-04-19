@@ -16,7 +16,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { toast } from 'react-toastify';
 import { getAllFriend } from '../../../service/UserService';
 import { CreateGroup } from '../../../service/GroupService';
-import { handlesendaddgroup } from '../../../socket/socket';
+import { handlesendaddgroup, handlesendtext } from '../../../socket/socket';
 import { fechUserToken } from '../../../redux/UserSlice';
 
 const style = {
@@ -182,9 +182,13 @@ const ModuleGroup = (props) => {
                 groupName: namegroup,
                 members: arr
             }
+            console.log(arr)
             let res = await CreateGroup(data)
             if (res && res.EC === 0) {
-                await handlesendaddgroup();
+                let phonearr = [...choosegroup.map((item, index) => {
+                    return item.phoneNumber
+                })]
+                handlesendtext({ receiver: phonearr })
                 handleCloseModel()
                 dispatch(fechUserToken())
             } else {

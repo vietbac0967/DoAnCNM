@@ -9,8 +9,7 @@ import { handlsendmessange, handlsendmessangeingroup } from '../../../../../sock
 import { Box } from '@mui/material';
 
 const MenuMessage = (props) => {
-
-    const { open, handleClose, anchorEl, item, handleGetAllMessage, user } = props;
+    const { open, handleClose, anchorEl, item, handleGetAllMessage, user, handleGetAllMessageinGroup } = props;
     const [userinfo, setuserinfo] = useState({});
 
     const dispatch = useDispatch();
@@ -19,7 +18,11 @@ const MenuMessage = (props) => {
     const handledelteMessage = async () => {
         let res = await deleteMessage({ messageId: item._id })
         if (res && res.EC === 0) {
-            await handleGetAllMessage()
+            if (userinfo && userinfo.phoneNumber) {
+                await handleGetAllMessage({ userId: userinfo._id })
+            } else {
+                await handleGetAllMessageinGroup({ groupId: userinfo._id })
+            }
         }
     }
 
@@ -31,14 +34,19 @@ const MenuMessage = (props) => {
     const handlerecallMessage = async () => {
         let res = await recallMessage({ messageId: item._id })
         if (res && res.EC === 0) {
-            await handleGetAllMessage()
+            // await handleGetAllMessage({ userId: userinfo._id })
             if (userinfo && userinfo.phoneNumber) {
-                handlsendmessange({ sender: dataredux.phoneNumber, receiver: userinfo.phoneNumber })
+                handlsendmessange({
+                    sender: { phone: dataredux.phoneNumber, userId: dataredux._id }
+                    , receiver: { phone: userinfo.phoneNumber, userId: userinfo._id }
+                })
             } else {
                 handlsendmessangeingroup({ groupId: userinfo._id })
             }
         }
     }
+
+    console.log("check user", userinfo)
 
     return (
         <Menu
@@ -84,7 +92,7 @@ const MenuMessage = (props) => {
                 </span>
             </MenuItem>
             {
-                item && item.receiverId === dataredux._id
+                item && item.senderId && item.senderId._id !== dataredux._id
                     ?
                     <Box></Box>
                     :

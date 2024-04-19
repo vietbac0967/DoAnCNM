@@ -50,7 +50,10 @@ const ContentChat = (props) => {
                     if (res) {
                         if (res.EC === 0) {
                             setchat("")
-                            handlsendmessange({ sender: dataredux.phoneNumber, receiver: userinfo.phoneNumber })
+                            handlsendmessange({
+                                sender: { phone: dataredux.phoneNumber, userId: dataredux._id }
+                                , receiver: { phone: userinfo.phoneNumber, userId: userinfo._id }
+                            })
                         }
                     }
                 } else {
