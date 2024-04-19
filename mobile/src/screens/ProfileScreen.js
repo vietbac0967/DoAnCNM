@@ -139,7 +139,6 @@ export default function ProfileScreen({ navigation }) {
           </View> */}
           <Text style={styles.username}>{user?.name}</Text>
           {/* <Text style={styles.email}>{"@"+extractUsername(user?.email)}</Text> */}
-          <Text style={styles.username}>{username}</Text>
         </View>
         <Pressable style={styles.logoutButton} onPress={handleUpdateImage}>
           <Feather name="edit" size={20} color="#444444" />
@@ -173,27 +172,27 @@ export default function ProfileScreen({ navigation }) {
             <Text style={styles.bottomButtonText}>Tài khoản và bảo mật</Text>
           </Pressable>
 
-          <Pressable style={styles.bottomButton}>
+          <Pressable style={styles.bottomButton} onPress={() => navigation.navigate("FunctionUnavailable", { screenTitle: "Quyền riêng tư" })}>
             <Feather name="settings" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Quyền riêng tư</Text>
           </Pressable>
 
-          <Pressable style={styles.bottomButton}>
+          <Pressable style={styles.bottomButton} onPress={() => navigation.navigate("FunctionUnavailable", { screenTitle: "Thông báo" })}>
             <Feather name="bell" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Thông báo</Text>
           </Pressable>
 
-          <Pressable style={styles.bottomButton}>
+          <Pressable style={styles.bottomButton} onPress={() => navigation.navigate("FunctionUnavailable", { screenTitle: "Danh bạ" })}>
             <Feather name="users" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Danh bạ</Text>
           </Pressable>
 
-          <Pressable style={styles.bottomButton}>
+          <Pressable style={styles.bottomButton} onPress={() => navigation.navigate("FunctionUnavailable", { screenTitle: "Nhật ký" })}>
             <Feather name="bookmark" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Nhật ký</Text>
           </Pressable>
 
-          <Pressable style={styles.bottomButton}>
+          <Pressable style={styles.bottomButton} onPress={() => navigation.navigate("FunctionUnavailable", { screenTitle: "Sao lưu và ngôn ngữ" })}>
             <Feather name="archive" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Sao lưu và ngôn ngữ</Text>
           </Pressable>
@@ -213,7 +212,6 @@ export default function ProfileScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   profileContainer: {
     alignItems: "center",
@@ -224,12 +222,12 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 75,
     borderWidth: 4,
-    borderColor: "#fff",
+    borderColor: "#F1F1F1",
     marginTop: 30,
   },
   updateAvatarBtn: {
     position: "absolute",
-    bottom: "32%",
+    bottom: "30%",
     right: "38%",
     backgroundColor: "#B5B5B5",
     padding: 5,
@@ -239,6 +237,7 @@ const styles = StyleSheet.create({
   },
   username: {
     marginTop: 10,
+    marginBottom: 10,
     fontSize: 20,
     fontWeight: "bold",
     color: "#404146",

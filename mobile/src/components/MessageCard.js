@@ -46,26 +46,19 @@ export default function MessageCard({
             setSelectMessage(message);
             setModalVisible(true);
           }}
-          style={[
-            !isCurrentUser
-              ? {
-                  alignSelf: "flex-start",
-                  backgroundColor: "white",
-                  paddingHorizontal: 8,
-                  paddingVertical: 5,
-                  // margin: 10,
-                  borderRadius: 7,
-                  maxWidth: "60%",
-                }
-              : {
-                  alignSelf: "flex-end",
-                  backgroundColor: "#DCF8C6",
-                  paddingHorizontal: 8,
-                  paddingVertical: 5,
-                  maxWidth: "60%",
-                  borderRadius: 7,
-                  marginRight: 10,
-                },
+          style={({ pressed }) => [
+            {
+              alignSelf: isCurrentUser ? "flex-end" : "flex-start",
+              backgroundColor: isCurrentUser ? "#DCF8C6" : "white",
+              paddingHorizontal: 8,
+              paddingVertical: 5,
+              maxWidth: "60%",
+              borderWidth: 0.8,
+              borderColor: "#ddd",
+              borderRadius: 7,
+              marginRight: isCurrentUser ? 10 : 0,
+            },
+            pressed && { opacity: 0.5, backgroundColor: isCurrentUser ? "#A3BA91" : "#A7A7A7" }, // Độ mờ thay đổi khi nhấn
           ]}
         >
           <Text style={{ fontSize: 13, textAlign: "left" }}>

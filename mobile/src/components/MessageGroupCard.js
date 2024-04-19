@@ -17,7 +17,26 @@ export default function MessageGroupCard({
   if (userId) {
     isCurrentUser = message.senderId?._id === userId;
   }
-  if (message.messageType === "text") {
+  const first5Chars = message.content.slice(0, 6);
+  let isAnnounce = false;
+  if (first5Chars === "##TB##") { isAnnounce = true; }
+  console.log("isAnnounce", isAnnounce);
+  if (message.messageType === "text" && isAnnounce) {
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+           borderRadius: 7, margin: 5
+        }}
+       
+      >
+        <Text style={{ fontSize: 13, padding:3, textAlign: 'center', }}>{message.content.slice(7)}</Text>
+      </View>
+    );
+  }
+
+  if (message.messageType === "text" && !isAnnounce) {
     return (
       <View
         style={{
@@ -47,26 +66,19 @@ export default function MessageGroupCard({
             setSelectMessage(message);
             setModalVisible(true);
           }}
-          style={[
-            !isCurrentUser
-              ? {
-                  alignSelf: "flex-start",
-                  backgroundColor: "white",
-                  paddingHorizontal: 8,
-                  paddingVertical: 5,
-                  // margin: 10,
-                  borderRadius: 7,
-                  maxWidth: "60%",
-                }
-              : {
-                  alignSelf: "flex-end",
-                  backgroundColor: "#DCF8C6",
-                  paddingHorizontal: 8,
-                  paddingVertical: 5,
-                  maxWidth: "60%",
-                  borderRadius: 7,
-                  marginRight: 10,
-                },
+          style={({ pressed }) => [
+            {
+              alignSelf: isCurrentUser ? "flex-end" : "flex-start",
+              backgroundColor: isCurrentUser ? "#DCF8C6" : "white",
+              paddingHorizontal: 8,
+              paddingVertical: 5,
+              maxWidth: "60%",
+              borderWidth: 0.8,
+              borderColor: "#ddd",
+              borderRadius: 7,
+              marginRight: isCurrentUser ? 10 : 0,
+            },
+            pressed && { opacity: 0.5, backgroundColor: isCurrentUser ? "#A3BA91" : "#A7A7A7" }, // Độ mờ thay đổi khi nhấn
           ]}
         >
           {!isCurrentUser && (
@@ -142,7 +154,7 @@ export default function MessageGroupCard({
         ]}
       >
         {!isCurrentUser && (
-          <View style={{ backgroundColor: "#fff", alignSelf: "flex-start", borderRadius: 15, marginBottom: 5 }}>
+          <View style={{ backgroundColor: "#fff", alignSelf: "flex-start", borderRadius: 15, marginBottom: 5, borderWidth: 0.8, borderColor: "#ddd" }}>
           <Text style={{ fontSize: 10, textAlign: "left", fontWeight: "bold", color: "#1C2932", paddingHorizontal: 8, paddingVertical: 5 }}>
             {message.senderId?.name}
           </Text>

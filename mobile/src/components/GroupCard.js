@@ -31,18 +31,21 @@ export default function GroupCard({ item }) {
   }, []);
   return (
     <Pressable
-      style={styles.container}
+      style={({ pressed }) => [
+        { backgroundColor: pressed ? "#E5E5E5" : "#F1F1F1" },
+        styles.container,
+      ]}
       onPress={() => {
         navigation.navigate("ChatGroup", { group: item });
       }}
     >
-      <View style={{}}>
+      <View style={{ marginLeft: 5 }}>
         <Image
           style={{ width: 50, height: 50 }}
           source={{ uri: item?.avatar || item?.author.avatar }}
         ></Image>
       </View>
-      <View style={{ marginLeft: 20 }}>
+      <View style={{ marginLeft: 15 }}>
         <Text style={{ fontSize: 16, fontWeight: "bold" }}>{item?.name}</Text>
         {item?.messages.length > 0 ? (
           <Text style={styles.text}>
@@ -64,7 +67,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     borderBottomWidth: 1,
-    marginBottom: 6,
+    borderBottomColor: "#ddd",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
   },
   text: {
     fontSize: 11,

@@ -8,6 +8,7 @@ import {
   Image,
 } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FriendRequestCard from "../components/FriendRequestCard";
 import {
@@ -49,11 +50,26 @@ export default function FriendRequestScreen( {navigation} ) {
     </View>
   );
 
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: "Lời mời kết bạn",
+      headerLeft: () => (
+        <View style={{ flexDirection: "row" }}>
+          <Pressable onPress={() => navigation.goBack()}>
+            <Ionicons
+              style={{ padding: 5, marginRight: 10}}
+              name="chevron-back"
+              size={24}
+              color="#fff"
+            />
+          </Pressable>
+        </View>
+      ),
+    });
+  }, [navigation]);
+
   return (
     <View style={styles.container}>
-      <Pressable onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back-outline" size={24} color="#444444" style={{ position: "absolute",  padding: 10 }}/>
-        </Pressable>
       <View style={styles.tabContainer}>
         
         <Pressable
@@ -61,8 +77,8 @@ export default function FriendRequestScreen( {navigation} ) {
           onPress={() => setActiveTab("friendsRequest")}
         >
           <View style={{ flexDirection: "row" }}>
-            <Feather name="user-plus" size={25} color="#444444" />
-            <Text style={styles.tabText}>Lời mời kết bạn</Text>
+          <MaterialCommunityIcons name="account-arrow-left" size={25} color="#444444" />
+            <Text style={styles.tabText}>Đã nhận</Text>
           </View>
         </Pressable>
 
@@ -74,8 +90,8 @@ export default function FriendRequestScreen( {navigation} ) {
           onPress={() => setActiveTab("sendFriendsRequest")}
         >
           <View style={{ flexDirection: "row" }}>
-            <Feather name="user-plus" size={25} color="#444444" />
-            <Text style={styles.tabText}>Lời mời đã gửi</Text>
+            <MaterialCommunityIcons name="account-arrow-right" size={25} color="#444444" />
+            <Text style={styles.tabText}>Đã gửi</Text>
           </View>
         </Pressable>
       </View>
@@ -103,26 +119,26 @@ export default function FriendRequestScreen( {navigation} ) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 10,
-    marginTop: 40,
   },
   tabContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginBottom: 10,
-    paddingHorizontal: 40,
+    marginVertical: 5,
+    paddingHorizontal: 5
   },
   tab: {
-    paddingHorizontal: 5,
+    paddingHorizontal: 30,
     paddingVertical: 10,
   },
   activeTab: {
+    paddingHorizontal: 30,
     borderBottomWidth: 2,
     borderBottomColor: "#33CCFF",
   },
   tabText: {
     fontSize: 14,
     fontWeight: "bold",
+    padding: 5,
     marginLeft: 10,
     color: "#444444",
   },
