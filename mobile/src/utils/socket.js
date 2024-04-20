@@ -1,16 +1,16 @@
 import { io } from "socket.io-client";
+import { URL_SERVER } from "@env";
+const socket = io(URL_SERVER);
 
-const socket = io("http://192.160.0.6:5000");
-
-const handleCusttomClient = (data) => {
+const handleCusttomClientSocket = (data) => {
   socket.emit("storeClientInfo", data);
 };
 
-const handlerefreshAccount = (callback) => {
+const handleRefreshAccount = (callback) => {
   socket.on("refresh", callback);
 };
 
-const handleoffrefreshAccount = () => {
+const handleOffefreshAccount = () => {
   socket.off("refresh");
 };
 
@@ -18,31 +18,33 @@ const handleroffefreshMessange = () => {
   socket.off("refreshmessange");
 };
 
-const handlerefreshMessange = (callback) => {
-  socket.on("refreshmessange", callback);
+const handleRefreshMessageSocket = (callback) => {
+  socket.on("refreshMessage", callback);
 };
 
-const handlerefreshMessangesennder = (callback) => {
-  socket.on("refreshmessangesender", callback);
+const handleRefreshMessageSenderSocket = (callback) => {
+  socket.on("refreshMessageSender", callback);
 };
 
-const handledisconnect = (data) => {
+const handleDisconnectSocket = (callback) => {
+  socket.emit("disconnet", callback);
+};
+const handleLogoutUserSocket = (data) => {
   socket.emit("logout", data);
 };
-
 const handleAcctiveDisconnect = () => {
   socket?.disconnect();
 };
 
-const handlsendmessange = (data) => {
-  socket.emit("sendmessange", data);
+const handlSendMessageSocket = (data) => {
+  socket.emit("sendMessage", data);
 };
 
-const handlesendtext = (data) => {
+const handleSendText = (data) => {
   socket.emit("sendtest", data);
 };
 
-const handlesendaddgroup = () => {
+const handleSendAddGroup = () => {
   socket.emit("sendaddgroup");
 };
 
@@ -50,37 +52,47 @@ const handleactionaddgroup = (callback) => {
   socket.on("sendaddgroup", callback);
 };
 
-const handlsendmessangeingroup = (data) => {
-  socket.emit("sendmessangeingroup", data);
-};
-
 const handlerefreshMessangeingroup = (callback) => {
   socket.on("refreshmessangeingroup", callback);
 };
-
-const handleuserjoingroup = (data) => {
-  socket.emit("joinRoom", data);
+const handleSendMessageInGroupSocket = (data) => {
+  socket.emit("sendMessageInGroup", data);
+};
+const handleReceiveMessageInGroupSocket = (callback) => {
+  socket.on("receiveMessageInGroup", callback);
+};
+const handleJoinGroupSocket = (data) => {
+  socket.emit("joinGroup", data);
 };
 
-const handleuserleavegroup = (data) => {
-  socket.emit("leaveRoom", data);
+const handleLeaveGroupUserSocket = (data) => {
+  socket.emit("leaveGroup", data);
 };
 
 export {
-  handleCusttomClient,
-  handlerefreshAccount,
-  handlerefreshMessange,
-  handleoffrefreshAccount,
-  handleroffefreshMessange,
-  handledisconnect,
-  handleAcctiveDisconnect,
-  handlsendmessange,
-  handlesendtext,
-  handlesendaddgroup,
-  handleactionaddgroup,
-  handlsendmessangeingroup,
-  handlerefreshMessangeingroup,
-  handlerefreshMessangesennder,
-  handleuserjoingroup,
-  handleuserleavegroup,
+  handleCusttomClientSocket,
+  handlSendMessageSocket,
+  handleRefreshMessageSocket,
+  handleRefreshMessageSenderSocket,
+  handleJoinGroupSocket,
+  handleSendMessageInGroupSocket,
+  handleReceiveMessageInGroupSocket,
+  handleLogoutUserSocket,
+  handleDisconnectSocket,
+  handleLeaveGroupUserSocket,
+  // handlerefreshAccount,
+  // handlerefreshMessange,
+  // handleoffrefreshAccount,
+  // handleroffefreshMessange,
+  // handledisconnect,
+  // handleAcctiveDisconnect,
+  // handlsendmessange,
+  // handlesendtext,
+  // handlesendaddgroup,
+  // handleactionaddgroup,
+  // handlsendmessangeingroup,
+  // handlerefreshMessangeingroup,
+  // handlerefreshMessangesennder,
+  // handleuserjoingroup,
+  // handleuserleavegroup,
 };

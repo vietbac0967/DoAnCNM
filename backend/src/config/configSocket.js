@@ -6,69 +6,106 @@ const io = new Server(server, {
   cors: {
     origin: "*",
   },
+  connectionStateRecovery: {},
 });
 global.onlineUsers = new Map();
+let clients = [];
 io.on("connection", (socket) => {
-  console.log("a user connected", socket.id);
+  // console.log("a user connected", socket.id);
+  // store client info
+  socket.on("storeClientInfo", (data) => {
+    console.log("storeClientInfo", data);
+    if (data && data.customId) {
+      const existingClientIndex = clients.findIndex(
+        (client) => client.customId === data.customId
+      );
+
+      if (existingClientIndex !== -1) {
+        clients[existingClientIndex] = {
+          customId: data.customId,
+          clientId: socket.id,
+        };
+      } else {
+        var clientInfo = {
+          customId: data.customId,
+          clientId: socket.id,
+        };
+        clients.push(clientInfo);
+      }
+      console.log(clients);
+    }
+  });
+
+  socket.on("sendMessage", (data) => {
+    console.log("data message:::", data);
+    const sender = data.sender;
+    const receiver = data.receiver;
+
+    if (clients && clients.length > 0) {
+      const index = clients.findIndex(
+        (item) => item.customId.localeCompare(receiver.phone) === 0
+      );
+      const indexSender = clients.findIndex(
+        (item) => item.customId.localeCompare(sender.phone) === 0
+      );
+      console.log("index:::", index);
+      if (index !== -1) {
+        socket.to(clients[index].clientId).emit("refreshMessage", {
+          phone: sender.phone,
+          userId: sender.userId,
+        });
+        // socket.to(clients[index].clientId).emit("refreshMessage", data);
+      }
+      if (indexSender !== -1) {
+        socket.emit("refreshMessageSender", {
+          phone: receiver.phoneNumber,
+          userId: receiver.userId,
+        });
+      }
+    }
+  });
+
   socket.on("disconnet", () => {
-    console.log("user disconnected");
-  });
-
-  global.chatSocket = socket;
-  socket.on("add-user", (userId) => {
-    onlineUsers.set(userId, socket.id);
-  });
-  // delete message
-
-  // recall message
-  socket.on("recall-msg", (data) => {
-    console.log("recall-msg", data);
-    const sendUserSocket = onlineUsers.get(data.to._id);
-    socket.to(sendUserSocket).emit("recall", data);
-  });
-
-  socket.on("send-msg", (data) => {
-    const sendUserSocket = onlineUsers.get(data.to);
-    console.log("send-msg", data);
-    if (sendUserSocket) {
-      socket.to(sendUserSocket).emit("msg-recieve", data);
+    if (clients && clients.length > 0) {
+      let index = clients.filter(
+        (item) => item.clientId.localeCompare(socket.id) !== 0
+      );
+      clients = [...index];
+      console.log(clients);
     }
   });
-  socket.on("send-image", (data) => {
-    const sendUserSocket = onlineUsers.get(data.to);
-    console.log("send-msg", data);
-    if (sendUserSocket) {
-      socket.to(sendUserSocket).emit("msg-recieve", data.msg);
+  socket.on("logout", (data) => {
+    console.log("check data", data);
+    if (clients && clients.length > 0) {
+      const index = clients.findIndex(
+        (client) => client.customId === data.customId
+      );
+      console.log(index);
+      if (index !== -1) {
+        clients.splice(index, 1);
+        console.log(`Người dùng ${data.customId} đã đăng xuất.`);
+      }
+      console.log(clients);
     }
   });
-  socket.on("join-group", (groupId) => {
-    console.log("join-group", groupId);
-    socket.join(groupId);
+  socket.on("joinGroup", (data) => {
+    socket.join(data.groupId);
+    if (data && data.user && data.name && data.groupId) {
+      console.log(`User ${data.user} joined room: ${data.name}`);
+    } else {
+      console.log(`User ${data.user} is ready`);
+    }
   });
 
-  socket.on("send-group-msg", (data) => {
-    // console.log("send-group-msg", data);
-    socket.to(data.groupId).emit("group-msg-receive", data.message);
+  socket.on("sendMessageInGroup", (data) => {
+    console.log(data);
+    socket.to(data.groupId).emit("receiveMessageInGroup", data);
   });
-  socket.on("recall-group-msg", (data) => {
-    console.log("recall-group-msg", data);
-    socket.to(data.groupId).emit("group-recall", data);
-  });
-  // leave room
-  socket.on("leave-group", (groupId) => {
-    console.log("leave-group", groupId);
-    socket.leave(groupId);
-  });
-  // rename group
-  socket.on("rename-group", (data) => {
-    console.log("rename-group", data);
-    socket.to(data.groupId).emit("group-rename", data);
-  });
-  // update avatar
-  socket.on("update-avatar", (data) => {
-    console.log("update-avatar", data);
-    socket.to(data.groupId).emit("group-avatar", data);
-  });
+  socket.on("leaveGroup", (data) => {
+    socket.leave(data.groupId);
+    console.log(`User ${data.user} left room: ${data.groupId}`);
+  })
+
 });
 
 export { io, server };

@@ -33,6 +33,7 @@ export const sendMessage = async (req, res) => {
     res.status(500).json({ EC: 1, EM: error.message, DT: "" });
   }
 };
+
 export const sendMessageGroup = async (req, res) => {
   try {
     const senderId = req.user._id;
@@ -61,12 +62,15 @@ export const sendMessageGroup = async (req, res) => {
  * @returns {Promise<void>} - A promise that resolves when the image is sent.
  */
 export const sendImage = async (req, res) => {
+  if (!req.file || !req.file.buffer) {
+    return res.status(400).json({ EC: 1, EM: "No file provided", DT: "" });
+  }
   try {
     const senderId = req.user._id;
     cloud.uploader
       .upload_stream({ resource_type: "auto" }, async (error, result) => {
         if (error) {
-          res.status(500).json({ EC: 1, EM: "Error", DT: "" });
+          return res.status(500).json({ EC: 1, EM: "Error", DT: "" });
         } else {
           const sendMessage = await sendMessageService(
             req.body.receiverId,
@@ -87,12 +91,12 @@ export const sendImage = async (req, res) => {
           }
           converstation.messages.push(sendMessage.DT._id);
           await converstation.save();
-          res.status(200).json(sendMessage);
+          return res.status(200).json(sendMessage);
         }
       })
       .end(req.file.buffer);
   } catch (error) {
-    res.status(500).json({ EC: 1, EM: error.message, DT: "" });
+    return res.status(500).json({ EC: 1, EM: error.message, DT: "" });
   }
 };
 /**
@@ -107,7 +111,11 @@ export const sendImage = async (req, res) => {
  * @param {Object} res - The response object.
  * @returns {Promise<void>} - A promise that resolves when the image is sent to the group.
  */
+
 export const sendImageGroup = async (req, res) => {
+  if (!req.file || !req.file.buffer) {
+    return res.status(400).json({ EC: 1, EM: "No file provided", DT: "" });
+  }
   try {
     const senderId = req.user._id;
     cloud.uploader
@@ -121,19 +129,6 @@ export const sendImageGroup = async (req, res) => {
             result.secure_url,
             "image"
           );
-          // push message to conversation
-          const converstation = await Conversation.findOne({
-            participantsGroup: { $all: [req.body.groupId, senderId] },
-          });
-          if (!converstation) {
-            res.status(500).json({
-              EC: 1,
-              EM: "Error",
-              DT: "Conversation not found",
-            });
-          }
-          converstation.messages.push(sendMessage.DT._id);
-          await converstation.save();
           res.status(200).json(sendMessage);
         }
       })

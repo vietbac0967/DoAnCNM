@@ -12,7 +12,7 @@ const formatDateOrTime = (updatedAt) => {
     return formatDate(updatedAt);
   } else {
     // Display full date if updatedAt is not today
-    return updatedAtDate.toLocaleDateString("en-US");
+    return updatedAtDate.toLocaleDateString("vi-VN",{day: "2-digit", month: "2-digit", year: "numeric"});
   }
 };
 export default formatDateOrTime;

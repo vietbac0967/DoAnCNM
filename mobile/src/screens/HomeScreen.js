@@ -13,20 +13,17 @@ import {
 import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getFriends } from "../services/user.service";
-import UserChat from "../components/UserChat";
 import { useIsFocused } from "@react-navigation/native";
 import ConversationCard from "../components/ConversationCard";
-import { getConversationsService } from "../services/converstation.service";
-// import { URL_SERVER } from "@env";
+import { getConversationsService } from "../services/conversation.service";
+import { handleCusttomClientSocket } from "../utils/socket";
+import { selectUser } from "../app/userSlice";
 export default function HomeScreen({ navigation, route }) {
   const token = useSelector((state) => state.token.token);
-  // console.log("token:::", token);
-  // console.log("isLoading:::", isLoading ? "true" : "false");
-  const [friends, setFriends] = useState([]);
   const [conversations, setConversations] = useState([]);
-  // console.log("URL_SERVER:::", URL_SERVER);
+  const user = useSelector(selectUser);
   const isFocused = useIsFocused();
+  console.log("user in home screen is:::", user);
   const getConversations = async () => {
     try {
       const conversations = await getConversationsService(token);
@@ -40,15 +37,25 @@ export default function HomeScreen({ navigation, route }) {
       Alert.alert("Error", error.message);
     }
   };
+
   useEffect(() => {
     getConversations();
   }, []);
+
+  useEffect(() => {
+    // socket.current = io(URL_SERVER);
+    if (user) {
+      console.log("phone number:::", user.phoneNumber);
+      handleCusttomClientSocket({ customId: user.phoneNumber });
+    }
+  }, [user]);
+
   useEffect(() => {
     if (isFocused) {
       getConversations();
     }
-    // getListFriend();
-    // getListFriend();
+    //   // getListFriend();
+    //   // getListFriend();
   }, [isFocused]);
 
   console.log("conversations:::", conversations.length);

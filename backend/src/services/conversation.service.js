@@ -165,7 +165,7 @@ export const getConversationForwardsService = async (userId, messageId) => {
         },
         {
           path: "participantsGroup",
-          select: "avatar _id name members",
+          select: "avatar _id name members author",
         },
         {
           path: "messages",

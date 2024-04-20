@@ -34,7 +34,6 @@ export default function CreateGroupScreen({ navigation }) {
   useEffect(() => {
     getListFriend();
   }, []);
-
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: "",
@@ -53,7 +52,10 @@ export default function CreateGroupScreen({ navigation }) {
         </View>
       ),
     });
-  }, [navigation, members]);
+  }, [navigation]);
+
+
+
 
   const handleSelectMember = (friendId) => {
     // Check if the friendId is already in the members list

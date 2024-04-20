@@ -19,61 +19,46 @@ import { baseURL } from "../api/baseURL";
 import * as ImagePicker from "expo-image-picker";
 import {
   deleteGroupService,
+  getGroupByIdService,
   leaveGroupService,
   updateNameGroupService,
 } from "../services/group.service";
-import { io } from "socket.io-client";
-import { URL_SERVER } from "@env";
+import { selectUser } from "../app/userSlice";
 export default function GroupInfoScreen({ navigation, route }) {
-  const group = route.params?.group;
+  const groupId = route.params?.groupId;
+
   const token = useSelector((state) => state.token.token);
-  const [user, setUser] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
-  const socket = useRef(null);
-  const [name, setName] = useState(group?.name);
-  const getUser = async () => {
+  // const socket = useRef(null);
+  // const [name, setName] = useState(groupId?.name);
+  const user = useSelector(selectUser);
+  const [group, setGroup] = useState(null);
+  const [name, setName] = useState("");
+  const getGroup = async () => {
     try {
-      // const token = await AsyncStorage.getItem("token");
-      const response = await baseURL.get("/info", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const { DT, EM, EC } = response.data;
-      if (EC === 0 && EM === "Success") {
-        setUser(DT);
+      const response = await getGroupByIdService(token, groupId);
+      const { EM, EC, DT } = response;
+      if (EM === "Success" && EC === 0) {
+        setName(DT?.name);
+        setGroup(DT);
       } else {
-        console.log("Error getting user:", EM);
+        Alert.alert("Something went wrong", EM);
       }
     } catch (error) {
-      console.log("Error getting user:", error);
+      Alert.alert("Error", error.message);
     }
   };
   useEffect(() => {
-    getUser();
-    socket.current = io(URL_SERVER);
-    socket.current.emit("join-group", group._id);
-  }, [group._id]);
+    getGroup();
+  }, []);
 
   useEffect(() => {
-    if (socket.current) {
-      socket.current.on("group-rename", (data) => {
-        if (data.groupId === group._id) {
-          group.name = data.name;
-        }
-      });
-      socket.current.on("group-avatar", (data) => {
-        if (data.groupId === group._id) {
-          group.avatar = data.avatar;
-        }
-      });
-      socket.current.on("group-avatar", (data) => {
-        if (data.groupId === group._id) {
-          group.avatar = data.avatar;
-        }
-      });
-    }
+    navigation.setOptions({
+      headerTitle: "Thông tin nhóm",
+    });
   }, []);
+  console.log("groupId in group info screen:::", groupId);
+  console.log("group in group info screen:::", group);
 
   const handleDeleteGroup = async () => {
     try {
@@ -83,11 +68,14 @@ export default function GroupInfoScreen({ navigation, route }) {
       if (EC === 0 && EM === "Success") {
         Alert.alert("Thông báo", "Giải tán nhóm thành công");
         navigation.navigate("Group", { isLoading: true });
+      } else {
+        Alert.alert("Somthing went wrong", EM);
       }
     } catch (err) {
       Alert.alert("Error", err.message);
     }
   };
+
   const handleLeaveGroup = async () => {
     try {
       Alert.alert("Cảnh báo", "Bạn có rời khỏi nhóm này không", [
@@ -100,14 +88,13 @@ export default function GroupInfoScreen({ navigation, route }) {
           text: "Có",
           onPress: async () => {
             try {
-              const groupId = group._id;
               console.log("groupId:::", groupId);
               const response = await leaveGroupService(token, groupId);
               console.log("response:::", response);
               const { EM, EC } = response;
               if (EC === 0 && EM === "Success") {
                 Alert.alert("Thông báo", "Rời nhóm thành công");
-                navigation.navigate("Main");
+                navigation.navigate("Group");
               } else {
                 Alert.alert("Thông báo", "Rời nhóm không thành công");
               }
@@ -140,7 +127,7 @@ export default function GroupInfoScreen({ navigation, route }) {
           name: filename,
           type,
         });
-        formData.append("groupId", group._id);
+        formData.append("groupId",groupId);
         const response = await baseURL.post(
           "/group/updateImageGroup",
           formData,
@@ -155,11 +142,11 @@ export default function GroupInfoScreen({ navigation, route }) {
         const { DT, EC, EM } = response.data;
         if (EC === 0 && EM === "Success") {
           Alert.alert("Thông báo", "Cập nhật ảnh đại diện thành công");
-          socket.current.emit("update-avatar", {
-            groupId: group._id,
-            avatar: DT.avatar,
-          });
-          navigation.goBack();
+          // socket.current.emit("update-avatar", {
+          //   groupId: group._id,
+          //   avatar: DT.avatar,
+          // });
+          navigation.navigate("Group");
         } else {
           Alert.alert("Cảnh báo", EM);
         }
@@ -172,14 +159,15 @@ export default function GroupInfoScreen({ navigation, route }) {
 
   const handleUpdateGroupName = async () => {
     try {
-      const groupId = group._id;
       const response = await updateNameGroupService(token, groupId, name);
       const { EM, EC } = response;
       if (EC === 0 && EM === "Success") {
         Alert.alert("Thông báo", "Đổi tên nhóm thành công");
         setModalVisible(false);
-        socket.current.emit("rename-group", { groupId, name });
-        navigation.goBack();
+        // socket.current.emit("rename-group", { groupId, name });
+        navigation.navigate("Group");
+      } else {
+        Alert.alert("Something went wrong", EM);
       }
     } catch (error) {
       Alert.alert("Error", error.message);
@@ -220,7 +208,7 @@ export default function GroupInfoScreen({ navigation, route }) {
         }}
       >
         <Text style={{ textAlign: "center", fontSize: 22, fontWeight: "bold" }}>
-          {group.name}
+          {group?.name}
         </Text>
         <Pressable onPress={() => setModalVisible(true)}>
           <AntDesign name="edit" size={22} color="black" />
@@ -265,7 +253,7 @@ export default function GroupInfoScreen({ navigation, route }) {
               >
                 Đổi tên nhóm
               </Text>
-              {/* xóa tin nhắn ở phía người gửi */}
+             
               <TextInput
                 style={{
                   borderRadius: 20,
@@ -364,8 +352,8 @@ export default function GroupInfoScreen({ navigation, route }) {
           <AntDesign name="setting" size={24} color="black" />
           <Text style={{ paddingLeft: 5 }}>Cài đặt nhóm</Text>
         </Pressable>
-        {/* condition for author and member */}
-        {user?._id === group.author._id ? (
+  
+        {user?._id === group?.author._id ? (
           <Pressable
             onPress={handleDeleteGroup}
             style={{ flexDirection: "row", marginBottom: 5, paddingLeft: 10 }}

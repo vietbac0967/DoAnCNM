@@ -4,6 +4,7 @@ import {
   createGroupService,
   deleteMemberFromGroupService,
   deteleGroupService,
+  getGroupByIdService,
   getGroupsForUserService,
   getLeadForGroupService,
   getUserForGroupService,
@@ -109,7 +110,7 @@ export const updatNameGroup = async (req, res) => {
 export const addMemberToGroup = async (req, res) => {
   try {
     const { groupId, members } = req.body;
-    
+
     const response = await addMemberToGroupService(groupId, members);
     res.status(200).json(response);
   } catch (error) {
@@ -192,5 +193,20 @@ export const updateImageGroup = async (req, res) => {
       .end(req.file.buffer);
   } catch (error) {
     res.status(500).json({ EC: 1, EM: error.message, DT: "" });
+  }
+};
+//
+export const getGroupById = async (req, res) => {
+  try {
+    console.log("req.query:::", req.query);
+    const groupId = req.query.groupId;
+    const response = await getGroupByIdService(groupId);
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(500).json({
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    });
   }
 };

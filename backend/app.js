@@ -5,6 +5,7 @@ import userRoutes from "./src/routes/user.routes.js";
 import messageRoutes from "./src/routes/message.routes.js";
 import groupRoutes from "./src/routes/group.routes.js";
 import converstationRoutes from "./src/routes/converstation.routes.js";
+import notificationRoutes from "./src/routes/notification.routes.js";
 import morgan from "morgan";
 import helmet from "helmet";
 import compression from "compression";
@@ -26,6 +27,7 @@ app.use("/api/", userRoutes);
 app.use("/api/", messageRoutes);
 app.use("/api/group/", groupRoutes);
 app.use("/api/conversation/", converstationRoutes);
+app.use("/api/notification/", notificationRoutes);
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.get("/docs.json", (req, res) => {
   res.setHeader("Content-Type", "application/json");

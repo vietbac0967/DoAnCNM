@@ -17,18 +17,23 @@ import { useSelector } from "react-redux";
 import { Ionicons, AntDesign, EvilIcons } from "@expo/vector-icons";
 import EmojiSelector from "react-native-emoji-selector";
 import { Entypo, Feather, FontAwesome } from "@expo/vector-icons";
-import { io } from "socket.io-client";
 import { URL_SERVER } from "@env";
-import { getUserInfo } from "../services/user.service";
 import {
   deleteMessageService,
   recallMessageService,
   sendMessageGroupService,
 } from "../services/message.service";
-import formatDateOrTime from "../utils/formatDateOrTime";
 import * as ImagePicker from "expo-image-picker";
 import MessageGroupCard from "../components/MessageGroupCard";
 import Loading from "../components/Loading";
+import {
+  handleJoinGroupSocket,
+  handleReceiveMessageInGroup,
+  handleReceiveMessageInGroupSocket,
+  handleSendMessageInGroupSocket,
+} from "../utils/socket";
+import { selectUser } from "../app/userSlice";
+import axios from "axios";
 export default function ChatGroupScreen({ route, navigation }) {
   const token = useSelector((state) => state.token.token);
   const [messages, setMessages] = useState([]);
@@ -38,11 +43,11 @@ export default function ChatGroupScreen({ route, navigation }) {
   const [selectMessage, setSelectMessage] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const inputRef = useRef(null);
-  const socket = useRef();
-  const user = useRef({});
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
   const group = route.params?.group;
   const scrollViewRef = useRef(null);
+  const user = useSelector(selectUser);
+
   const getMessagesGroup = async () => {
     try {
       const response = await baseURL.get("/message/messagesGroup", {
@@ -56,18 +61,21 @@ export default function ChatGroupScreen({ route, navigation }) {
       const { EM, EC, DT } = response.data;
       if (EC === 0 && EM === "Success") {
         setMessages(DT);
-        // setIsLoading(false);
       }
     } catch (error) {
       console.log(error);
       Alert.alert("Error", "Something went wrong");
     }
   };
+
+
   console.log("Group:::", group);
+
   const handleEmojiPress = () => {
     setShowEmojiSelector(!showEmojiSelector);
     inputRef.current.blur();
   };
+
   const pickImage = async () => {
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
@@ -87,8 +95,8 @@ export default function ChatGroupScreen({ route, navigation }) {
           type,
         });
         formData.append("groupId", group._id);
-        const response = await baseURL.post(
-          "/message/sendImageGroup",
+        const response = await axios.post(
+          `${URL_SERVER}/api/message/sendImageGroup`,
           formData,
           {
             headers: {
@@ -99,18 +107,18 @@ export default function ChatGroupScreen({ route, navigation }) {
         );
         const { DT, EC, EM } = response.data;
         if (EC === 0 && EM === "Success") {
-          socket.current.emit("send-group-msg", {
+          handleSendMessageInGroupSocket({
             groupId: group._id,
             message: DT,
           });
           setMessage("");
           getMessagesGroup();
-          return;
+        } else {
+          Alert.alert("Cảnh báo", EM);
         }
       }
     } catch (error) {
-      console.error("Error while picking image and sending message:", error);
-      Alert.alert("Cảnh báo", "Kích thước ảnh quá lớn, vui lòng chọn ảnh khác");
+      Alert.alert("Cảnh báo", error.message);
     }
   };
   // if (isLoading) {
@@ -122,7 +130,7 @@ export default function ChatGroupScreen({ route, navigation }) {
       const { EM, EC, DT } = response;
       console.log("DT:::", DT);
       if (EC === 0 && EM === "Success") {
-        socket.current.emit("send-group-msg", {
+        handleSendMessageInGroupSocket({
           groupId: group._id,
           message: DT,
         });
@@ -133,11 +141,13 @@ export default function ChatGroupScreen({ route, navigation }) {
       Alert.alert("Error", "Something went wrong");
     }
   };
+
   const scrollToBottom = () => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollToEnd({ animated: false });
     }
   };
+
   const handleContentSizeChange = () => {
     scrollToBottom();
   };
@@ -157,6 +167,7 @@ export default function ChatGroupScreen({ route, navigation }) {
       console.log(error);
     }
   };
+
   const handleRecallMessage = async () => {
     try {
       Alert.alert("Cảnh báo", "Bạn có muốn thu hồi nhắn này không?", [
@@ -177,17 +188,11 @@ export default function ChatGroupScreen({ route, navigation }) {
               const { EC, EM, DT } = response;
               if (EC === 0 && EM === "Success") {
                 setModalVisible(false);
-                socket.current.emit("recall-group-msg", {
+                handleSendMessageInGroupSocket({
                   groupId: group._id,
-                  messageId: selectMessage?._id,
+                  message: DT,
                 });
-
-                // Update the messages state by filtering out the deleted message
-                setMessages((messages) =>
-                  messages.filter(
-                    (message) => message._id !== selectMessage._id
-                  )
-                );
+                getMessagesGroup();
               }
             } catch (error) {
               Alert.alert("Error", error.message);
@@ -200,51 +205,26 @@ export default function ChatGroupScreen({ route, navigation }) {
     }
   };
 
-  const getInfo = async () => {
-    try {
-      const response = await getUserInfo(token);
-      console.log("response:::", response);
-      const { EM, EC, DT } = response;
-      if (EC === 0 && EM === "Success") {
-        user.current = DT;
-      }
-    } catch (error) {
-      Alert.alert("Error", "Something went wrong");
-    }
-  };
   useEffect(() => {
     getMessagesGroup();
-    getInfo();
   }, []);
-  // add socket id to room
+  // add group id to socket
   useEffect(() => {
-    socket.current = io(URL_SERVER);
-    socket.current.emit("join-group", group._id);
-    return () => {
-      socket.current.disconnect();
-    };
-  }, [group._id]);
-  // envent receive message
-  useEffect(() => {
-    if (socket.current) {
-      socket.current.on("group-msg-receive", (data) => {
-        console.log("Received group message:", data);
-        // Handle received message, e.g., update state to display the message
-        setMessages((prevMessages) => [...prevMessages, data]);
-        // getMessagesGroup();
-      });
-      socket.current.on("group-recall", (data) => {
-        getMessagesGroup();
-      });
-      // change name
-      socket.current.on("group-rename", (data) => {
-        console.log("group-rename", data);
-        if (data.groupId === group._id) {
-          group.name = data.name;
-        }
+    if (group._id && user) {
+      handleJoinGroupSocket({
+        groupId: group._id,
+        name: group.name,
+        user: user.name,
       });
     }
   }, []);
+
+  useEffect(() => {
+    handleReceiveMessageInGroupSocket((data) => {
+      getMessagesGroup();
+    });
+  }, []);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: "",
@@ -277,7 +257,7 @@ export default function ChatGroupScreen({ route, navigation }) {
         <Pressable
           onPress={() => {
             navigation.navigate("GroupInfo", {
-              group: group,
+              groupId: group._id,
             });
           }}
         >
@@ -321,16 +301,14 @@ export default function ChatGroupScreen({ route, navigation }) {
             </Pressable>
             {/* Thu hồi tin nhắn ở hai phía */}
             <Pressable
-              disabled={selectMessage.senderId?._id !== user.current?._id}
+              disabled={selectMessage.senderId?._id !== user?._id}
               onPress={handleRecallMessage}
               style={{
                 flex: 1,
                 alignItems: "center",
                 justifyContent: "center",
                 display:
-                  selectMessage.senderId?._id === user.current?._id
-                    ? "flex"
-                    : "none",
+                  selectMessage.senderId?._id === user?._id ? "flex" : "none",
               }}
             >
               <FontAwesome name="refresh" size={22} color="orange" />
@@ -358,6 +336,7 @@ export default function ChatGroupScreen({ route, navigation }) {
           </View>
         </Pressable>
       </Modal>
+
       <Modal
         animationType="fade"
         transparent={true}
@@ -401,7 +380,7 @@ export default function ChatGroupScreen({ route, navigation }) {
         renderItem={({ item }) => (
           <MessageGroupCard
             message={item}
-            userId={user.current?._id}
+            userId={user?._id}
             setModalVisible={setModalVisible}
             setModalImageVisible={setModalImageVisible}
             setSelectMessage={setSelectMessage}
@@ -412,73 +391,6 @@ export default function ChatGroupScreen({ route, navigation }) {
         contentContainerStyle={{ flexGrow: 1 }}
         onContentSizeChange={handleContentSizeChange}
       />
-      {/* <ScrollView>
-        {messages.length > 0 &&
-          messages.map((message) => {
-            const isCurrentUser = message.senderId?._id === user.current?._id;
-            if (message.messageType === "text") {
-              return (
-                <View
-                  key={message._id}
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: isCurrentUser ? "flex-end" : "flex-start",
-                    marginVertical: 10,
-                  }}
-                >
-                  {!isCurrentUser && (
-                    <Image
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        marginRight: 10,
-                      }}
-                      resizeMode="cover"
-                      source={{ uri: message.senderId?.avatar }}
-                    />
-                  )}
-                  <Pressable
-                    key={message._id}
-                    onPress={() => {
-                      setModalVisible(true);
-                    }}
-                    style={[
-                      {
-                        backgroundColor: isCurrentUser ? "#DCF8C6" : "white",
-                        padding: 8,
-                        borderRadius: 7,
-                        maxWidth: "60%",
-                        alignSelf: isCurrentUser ? "flex-end" : "flex-start",
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 13,
-                        textAlign: isCurrentUser ? "right" : "left",
-                      }}
-                    >
-                      {message.content}
-                    </Text>
-                    <Text
-                      style={{
-                        textAlign: isCurrentUser ? "right" : "left",
-                        fontSize: 9,
-                        color: "gray",
-                        marginTop: 5,
-                      }}
-                    >
-                      {formatDateOrTime(message?.createdAt)}
-                    </Text>
-                  </Pressable>
-                </View>
-              );
-            }
-            // Return null for non-text messages
-          })}
-      </ScrollView> */}
-
       <View
         style={{
           flexDirection: "row",
