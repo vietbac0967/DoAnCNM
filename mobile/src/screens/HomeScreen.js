@@ -43,7 +43,6 @@ export default function HomeScreen({ navigation, route }) {
   }, []);
 
   useEffect(() => {
-    // socket.current = io(URL_SERVER);
     if (user) {
       console.log("phone number:::", user.phoneNumber);
       handleCusttomClientSocket({ customId: user.phoneNumber });
@@ -54,8 +53,6 @@ export default function HomeScreen({ navigation, route }) {
     if (isFocused) {
       getConversations();
     }
-    //   // getListFriend();
-    //   // getListFriend();
   }, [isFocused]);
 
   console.log("conversations:::", conversations.length);
