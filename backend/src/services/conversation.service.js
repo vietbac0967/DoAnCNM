@@ -94,7 +94,7 @@ export const getConversationService = async (userId) => {
         },
         {
           path: "messages",
-          select: "content createdAt messageType",
+          select: "content createdAt messageType receiverId senderId",
         },
       ])
       .sort({ updatedAt: -1 });
@@ -115,14 +115,14 @@ export const getConversationService = async (userId) => {
           (participant) => participant._id.toString() !== userId.toString()
         );
       }
-
       return {
         _id: type === "group" ? participants._id : participants._id,
         name: participants ? participants.name : null,
         avatar: participants ? participants.avatar : null,
+        members: conversation.participantsGroup[0]?.members || [],
         type,
         message:
-          conversation.messages[conversation.messages.length - 1]?.content ||
+          conversation.messages[conversation.messages.length - 1] ||
           "",
         messageType:
           conversation.messages[conversation.messages.length - 1]

@@ -24,7 +24,6 @@ export default function HomeScreen({ navigation, route }) {
   const user = useSelector(selectUser);
   const isFocused = useIsFocused();
   console.log("user in home screen is:::", user);
-
   const getConversations = async () => {
     try {
       const conversations = await getConversationsService(token);
@@ -94,7 +93,7 @@ export default function HomeScreen({ navigation, route }) {
           onPress={() => navigation.navigate("AddFriend")}
         >
           <Ionicons
-            style={{ paddingTop: 5 }}
+            style={{ paddingTop: 8 }}
             name="person-add-outline"
             size={24}
             color="#fff"

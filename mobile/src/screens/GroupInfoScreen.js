@@ -9,9 +9,8 @@ import {
   TextInput,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Feather } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Octicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
@@ -225,14 +224,7 @@ export default function GroupInfoScreen({ navigation, route }) {
       >
         <View style={{ alignContent: "center", alignItems: "center" }}>
           <View
-            style={{
-              backgroundColor: "gray",
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            style={styles.iconHeader}
           >
             <AntDesign name="search1" size={20} color="black" />
           </View>
@@ -328,14 +320,14 @@ export default function GroupInfoScreen({ navigation, route }) {
 
         <View style={{ alignItems: "center" }}>
           <View style={styles.iconHeader}>
-            <AntDesign name="search1" size={20} color="black" />
+            <AntDesign name="picture" size={20} color="black" />
           </View>
-          <Text style={{ textAlign: "center" }}>Đổi{"\n"} hình nên</Text>
+          <Text style={{ textAlign: "center" }}>Đổi{"\n"} hình nền</Text>
         </View>
 
         <View style={{ alignItems: "center" }}>
           <View style={styles.iconHeader}>
-            <Octicons name="bell" size={24} color="black" />
+            <Feather name="bell" size={20} color="black" />
           </View>
           <Text style={{ textAlign: "center" }}>Tắt{"\n"} thông báo</Text>
         </View>
@@ -389,7 +381,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   iconHeader: {
-    backgroundColor: "gray",
+    backgroundColor: "#ddd",
     width: 40,
     height: 40,
     borderRadius: 20,

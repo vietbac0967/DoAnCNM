@@ -2,7 +2,6 @@ import { io } from "socket.io-client";
 import { URL_SERVER } from "@env";
 const socket = io(URL_SERVER);
 
-// register user to socket server
 const handleCusttomClientSocket = (data) => {
   socket.emit("storeClientInfo", data);
 };

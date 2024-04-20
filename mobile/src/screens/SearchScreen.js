@@ -66,7 +66,10 @@ export default function SearchScreen({ navigation, route }) {
   const renderFriendItem = ({ item }) =>
     item.author === undefined ? (
       <Pressable
-        style={{ paddingHorizontal: 10 }}
+        style={({ pressed }) => [
+          { backgroundColor: pressed ? "#ddd" : "#F1F1F1" },
+          { paddingHorizontal: 10 },
+        ]}
         onPress={() =>
           navigation.navigate("ChatScreen", {
             recevierId: item._id,
@@ -87,7 +90,10 @@ export default function SearchScreen({ navigation, route }) {
       </Pressable>
     ) : (
       <Pressable
-        style={{ paddingHorizontal: 10 }}
+        style={({ pressed }) => [
+          { backgroundColor: pressed ? "#ddd" : "#F1F1F1" },
+          { paddingHorizontal: 10 },
+        ]}
         onPress={() =>
           navigation.navigate("ChatGroup", {
             group: item,
@@ -95,7 +101,10 @@ export default function SearchScreen({ navigation, route }) {
         }
       >
         <View style={styles.friendItem}>
-          <Image source={{ uri: item?.avatar || item?.author.avatar }} style={styles.avatar}/>
+          <Image
+            source={{ uri: item?.avatar || item?.author.avatar }}
+            style={styles.avatar}
+          />
           <View style={styles.friendInfo}>
             <Text>{item.name}</Text>
           </View>

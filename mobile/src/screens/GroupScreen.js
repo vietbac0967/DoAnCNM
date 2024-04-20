@@ -76,7 +76,7 @@ export default function GroupScreen({ navigation, route }) {
           onPress={() => navigation.navigate("AddFriend")}
         >
           <Ionicons
-            style={{ paddingTop: 5 }}
+            style={{ paddingTop: 8 }}
             name="person-add-outline"
             size={24}
             color="#fff"
@@ -88,19 +88,22 @@ export default function GroupScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-        <Text style={styles.title}>Nhóm</Text>
+      <View style={styles.headerContainer}>
+        <Text style={styles.title}>Nhóm trò chuyện</Text>
 
         <Pressable
           onPress={() => {
             navigation.navigate("CreateGroup");
           }}
+          style={({pressed}) => ({opacity: pressed ? 0.5 : 1})}
         >
-          <AntDesign name="addusergroup" size={30} color="black" />
+          <View style={{ paddingVertical: 5, paddingHorizontal: 15, backgroundColor: "#ddd", borderRadius: 7}}>
+          <AntDesign name="addusergroup" size={25} color="#444444" />
+          </View>
         </Pressable>
       </View>
-      <Text style={{ fontSize: 13, fontWeight: "bold", marginBottom: 10 }}>
-        Nhóm đã tham gia {groups.length}
+      <Text style={{ fontSize: 13, fontWeight: "bold", marginBottom: 10, marginLeft: 10 }}>
+        Nhóm đã tham gia: {groups.length}
       </Text>
       {/* <View>
         <Pressable style={styles.contactButton} 
@@ -120,14 +123,21 @@ export default function GroupScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
-    // marginTop: 50,
+    // backgroundColor: "#fff",
+  },
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    marginBottom: 10,
+    padding: 10,
+    marginHorizontal: 20,
+    alignItems: "center",
   },
   title: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 20,
   },
   input: {
     height: 40,
