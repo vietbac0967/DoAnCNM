@@ -37,6 +37,7 @@ export const getReceiverService = async (token, receiverId) => {
       return {};
     }
   } catch (error) {
+    console.log("error:::", error); // eslint-disable-line no-console 
     return {};
   }
 };

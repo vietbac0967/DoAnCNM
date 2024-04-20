@@ -2,33 +2,31 @@ import { StyleSheet, Text, View, Image, Pressable } from "react-native";
 import React, { useEffect, useRef } from "react";
 import { useNavigation } from "@react-navigation/native";
 import formatDateOrTime from "../utils/formatDateOrTime";
-import { URL_SERVER } from "@env";
-import { io } from "socket.io-client";
 export default function GroupCard({ item }) {
   const navigation = useNavigation();
-  const socket = useRef(null);
-  useEffect(() => {
-    socket.current = io(URL_SERVER);
-    socket.current.emit("join-group", item._id);
-    return () => {
-      socket.current.disconnect();
-    };
-  }, [item._id]);
-  // update group when receive message
-  useEffect(() => {
-    if (socket.current) {
-      socket.current.on("group-rename", (data) => {
-        if (data.groupId === item._id) {
-          item.name = data.name;
-        }
-      });
-      socket.current.on("group-avatar", (data) => {
-        if (data.groupId === item._id) {
-          item.avatar = data.avatar;
-        }
-      });
-    }
-  }, []);
+  // const socket = useRef(null);
+  // useEffect(() => {
+  //   socket.current = io(URL_SERVER);
+  //   socket.current.emit("join-group", item._id);
+  //   return () => {
+  //     socket.current.disconnect();
+  //   };
+  // }, [item._id]);
+  // // update group when receive message
+  // useEffect(() => {
+  //   if (socket.current) {
+  //     socket.current.on("group-rename", (data) => {
+  //       if (data.groupId === item._id) {
+  //         item.name = data.name;
+  //       }
+  //     });
+  //     socket.current.on("group-avatar", (data) => {
+  //       if (data.groupId === item._id) {
+  //         item.avatar = data.avatar;
+  //       }
+  //     });
+  //   }
+  // }, []);
   return (
     <Pressable
       style={styles.container}
@@ -44,7 +42,7 @@ export default function GroupCard({ item }) {
       </View>
       <View style={{ marginLeft: 20 }}>
         <Text style={{ fontSize: 16, fontWeight: "bold" }}>{item?.name}</Text>
-        {item?.messages.length > 0 ? (
+        {item?.messages && item?.messages.length > 0 ? (
           <Text style={styles.text}>
             {item?.messages[item?.messages.length - 1]?.content}
           </Text>

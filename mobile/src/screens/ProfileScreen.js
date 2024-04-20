@@ -16,12 +16,15 @@ import { baseURL } from "../api/baseURL";
 import { useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import Loading from "../components/Loading";
+import { handleLogoutUser, handleLogoutUserSocket } from "../utils/socket";
+import { selectUser } from "../app/userSlice";
 export default function ProfileScreen({ navigation }) {
   const token = useSelector((state) => state.token.token);
   const [modalVisible, setModalVisible] = useState(false);
   const [user, setUser] = useState({});
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const userRedux = useSelector(selectUser);
   const [avatar, setAvatar] = useState(
     "https://avatar.iran.liara.run/username"
   );
@@ -64,6 +67,9 @@ export default function ProfileScreen({ navigation }) {
       console.log("Logout:", response.data);
       if (EC === 0) {
         await AsyncStorage.removeItem("token");
+        handleLogoutUserSocket({
+          customId: userRedux.phoneNumber,
+        });
         navigation.navigate("Login");
       } else {
         Alert.alert("Error", EM);

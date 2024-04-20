@@ -177,3 +177,20 @@ export const updateNameGroupService = async (token, groupId, name) => {
     return {};
   }
 };
+
+export const getGroupByIdService = async (token, groupId) => {
+  try {
+    const group = await baseURL.get("/group/byId", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        groupId,
+      },
+    });
+    return group.data;
+  } catch (error) {
+    console.log("error:::", error);
+    throw new Error(error);
+  }
+};

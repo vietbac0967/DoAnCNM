@@ -1,6 +1,5 @@
 import Conversation from "../models/converstation.model.js";
 import Message from "../models/message.model.js";
-import User from "../models/user.model.js";
 
 export const sendMessageService = async (
   receiverId,
@@ -152,10 +151,10 @@ export const sendMessageGroupService = async (
       "_id name avatar"
     );
     // find conversation
-    let conversation;
-    conversation = await Conversation.findOne({
+    const conversation = await Conversation.findOne({
       participantsGroup: { $all: [groupId] },
     });
+    console.log("conversation::::", conversation);
     if (!conversation) {
       return {
         EC: 1,

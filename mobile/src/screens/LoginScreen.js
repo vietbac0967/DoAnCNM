@@ -14,19 +14,39 @@ import { Feather } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { baseURL } from "../api/baseURL";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setToken } from "../app/tokenSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getUserInfo } from "../services/user.service";
+import { selectUser, setUser } from "../app/userSlice";
 export default function LoginScreen({ navigation }) {
   const [passwordShow, setPasswordShow] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+
+  // get user and save info user to async storage
+  const getUser = async (token) => {
+    try {
+      const response = await getUserInfo(token);
+      const { EC, EM, DT } = response;
+      if (EC === 0 && EM === "Success") {
+        console.log("data in login is", DT);
+        const { _id, name, email, phoneNumber, avatar } = DT;
+        dispatch(setUser({ _id, name, email, phoneNumber, avatar }));
+        console.log("user in login is", user);
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
   useEffect(() => {
     const checkToken = async () => {
       const token = await AsyncStorage.getItem("token");
       if (token) {
         dispatch(setToken(token));
+        getUser(token);
         navigation.navigate("Main");
       }
     };
@@ -52,10 +72,11 @@ export default function LoginScreen({ navigation }) {
       if (EM === "Success" && EC === 0 && DT) {
         setPassword("");
         setUsername("");
-        dispatch(setToken(DT));
         await AsyncStorage.setItem("token", DT);
+        const accessToken = await AsyncStorage.getItem("token");
+        getUser(accessToken);
+        dispatch(setToken(accessToken));
         navigation.navigate("Main");
-        return;
       }
       if (EC == 1 && EM == "User not found") {
         Alert.alert("Cảnh báo", "Tài khoản hoặc mật khẩu không đúng");

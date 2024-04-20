@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 import {
   getConversationForward,
   getConversationsService,
-} from "../services/converstation.service";
+} from "../services/conversation.service";
 import ForwardMessageCard from "../components/ForwardMessageCard";
 export default function ForwardMessageScreen({ navigation, route }) {
   const token = useSelector((state) => state.token.token);

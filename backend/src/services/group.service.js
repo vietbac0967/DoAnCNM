@@ -336,3 +336,31 @@ export const updateDeputyLeaderService = async (groupId, userId) => {
     };
   }
 };
+// Path: backend/src/routes/group.controller.js
+export const getGroupByIdService = async (groupId) => {
+  try {
+    const group = await Group.findById(groupId).populate(
+      "author",
+      "_id name email avatar"
+    );
+    if (!group) {
+      return {
+        EC: 1,
+        EM: "Group not found",
+        DT: "",
+      };
+    }
+
+    return {
+      EC: 0,
+      EM: "Success",
+      DT: group,
+    };
+  } catch (error) {
+    return {
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    };
+  }
+};

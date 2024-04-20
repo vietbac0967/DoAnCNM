@@ -5,6 +5,7 @@ import {
   createGroup,
   deleteGroup,
   deleteMemeberFromGroup,
+  getGroupById,
   getGroupsForUser,
   getLeadForGroup,
   getUserForGroup,
@@ -236,4 +237,5 @@ router.post(
   updateImageGroup
 );
 
+router.get("/byId", verifyAccount, getGroupById);
 export default router;

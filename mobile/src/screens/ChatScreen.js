@@ -1,9 +1,10 @@
 import React, {
   useState,
   useEffect,
-  useRef,
+  useref,
   useLayoutEffect,
   useCallback,
+  useRef,
 } from "react";
 import {
   View,
@@ -31,25 +32,28 @@ import {
   sendImageService,
   sendMessageService,
 } from "../services/message.service";
-import { getReceiverService } from "../services/user.service";
+import { getReceiverService, getuser } from "../services/user.service";
 import { Entypo } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-import { io } from "socket.io-client";
 import { useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import { URL_SERVER } from "@env";
-import { baseURL } from "../api/baseURL";
-import ChatMessageItem from "../components/ChatMessageItem";
 import MessageCard from "../components/MessageCard";
+import {
+  handlSendMessageSocket,
+  handleRefreshMessageSenderSocket,
+  handleRefreshMessageSocket,
+} from "../utils/socket";
+import axios from "axios";
+import { selectToken } from "../app/tokenSlice";
+import { selectUser } from "../app/userSlice";
 const ChatScreen = ({ navigation, route }) => {
-  const token = useSelector((state) => state.token.token);
+  const token = useSelector(selectToken);
   const [messages, setMessages] = useState([]);
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
   const { recevierId } = route.params;
-  console.log("params:::", route.params);
-  const socket = useRef();
   const inputRef = useRef(null);
   const [selectMessage, setSelectMessage] = useState({});
   const [message, setMessage] = useState("");
@@ -58,12 +62,16 @@ const ChatScreen = ({ navigation, route }) => {
   const [modalImageVisible, setModalImageVisible] = useState(false);
   const [receiver, setReceiver] = useState({});
   const scrollViewRef = useRef(null);
+  const user = useSelector(selectUser);
 
   const scrollToBottom = () => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollToEnd({ animated: false });
     }
   };
+
+  console.log("user in chat screen:::", user);
+
   const handleContentSizeChange = () => {
     scrollToBottom();
   };
@@ -92,34 +100,36 @@ const ChatScreen = ({ navigation, route }) => {
           type,
         });
         formData.append("receiverId", recevierId);
-        const response = await baseURL.post("/message/sendImage", formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        const response = await axios.post(
+          `${URL_SERVER}/api/message/sendImage`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
         const { DT, EC, EM } = response.data;
         if (EC === 0 && EM === "Success") {
-          socket.current.emit("send-msg", {
-            from: DT.receiverId,
-            to: DT.senderId,
-            msg: DT.content,
+          handlSendMessageSocket({
+            sender: { phone: user.phoneNumber, userId: user._id },
+            receiver: { phone: receiver.phoneNumber, userId: receiver._id },
           });
           setMessage("");
           getMessages();
-          return;
+        }else{
+          Alert.alert("Cảnh báo", EM)
         }
       }
     } catch (error) {
-      console.error("Error while picking image and sending message:", error);
-      Alert.alert("Cảnh báo", "Kích thước ảnh quá lớn, vui lòng chọn ảnh khác");
+      Alert.alert("Cảnh báo", error.message);
     }
   };
-
+  // get all messages of conversation
   const getMessages = async () => {
     try {
       const response = await getMessagesService(token, recevierId);
-      // console.log("response:::", response);
       setMessages(response);
     } catch (error) {
       console.log("error:::", error);
@@ -128,7 +138,7 @@ const ChatScreen = ({ navigation, route }) => {
 
   const getReceiver = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
+      // const token = await AsyncStorage.getItem("token");
       const response = await getReceiverService(token, recevierId);
       setReceiver(response);
     } catch (error) {
@@ -137,10 +147,16 @@ const ChatScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    socket.current = io(URL_SERVER);
-    // socket.current = io("http://192.168.0.6:5000");
-    console.log("URL_SERVER:::", URL_SERVER);
-    socket.current.emit("add-user", recevierId);
+    if (user) {
+      handleRefreshMessageSocket(async (data) => {
+        console.log("data refresh message:::", data);
+        getMessages();
+      });
+      handleRefreshMessageSenderSocket(async (data) => {
+        console.log("data message sender:::", data);
+        getMessages();
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -154,15 +170,12 @@ const ChatScreen = ({ navigation, route }) => {
         recevierId,
         message
       );
-      console.log("DT:::", DT);
       if (EC === 0 && EM === "Success") {
-        socket.current.emit("send-msg", {
-          from: DT.receiverId,
-          to: DT.senderId._id,
-          msg: DT,
+        handlSendMessageSocket({
+          sender: { phone: user.phoneNumber, userId: user._id },
+          receiver: { phone: receiver.phoneNumber, userId: receiver._id },
         });
         setMessage("");
-        getMessages();
       }
     } catch (error) {
       console.log("error:::", error);
@@ -170,29 +183,9 @@ const ChatScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    if (socket.current) {
-      socket.current.on("msg-recieve", (data) => {
-        console.log("data:::", data);
-        setMessages((prevMessages) => [...prevMessages, data.msg]);
-      });
-      socket.current.on("recall", (msg) => {
-        // setMessages((prevMessages) => {
-        //   const newMessages = prevMessages.map((message) => {
-        //     if (message._id === msg._id) {
-        //       return msg;
-        //     }
-        //     return message;
-        //   });
-        //   return newMessages;
-        // });
-        getMessages();
-      });
-    }
-  }, []);
-
-  useEffect(() => {
     getReceiver();
   }, []);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -228,10 +221,12 @@ const ChatScreen = ({ navigation, route }) => {
           const { EC, EM, DT } = response;
           setModalVisible(false);
           if (EC === 0 && EM === "Success") {
-            socket.current.emit("recall-msg", {
-              from: selectMessage.receiverId,
-              to: selectMessage.senderId,
-              msg: selectMessage.content,
+            handlSendMessageSocket({
+              sender: { phone: user.phoneNumber, userId: user._id },
+              receiver: {
+                phone: receiver.phoneNumber,
+                userId: receiver._id,
+              },
             });
             getMessages();
           }
