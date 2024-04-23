@@ -7,10 +7,11 @@ import { getAllMessage } from '../../../../service/MessageService';
 import { handlerefreshMessange } from '../../../../socket/socket';
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const InfoChat = (props) => {
 
-    const { listfrient, handleGetAllMessage, listmessage,
+    const { users, handleGetAllMessage, listmessage,
         setlistmessage, user, reflistmessage, handleGetAllMessageinGroup
     } = props;
 
@@ -19,77 +20,98 @@ const InfoChat = (props) => {
 
     return (
         <Box className="info-chat-container">
-            {
-                listmessage && listmessage.length > 0
-                && listmessage.map((item, index) => {
-                    if (item && item.senderId && item.receiverId) {
-                        return (
-                            <Box key={`chat-private-${index}`}>
-                                {
-                                    item.senderId._id === dataredux._id ?
-                                        <Box key={`chat-private-sender-${index}`}>
-                                            <Sender
-                                                item={item}
-                                                listfrient={listfrient}
-                                                setlistmessage={setlistmessage}
-                                                reflistmessage={reflistmessage}
-                                                handleGetAllMessage={handleGetAllMessage}
-                                                user={user}
-                                                handleGetAllMessageinGroup={handleGetAllMessageinGroup}
+            <Box
+                id="scrollableDiv"
+                sx={{
+                    overflowY: 'auto',
+                    height: "100%",
+                    overflow: 'auto',
+                    display: 'flex',
+                    flexDirection: 'column-reverse',
+                    borderWidth: 1
+                }}
+            >
+                <InfiniteScroll
+                    dataLength={listmessage.length}
+                    // next={fetchMoreData}
+                    // hasMore={true}
+                    inverse={true}
+                    style={{ display: 'flex', flexDirection: 'column' }}
+                    loader={<h4>Loading...</h4>}
+                    scrollableTarget="scrollableDiv"
+                >
+                    {
+                        listmessage && listmessage.length > 0
+                        && listmessage.reverse().map((item, index) => {
+                            if (item && item.senderId && item.receiverId) {
+                                return (
+                                    <Box key={`chat-private-${index}`}>
+                                        {
+                                            item.senderId._id === dataredux._id ?
+                                                <Box key={`chat-private-sender-${index}`}>
+                                                    <Sender
+                                                        item={item}
+                                                        users={users}
+                                                        setlistmessage={setlistmessage}
+                                                        reflistmessage={reflistmessage}
+                                                        handleGetAllMessage={handleGetAllMessage}
+                                                        user={user}
+                                                        handleGetAllMessageinGroup={handleGetAllMessageinGroup}
 
-                                            />
-                                        </Box>
-                                        :
-                                        <Box key={`chat-private-receiver-${index}`}>
-                                            <Receiver
-                                                item={item}
-                                                listfrient={listfrient}
-                                                setlistmessage={setlistmessage}
-                                                reflistmessage={reflistmessage}
-                                                handleGetAllMessage={handleGetAllMessage}
-                                                handleGetAllMessageinGroup={handleGetAllMessageinGroup}
-                                                user={user}
-                                            />
-                                        </Box>
+                                                    />
+                                                </Box>
+                                                :
+                                                <Box key={`chat-private-receiver-${index}`}>
+                                                    <Receiver
+                                                        item={item}
+                                                        users={users}
+                                                        setlistmessage={setlistmessage}
+                                                        reflistmessage={reflistmessage}
+                                                        handleGetAllMessage={handleGetAllMessage}
+                                                        handleGetAllMessageinGroup={handleGetAllMessageinGroup}
+                                                        user={user}
+                                                    />
+                                                </Box>
 
-                                }
-                            </Box>
-                        )
-                    } else {
-                        return (
-                            <Box key={`chat-private-${index}`}>
-                                {
-                                    item.senderId && item.senderId._id === dataredux._id ?
-                                        <Box key={`chat-private-sender-${index}`}>
-                                            <Sender
-                                                item={item}
-                                                listfrient={listfrient}
-                                                setlistmessage={setlistmessage}
-                                                reflistmessage={reflistmessage}
-                                                handleGetAllMessage={handleGetAllMessage}
-                                                user={user}
-                                                handleGetAllMessageinGroup={handleGetAllMessageinGroup}
+                                        }
+                                    </Box>
+                                )
+                            } else {
+                                return (
+                                    <Box key={`chat-private-${index}`}>
+                                        {
+                                            item.senderId && item.senderId._id === dataredux._id ?
+                                                <Box key={`chat-private-sender-${index}`}>
+                                                    <Sender
+                                                        item={item}
+                                                        users={users}
+                                                        setlistmessage={setlistmessage}
+                                                        reflistmessage={reflistmessage}
+                                                        handleGetAllMessage={handleGetAllMessage}
+                                                        user={user}
+                                                        handleGetAllMessageinGroup={handleGetAllMessageinGroup}
 
-                                            />
-                                        </Box>
-                                        :
-                                        <Box key={`chat-private-receiver-${index}`}>
-                                            <Receiver
-                                                item={item}
-                                                user={user}
-                                                handleGetAllMessage={handleGetAllMessage}
-                                                handleGetAllMessageinGroup={handleGetAllMessageinGroup}
+                                                    />
+                                                </Box>
+                                                :
+                                                <Box key={`chat-private-receiver-${index}`}>
+                                                    <Receiver
+                                                        item={item}
+                                                        user={user}
+                                                        handleGetAllMessage={handleGetAllMessage}
+                                                        handleGetAllMessageinGroup={handleGetAllMessageinGroup}
 
-                                            />
-                                        </Box>
+                                                    />
+                                                </Box>
 
-                                }
-                            </Box>
-                        )
+                                        }
+                                    </Box>
+                                )
+                            }
+                        })
                     }
-                })
-            }
-
+                </InfiniteScroll>
+            </Box>
         </Box>
     );
 };

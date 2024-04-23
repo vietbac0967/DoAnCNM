@@ -5,7 +5,7 @@ import MenuMessage from '../menuaction/MenuMessage';
 
 const Sender = (props) => {
 
-    const { item, listfrient, setlistmessage, handleGetAllMessage
+    const { item, users, setlistmessage, handleGetAllMessage
         , user, reflistmessage, handleGetAllMessageinGroup } = props;
 
     const [anchorEl, setAnchorEl] = useState(null);
@@ -38,7 +38,7 @@ const Sender = (props) => {
                 anchorEl={anchorEl}
                 handleClose={handleClose}
                 item={item}
-                listfrient={listfrient}
+                users={users}
                 setlistmessage={setlistmessage}
                 reflistmessage={reflistmessage}
                 handleGetAllMessage={handleGetAllMessage}

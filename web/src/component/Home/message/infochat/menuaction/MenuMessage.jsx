@@ -46,8 +46,6 @@ const MenuMessage = (props) => {
         }
     }
 
-    console.log("check user", userinfo)
-
     return (
         <Menu
             anchorEl={anchorEl}

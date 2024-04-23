@@ -5,29 +5,36 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import './ContentChat.scss'
 import { useDispatch, useSelector } from 'react-redux';
 import { sendMessage, sendMessageGroup } from '../../../../service/MessageService';
-import { handlsendmessange, handlsendmessangeingroup } from '../../../../socket/socket';
+import { handlesendAllInfo, handlesendinfoAll, handlsendmessange, handlsendmessangeingroup } from '../../../../socket/socket';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import data from '@emoji-mart/data/sets/14/twitter.json'
 import Picker from '@emoji-mart/react'
+import _ from 'lodash';
 
 const ContentChat = (props) => {
 
-    const { listfrient, user } = props;
+    const { users, user, handleGetAllFriend, showchat, mdup } = props;
 
     const [chat, setchat] = useState("");
     const [userinfo, setuserinfo] = useState({});
 
     const [emoij, setemoij] = useState(false);
 
-    useEffect(() => {
-        if (listfrient && listfrient.length > 0) {
-            let index = listfrient.findIndex(item => item.click === true);
-            if (index !== -1) {
-                setuserinfo(listfrient[index])
+    // useEffect(() => {
+    //     if (listfrient && listfrient.length > 0) {
+    //         let index = listfrient.findIndex(item => item.click === true);
+    //         if (index !== -1) {
+    //             setuserinfo(listfrient[index])
 
-            }
+    //         }
+    //     }
+    // }, [listfrient])
+
+    useEffect(() => {
+        if (users && !_.isEmpty(users)) {
+            setuserinfo(users)
         }
-    }, [listfrient])
+    }, [users])
 
 
     const dispatch = useDispatch();
@@ -41,7 +48,7 @@ const ContentChat = (props) => {
     const handleSendChat = async (e) => {
         if (e.key === 'Enter') {
             if (chat) {
-                if (userinfo && userinfo.phoneNumber) {
+                if (userinfo && userinfo.type === "private") {
                     let data = {
                         receiverId: userinfo._id,
                         content: chat
@@ -54,22 +61,33 @@ const ContentChat = (props) => {
                                 sender: { phone: dataredux.phoneNumber, userId: dataredux._id }
                                 , receiver: { phone: userinfo.phoneNumber, userId: userinfo._id }
                             })
+                            handlesendAllInfo({
+                                sender: { phone: dataredux.phoneNumber, userId: dataredux._id }
+                                , receiver: { phone: userinfo.phoneNumber, userId: userinfo._id },
+                                type: "private"
+                            })
                         }
                     }
                 } else {
                     let data = {
-                        groupId: userinfo._id,
+                        groupId: userinfo._id._id,
                         content: chat
                     }
                     let res = await sendMessageGroup(data)
                     if (res) {
                         if (res.EC === 0) {
                             setchat("")
-                            handlsendmessangeingroup({ groupId: userinfo._id })
+                            handlsendmessangeingroup({ groupId: userinfo._id._id })
+                            handlesendAllInfo({
+                                groupId: userinfo._id._id,
+                                type: "group"
+                            })
+
                         }
                     }
 
                 }
+
 
             }
         }

@@ -39,34 +39,33 @@ export const SocketSetup = (server) => {
         })
 
         socket.on("sendtest", (data) => {
-            console.log(data)
             let sender = data.sender;
             let receiver = data.receiver;
 
 
             if (clients && clients.length > 0) {
-                if (receiver && receiver.length > 0) {
-                    for (let i = 0; i < receiver.length; i++) {
-                        let index = clients.findIndex((item) => item.customId.localeCompare(receiver[i]) === 0)
-                        if (index !== -1) {
-                            socket.to(clients[index].clientId).emit("refresh", () => {
-                                console.log("test success");
-                            })
-                        } else {
-                            console.log("test error");
-                        }
-                    }
+                // if (receiver.length > 0) {
+                //     for (let i = 0; i < receiver.length; i++) {
+                //         let index = clients.findIndex((item) => item.customId.localeCompare(receiver[i]) === 0)
+                //         if (index !== -1) {
+                //             socket.to(clients[index].clientId).emit("refresh", () => {
+                //                 console.log("test success");
+                //             })
+                //         } else {
+                //             console.log("test error");
+                //         }
+                //     }
+                // }
+                // else {
+                let index = clients.findIndex((item) => item.customId.localeCompare(receiver) === 0)
+                if (index !== -1) {
+                    socket.to(clients[index].clientId).emit("refresh", () => {
+                        console.log("test success");
+                    })
                 } else {
-                    let index = clients.findIndex((item) => item.customId.localeCompare(receiver) === 0)
-                    console.log(index)
-                    if (index !== -1) {
-                        socket.to(clients[index].clientId).emit("refresh", () => {
-                            console.log("test success");
-                        })
-                    } else {
-                        console.log("test error");
-                    }
+                    console.log("test error");
                 }
+                // }
 
             }
         })
@@ -114,8 +113,12 @@ export const SocketSetup = (server) => {
             io.to(data.groupId).emit("refreshmessangeingroup", { groupId: data.groupId })
         })
 
-        socket.on("typing", () => {
-            socket.broadcast.emit("typing")
+        socket.on("typing", (data) => {
+            socket.broadcast.emit("typing", { groupId: data.groupId })
+        })
+
+        socket.on("allinfo", (data) => {
+            io.emit("allinfo", data)
         })
 
         socket.on("sendaddgroup", () => {

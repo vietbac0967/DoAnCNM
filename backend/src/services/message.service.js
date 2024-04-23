@@ -1,19 +1,41 @@
+import Conversation from "../models/converstation.model.js";
 import Message from "../models/message.model.js";
 
-export const sendMessageService = async (receiverId, senderId, content, messageType) => {
-
+export const sendMessageService = async (
+    receiverId,
+    senderId,
+    content,
+    messageType
+) => {
     try {
+        // find conversation
+        const conversation = await Conversation.findOne({
+            participants: { $all: [receiverId, senderId] },
+        });
+        if (!conversation) {
+            return {
+                EC: 1,
+                EM: "Conversation not found",
+                DT: "",
+            };
+        }
         const newMessage = new Message({
             senderId,
             receiverId,
             content,
-            messageType
+            messageType,
         });
         await newMessage.save();
+        const populatedMessage = await Message.findById(newMessage._id).populate(
+            "senderId",
+            "_id name avatar"
+        );
+        conversation.messages.push(newMessage._id);
+        await conversation.save();
         return {
             EC: 0,
             EM: "Success",
-            DT: newMessage,
+            DT: populatedMessage,
         };
     } catch (error) {
         return {
@@ -23,8 +45,6 @@ export const sendMessageService = async (receiverId, senderId, content, messageT
         };
     }
 };
-
-
 
 export const getMessagesService = async (senderId, receiverId) => {
     try {
@@ -53,6 +73,7 @@ export const getMessagesService = async (senderId, receiverId) => {
         };
     }
 };
+
 export const deleteMessageService = async (messageId, senderID) => {
     try {
         const message = await Message.findByIdAndUpdate(messageId, {
@@ -78,9 +99,11 @@ export const deleteMessageService = async (messageId, senderID) => {
         };
     }
 };
+
 export const recallMessageService = async (messageId) => {
     try {
         const messages = await Message.findByIdAndDelete(messageId);
+
         if (!messages) {
             return {
                 EC: 1,
@@ -88,6 +111,12 @@ export const recallMessageService = async (messageId) => {
                 DT: "",
             };
         }
+        // remove message from conversation
+        const conversation = await Conversation.findOne({
+            messages: { $in: [messageId] },
+        });
+        conversation.messages.pull(messageId);
+        await conversation.save();
         return {
             EC: 0,
             EM: "Success",
@@ -95,6 +124,51 @@ export const recallMessageService = async (messageId) => {
         };
     } catch (error) {
         console.log(error);
+        return {
+            EC: 1,
+            EM: "Error",
+            DT: error,
+        };
+    }
+};
+
+export const sendMessageGroupService = async (
+    senderId,
+    groupId,
+    content,
+    messageType
+) => {
+    try {
+        const newMessage = new Message({
+            senderId,
+            groupId,
+            content,
+            messageType,
+        });
+        await newMessage.save();
+        const populatedMessage = await Message.findById(newMessage._id).populate(
+            "senderId",
+            "_id name avatar"
+        );
+        // find conversation
+        const conversation = await Conversation.findOne({
+            participantsGroup: { $all: [groupId] },
+        });
+        if (!conversation) {
+            return {
+                EC: 1,
+                EM: "Conversation not found",
+                DT: "",
+            };
+        }
+        conversation.messages.push(newMessage._id);
+        await conversation.save();
+        return {
+            EC: 0,
+            EM: "Success",
+            DT: populatedMessage,
+        };
+    } catch (error) {
         return {
             EC: 1,
             EM: "Error",
@@ -136,24 +210,63 @@ export const getMessagesGroupService = async (groupId, senderId) => {
     }
 };
 
-export const sendMessageGroupService = async (
+export const forwardMessageService = async (
+    messageId,
     senderId,
-    groupId,
-    content,
-    messageType
+    receiverId,
+    groupId
 ) => {
     try {
+        const message = await Message.findById(messageId);
+        if (!message) {
+            return {
+                EC: 1,
+                EM: "Message not found",
+                DT: "",
+            };
+        }
         const newMessage = new Message({
             senderId,
-            groupId,
-            content,
-            messageType,
+            receiverId,
+            groupId, // add this line
+            content: message.content,
+            messageType: message.messageType,
         });
         await newMessage.save();
         const populatedMessage = await Message.findById(newMessage._id).populate(
             "senderId",
             "_id name avatar"
         );
+        // if groupId exist
+        if (groupId) {
+            const conversation = await Conversation.findOne({
+                participantsGroup: { $all: [groupId] },
+            });
+            if (!conversation) {
+                return {
+                    EC: 1,
+                    EM: "Conversation not found",
+                    DT: "",
+                };
+            }
+            conversation.messages.push(newMessage._id);
+            await conversation.save();
+        }
+        // if receiverId exist
+        if (receiverId) {
+            const conversation = await Conversation.findOne({
+                participants: { $all: [receiverId, senderId] },
+            });
+            if (!conversation) {
+                return {
+                    EC: 1,
+                    EM: "Conversation not found",
+                    DT: "",
+                };
+            }
+            conversation.messages.push(newMessage._id);
+            await conversation.save();
+        }
         return {
             EC: 0,
             EM: "Success",

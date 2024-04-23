@@ -6,6 +6,8 @@ import {
     sendMessageGroupService,
     sendMessageService,
 } from "../services/message.service.js";
+import Conversation from "../models/converstation.model.js";
+
 //   import AWS from "aws-sdk";
 //   AWS.config.update({
 //     region: process.env.REGION,

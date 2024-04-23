@@ -26,7 +26,6 @@ const validateOTP = async ({ otp, hashOTP }) => {
     const isValid = await bcrypt.compare(otp, hashOTP);
     return isValid;
   } catch (error) {
-    console.log({ message: error.message });
     return { message: error.message };
   }
 };

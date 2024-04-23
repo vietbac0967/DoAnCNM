@@ -53,8 +53,25 @@ const handleuserleavegroup = (data) => {
     socket.emit("leaveRoom", data)
 }
 
+const handlesendinfoAll = (data) => {
+    socket.emit("typing", data)
+}
+
+const handlerefreshinfoAll = (callback) => {
+    socket.on("typing", callback)
+}
+
+const handlesendAllInfo = (data) => {
+    socket.emit("allinfo", data)
+}
+
+const handlerefreshAllInfo = (callback) => {
+    socket.on("allinfo", callback)
+}
+
 export {
     handleCusttomClient, handlerefreshAccount, handlesendtext, handlsendmessange,
     handlerefreshMessange, handlerefreshMessangesennder, handlesendaddgroup, handleactionaddgroup,
-    handlsendmessangeingroup, handlerefreshMessangeingroup, handleuserjoingroup, handleuserleavegroup
+    handlsendmessangeingroup, handlerefreshMessangeingroup, handleuserjoingroup, handleuserleavegroup,
+    handlesendinfoAll, handlerefreshinfoAll, handlesendAllInfo, handlerefreshAllInfo
 }

@@ -182,7 +182,6 @@ const ModuleGroup = (props) => {
                 groupName: namegroup,
                 members: arr
             }
-            console.log(arr)
             let res = await CreateGroup(data)
             if (res && res.EC === 0) {
                 let phonearr = [...choosegroup.map((item, index) => {

@@ -14,7 +14,7 @@ import ModuleGroup from '../../../model/moduleaddgroup/ModuleGroup';
 
 const Search = (props) => {
 
-    const { model, setmodel } = props;
+    const { model, setmodel, setuser } = props;
 
     const [open, setOpen] = useState(false);
     const [openAddGroup, setOpenAddGroup] = useState(false);
@@ -39,6 +39,11 @@ const Search = (props) => {
 
     const handleCloseAddGroup = () => {
         setOpenAddGroup(false)
+    }
+
+    const handleCloseSearchModel = () => {
+        setmodel(false)
+        setuser({})
     }
 
     return (
@@ -76,7 +81,7 @@ const Search = (props) => {
 
                         :
                         <IconButton color="primary" sx={{ p: '10px' }} aria-label="directions"
-                            onClick={() => setmodel(false)}
+                            onClick={() => handleCloseSearchModel()}
                         >
                             <CancelIcon />
                         </IconButton>

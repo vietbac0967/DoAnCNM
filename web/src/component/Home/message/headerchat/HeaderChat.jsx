@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AvatarGroup, Box, useMediaQuery, useTheme } from '@mui/material'
 import Avatar from '@mui/material/Avatar';
 import './HeaderChat.scss'
@@ -7,32 +7,33 @@ import SearchIcon from '@mui/icons-material/Search';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import _ from 'lodash';
 
 const HeaderChat = (props) => {
 
-    const { listfrient, setshowchat } = props;
+    const { users, setshowchat } = props;
+    const showChatRef = useRef(null);
 
     const theme = useTheme();
     const mdup = useMediaQuery(theme.breakpoints.up('md'))
     const [user, setuser] = useState({});
 
     useEffect(() => {
-        if (listfrient && listfrient.length > 0) {
-            let index = listfrient.findIndex(item => item.click === true);
-            if (index !== -1) {
-                setuser(listfrient[index])
-            }
+        if (users && !_.isEmpty(users)) {
+            setuser(users)
         }
     }, [])
 
     useEffect(() => {
-        if (listfrient && listfrient.length > 0) {
-            let index = listfrient.findIndex(item => item.click === true);
-            if (index !== -1) {
-                setuser(listfrient[index])
-            }
+        if (users && !_.isEmpty(users)) {
+            setuser(users)
         }
-    }, [listfrient])
+    }, [users])
+
+    const handleCancel = async () => {
+        setshowchat(false)
+        // await handleGetAllFriend()
+    }
 
     return (
         <Box className="header-chat-container">
@@ -41,7 +42,7 @@ const HeaderChat = (props) => {
                 className="header-icon-goback"
             >
                 <IconButton
-                    onClick={() => setshowchat(false)}
+                    onClick={() => handleCancel()}
                 >
                     <ArrowBackIosIcon />
                 </IconButton>
@@ -50,29 +51,31 @@ const HeaderChat = (props) => {
 
                 <Box className="info-user">
                     {
-                        user && user.phoneNumber
+                        user && user.type === "private"
                             ?
                             <Avatar
-                                alt="Remy Sharp"
-                                src={user && user.avatar}
-                                sx={{ width: 56, height: 56 }}
-                            />
-                            : <AvatarGroup max={4}>
-                                {user && user.members && user.members.length > 0 &&
-                                    user.members.slice(0, 3).map((member, index) => {
-                                        return (
-                                            <Avatar
-                                                key={`avatar-${index}`}
-                                                sx={{ width: 30, height: 30 }}
-                                                src={member && member.avatar}
+                                sx={{ width: 50, height: 50 }}
+                                alt="Remy Sharp" src={user.avatar} />
+                            : user.type === "group" && user.avatar ?
+                                <Avatar
+                                    sx={{ width: 50, height: 50 }}
+                                    alt="Remy Sharp" src={user.avatar} />
+                                :
+                                <AvatarGroup max={4}>
+                                    {user && user.members && user.members.length > 0 &&
+                                        user.members.slice(0, 3).map((member, index) => {
+                                            return (
+                                                <Avatar
+                                                    key={`avatar-${index}`}
+                                                    sx={{ width: 40, height: 40 }}
+                                                    src={member && member.avatar}
 
-                                            >
-
-                                            </Avatar>
-                                        )
-                                    }
-                                    )}
-                            </AvatarGroup>
+                                                >
+                                                </Avatar>
+                                            )
+                                        }
+                                        )}
+                                </AvatarGroup>
                     }
 
                     <Box className="info-name-user">
