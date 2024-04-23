@@ -10,12 +10,7 @@ export default function ForwardMessageCard({ item, messageId }) {
   const handleForward = async () => {
     try {
       if (item?.type === "private") {
-        const response = await forwardMessageService(
-          token,
-          messageId,
-          item._id,
-          null
-        );
+        const response = await forwardMessageService(messageId, item._id, null);
         const { EM, EC } = response;
         if (EC === 0 && EM === "Success") {
           navigation.navigate("Message");
@@ -24,7 +19,6 @@ export default function ForwardMessageCard({ item, messageId }) {
         }
       } else {
         const response = await forwardMessageService(
-          token,
           messageId,
           null,
           item._id._id
@@ -41,20 +35,7 @@ export default function ForwardMessageCard({ item, messageId }) {
     }
   };
   return (
-    <Pressable
-      style={styles.btn}
-      onPress={() => {
-        // if (item?.type === "private") {
-        //   navigation.navigate("ChatScreen", {
-        //     recevierId: item?._id,
-        //   });
-        // } else {
-        //   navigation.navigate("ChatGroup", {
-        //     group: item?._id,
-        //   });
-        // }
-      }}
-    >
+    <Pressable style={styles.btn}>
       <Image
         style={{ width: 50, height: 50, borderRadius: 25, resizeMode: "cover" }}
         source={{

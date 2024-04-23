@@ -1,11 +1,7 @@
-import { baseURL } from "../api/baseURL";
-export const getFriendRequests = async (token) => {
+import api, { baseURL } from "../api/baseURL";
+export const getFriendRequests = async () => {
   try {
-    const response = await baseURL.get("user/getFriendRequests", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.get("user/getFriendRequests");
     const { EC, EM, DT } = response.data;
     if (EC === 0 && EM === "Success") {
       return DT;
@@ -17,19 +13,11 @@ export const getFriendRequests = async (token) => {
   }
 };
 
-export const getReceiverService = async (token, receiverId) => {
+export const getReceiverService = async (receiverId) => {
   try {
-    const response = await baseURL.post(
-      `/user/`,
-      {
-        userId: receiverId,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await api.post(`/user/`, {
+      userId: receiverId,
+    });
     const { EC, EM, DT } = response.data;
     if (EC === 0 && EM === "Success") {
       return DT;
@@ -37,18 +25,14 @@ export const getReceiverService = async (token, receiverId) => {
       return {};
     }
   } catch (error) {
-    console.log("error:::", error); // eslint-disable-line no-console 
+    console.log("error:::", error); // eslint-disable-line no-console
     return {};
   }
 };
 
-export const getFriends = async (token) => {
+export const getFriends = async () => {
   try {
-    const response = await baseURL.get("user/getFriends", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.get("user/getFriends");
     const { EC, EM, DT } = response.data;
     if (EC === 0 && EM === "Success") {
       return DT;
@@ -59,17 +43,9 @@ export const getFriends = async (token) => {
     return [];
   }
 };
-export const searchUser = async (token, phone) => {
+export const searchUser = async (phone) => {
   try {
-    const response = await baseURL.post(
-      "user/getByPhone",
-      { phone },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await api.post("user/getByPhone", { phone });
     return response.data;
   } catch (error) {
     console.log("Error:::", error);
@@ -77,13 +53,9 @@ export const searchUser = async (token, phone) => {
   }
 };
 
-export const getSendFriendRequests = async (token) => {
+export const getSendFriendRequests = async () => {
   try {
-    const response = await baseURL.get("user/getSentFriendRequests", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.get("user/getSentFriendRequests");
     const { EC, EM, DT } = response.data;
     if (EC === 0 && EM === "Success") {
       return DT;
@@ -94,17 +66,11 @@ export const getSendFriendRequests = async (token) => {
     return [];
   }
 };
-export const acceptFriendRequest = async (token, senderId) => {
+export const acceptFriendRequest = async (senderId) => {
   try {
-    const response = await baseURL.post(
-      "user/acceptFriendRequest",
-      { senderId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await baseURL.post("user/acceptFriendRequest", {
+      senderId,
+    });
     const { EC, EM } = response.data;
     if (EC === 0 && EM === "Success") {
       return true;
@@ -115,17 +81,9 @@ export const acceptFriendRequest = async (token, senderId) => {
     return false;
   }
 };
-export const rejectFriendRequest = async (token, senderId) => {
+export const rejectFriendRequest = async (senderId) => {
   try {
-    const response = await baseURL.post(
-      "user/rejectFriendRequest",
-      { senderId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await api.post("user/rejectFriendRequest", { senderId });
     const { EC, EM } = response.data;
     if (EC === 0 && EM === "Success") {
       return true;
@@ -136,17 +94,11 @@ export const rejectFriendRequest = async (token, senderId) => {
     return false;
   }
 };
-export const sendFriendRequest = async (token, receiverId) => {
+export const sendFriendRequest = async (receiverId) => {
   try {
-    const response = await baseURL.post(
-      "user/sendFriendRequest",
-      { receiverId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await api.post("user/sendFriendRequest", {
+      receiverId,
+    });
     const { EC, EM } = response.data;
     if (EC === 0 && EM === "Success") {
       return true;
@@ -159,15 +111,27 @@ export const sendFriendRequest = async (token, receiverId) => {
   }
 };
 
-export const getUserInfo = async (token) => {
+export const getUserInfo = async () => {
   try {
-    const response = await baseURL.get("/info", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    // const response = await baseURL.get("/info", {
+    //   headers: {
+    //     Authorization: `Bearer ${token}`,
+    //   },
+    // });
+    const response = await api.get("/info");
     return response.data;
   } catch (error) {
     return {};
+  }
+};
+export const sendFriendRequestService = async (receiverId) => {
+  try {
+    const res = await api.post("/user/sendFriendRequest", {
+      receiverId,
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    throw new Error(error.message);
   }
 };

@@ -24,10 +24,10 @@ import {
   updateNameGroupService,
 } from "../services/group.service";
 import { selectUser } from "../app/userSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function GroupInfoScreen({ navigation, route }) {
   const groupId = route.params?.groupId;
 
-  const token = useSelector((state) => state.token.token);
   const [modalVisible, setModalVisible] = useState(false);
   // const socket = useRef(null);
   // const [name, setName] = useState(groupId?.name);
@@ -36,7 +36,7 @@ export default function GroupInfoScreen({ navigation, route }) {
   const [name, setName] = useState("");
   const getGroup = async () => {
     try {
-      const response = await getGroupByIdService(token, groupId);
+      const response = await getGroupByIdService(groupId);
       const { EM, EC, DT } = response;
       if (EM === "Success" && EC === 0) {
         setName(DT?.name);
@@ -62,7 +62,7 @@ export default function GroupInfoScreen({ navigation, route }) {
 
   const handleDeleteGroup = async () => {
     try {
-      const response = await deleteGroupService(token, group._id);
+      const response = await deleteGroupService(group._id);
       console.log("response:::", response);
       const { EM, EC } = response;
       if (EC === 0 && EM === "Success") {
@@ -89,7 +89,7 @@ export default function GroupInfoScreen({ navigation, route }) {
           onPress: async () => {
             try {
               console.log("groupId:::", groupId);
-              const response = await leaveGroupService(token, groupId);
+              const response = await leaveGroupService(groupId);
               console.log("response:::", response);
               const { EM, EC } = response;
               if (EC === 0 && EM === "Success") {
@@ -127,7 +127,8 @@ export default function GroupInfoScreen({ navigation, route }) {
           name: filename,
           type,
         });
-        formData.append("groupId",groupId);
+        formData.append("groupId", groupId);
+        const token = await AsyncStorage.getItem("accessToken");
         const response = await baseURL.post(
           "/group/updateImageGroup",
           formData,
@@ -159,7 +160,7 @@ export default function GroupInfoScreen({ navigation, route }) {
 
   const handleUpdateGroupName = async () => {
     try {
-      const response = await updateNameGroupService(token, groupId, name);
+      const response = await updateNameGroupService(groupId, name);
       const { EM, EC } = response;
       if (EC === 0 && EM === "Success") {
         Alert.alert("Thông báo", "Đổi tên nhóm thành công");
@@ -223,9 +224,7 @@ export default function GroupInfoScreen({ navigation, route }) {
         }}
       >
         <View style={{ alignContent: "center", alignItems: "center" }}>
-          <View
-            style={styles.iconHeader}
-          >
+          <View style={styles.iconHeader}>
             <AntDesign name="search1" size={20} color="black" />
           </View>
           <Text style={{ textAlign: "center" }}>Tìm {"\n"} tin nhắn</Text>
@@ -253,7 +252,7 @@ export default function GroupInfoScreen({ navigation, route }) {
               >
                 Đổi tên nhóm
               </Text>
-             
+
               <TextInput
                 style={{
                   borderRadius: 20,
@@ -352,7 +351,7 @@ export default function GroupInfoScreen({ navigation, route }) {
           <AntDesign name="setting" size={24} color="black" />
           <Text style={{ paddingLeft: 5 }}>Cài đặt nhóm</Text>
         </Pressable>
-  
+
         {user?._id === group?.author._id ? (
           <Pressable
             onPress={handleDeleteGroup}

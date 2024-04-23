@@ -14,13 +14,12 @@ import {
 } from "../services/conversation.service";
 import ForwardMessageCard from "../components/ForwardMessageCard";
 export default function ForwardMessageScreen({ navigation, route }) {
-  const token = useSelector((state) => state.token.token);
   const [isLoading, setIsLoading] = useState(true);
   const messageId = route.params?.messageId;
   const [conversation, setConversation] = useState([]);
   const getConversation = async () => {
     try {
-      const response = await getConversationForward(token, messageId);
+      const response = await getConversationForward(messageId);
       const { DT, EM, EC } = response;
       if (EC === 0 && EM === "Success") {
         setConversation(DT);

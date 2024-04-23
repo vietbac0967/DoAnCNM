@@ -1,4 +1,6 @@
 import User from "../models/user.model.js";
+import dotenv from "dotenv";
+dotenv.config();
 import {
   generateRefreshToken,
   generateAccessToken,
@@ -9,11 +11,13 @@ import {
   validatePassword,
   validatePhoneNumber,
 } from "../utils/validate.js";
+import jwt from "jsonwebtoken";
 import { insertOTP, validateOTP } from "../services/otp.service.js";
 import otpGenerator from "otp-generator";
 import bcrypt from "bcrypt";
 import OTP from "../models/otp.model.js";
 import { sendOTPForUser, sendOTPForgotPassword } from "./sendMail.service.js";
+import { client } from "../config/connectToRedis.js";
 
 export const verifyOTPService = async ({ email, otp }) => {
   try {
@@ -194,12 +198,15 @@ export const loginService = async (data) => {
         DT: "",
       };
     }
-    const token = generateAccessToken(user._id);
-
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = await generateRefreshToken(user._id);
     return {
       EC: 0,
       EM: "Success",
-      DT: token,
+      DT: {
+        accessToken,
+        refreshToken,
+      },
     };
   } catch (err) {
     return {
@@ -317,7 +324,7 @@ export const resetPasswordService = async (
         DT: "",
       };
     }
-    
+
     const user = await User.findOne({ email });
     const passwordExist = await bcrypt.compare(password, user.password);
     if (passwordExist) {
@@ -368,7 +375,7 @@ export const changePasswordService = async (
         DT: "",
       };
     }
-    
+
     const user = await User.findOne({ email });
     const comparePassword = await bcrypt.compare(oldPassword, user.password);
     if (!comparePassword) {
@@ -392,6 +399,56 @@ export const changePasswordService = async (
     return {
       EC: 1,
       EM: err.message,
+      DT: "",
+    };
+  }
+};
+export const refreshTokenService = async (token) => {
+  try {
+    if (!token) {
+      return {
+        EC: 1,
+        EM: "Refresh token is empty",
+        DT: "",
+      };
+    }
+    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    if (!decoded) {
+      return {
+        EC: 1,
+        EM: "Invalid refresh token",
+        DT: "",
+      };
+    }
+    const existToken = await client.get(decoded.id);
+    if (!existToken) {
+      return {
+        EC: 1,
+        EM: "Jwt is not exist in redis",
+        DT: "",
+      };
+    }
+    if (token !== existToken) {
+      return {
+        EC: 1,
+        EM: "Token and redis token are not the same",
+        DT: "",
+      };
+    }
+    const accessToken = generateAccessToken(decoded.id);
+    const refreshToken = await generateRefreshToken(decoded.id);
+    return {
+      EC: 0,
+      EM: "Success",
+      DT: {
+        accessToken,
+        refreshToken,
+      },
+    };
+  } catch (error) {
+    return {
+      EC: 1,
+      EM: error.message,
       DT: "",
     };
   }

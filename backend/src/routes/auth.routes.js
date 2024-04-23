@@ -194,7 +194,7 @@ router.post("/login", login);
  *      500:
  *        description: Server error
  */
-router.post("/logout", verifyAccount, logout);
+router.post("/logout", logout);
 /**
  * @openapi
  * '/api/auth/forgotPassword':
@@ -303,4 +303,5 @@ router.post("/changePassword", changePassword);
  */
 router.get("/verifyAccount", verifyAccount, account);
 // router.post("/refreshToken", refreshToken);
+router.post("/refreshToken", refreshToken);
 export default router;

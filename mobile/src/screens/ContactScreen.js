@@ -30,10 +30,9 @@ export default function ContactScreen({ navigation }) {
     return name.charAt(0).toUpperCase();
   };
   const fetchData = async () => {
-    const token = await AsyncStorage.getItem("token");
-    const friends = await getFriends(token);
-    const friendRequests = await getFriendRequests(token);
-    const sendFriendRequests = await getSendFriendRequests(token);
+    const friends = await getFriends();
+    const friendRequests = await getFriendRequests();
+    const sendFriendRequests = await getSendFriendRequests();
     setFriends(friends);
     setFriendRequests(friendRequests);
     setSendFriendRequests(sendFriendRequests);

@@ -16,7 +16,6 @@ import { getGroupsService } from "../services/group.service";
 
 export default function SearchScreen({ navigation, route }) {
   const [search, setSearch] = useState("");
-  const token = useSelector((state) => state.token.token);
   const isLoading = route.params?.isLoading;
   const [friends, setFriends] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -24,7 +23,7 @@ export default function SearchScreen({ navigation, route }) {
 
   const getListFriend = async () => {
     try {
-      const friends = await getFriends(token);
+      const friends = await getFriends();
       setFriends(friends); // Ban đầu, kết quả tìm kiếm là toàn bộ danh sách bạn bè
     } catch (error) {
       console.log("error:::", error);
@@ -33,7 +32,7 @@ export default function SearchScreen({ navigation, route }) {
 
   const getListGroups = async () => {
     try {
-      const response = await getGroupsService(token);
+      const response = await getGroupsService();
       const { EC, EM, DT } = response;
       if (EC === 0) {
         setGroups(DT);

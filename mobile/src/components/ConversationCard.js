@@ -4,55 +4,81 @@ import { useEffect, useRef, useState } from "react";
 import { URL_SERVER } from "@env";
 import { selectToken } from "../app/tokenSlice";
 import formatDateOrTime from "../utils/formatDateOrTime";
+import {
+  handleCleanNotification,
+  handleReceiveCleanNotification,
+  handleReceiveNotification,
+  handleRefreshNotificationToGroup,
+} from "../utils/socket";
+import {
+  getNotificationService,
+  readNotificationService,
+} from "../services/notification.service";
+import { selectUser } from "../app/userSlice";
 export default function ConversationCard({ item, navigation }) {
-  // console.log("URL_SERVER:::", URL_SERVER);
-  // const token = useSelector(selectToken);
-  // const [receiver, setReceiver] = useState(null);
-  // const [notifications, setNotifications] = useState([]);
-  // const dispatch = useDispatch();
-  // const getNotifications = async () => {
-  //   try {
-  //     const response = await getNotificationService(token, receiver);
-  //     const { EM, EC, DT } = response;
-  //     if (EM === "Success" && EC === 0) {
-  //       setNotifications(DT);
-  //     } else {
-  //       Alert.alert("Error", EM);
-  //     }
-  //   } catch (error) {
-  //     Alert.alert("Error", error.message);
-  //   }
-  // };
+  const [notifications, setNotifications] = useState([]);
+  const [receiver, setReceiver] = useState(null);
+  const user = useSelector(selectUser);
 
-  // useEffect(() => {
-  // socket.current = io(URL_SERVER);
-  // // socket.current = io("http://192.168.0.6:5000");
-  // console.log("URL_SERVER:::", URL_SERVER);
-  // if (item?.type === "private") {
-  //   socket.current.emit("add-user", item?._id);
-  //   setReceiver(item?._id);
-  // } else {
-  //   socket.current.emit("join-group", item?._id._id);
-  //   setReceiver(item?._id._id);
-  // }
-  // getNotifications();
-  // }, []);
-
-  // const handleReadNotification = async () => {
-  //   try {
-  //     const response = await readNotificationService(token, receiver);
-  //     const { EM, EC } = response;
-  //     if (EM === "Success" && EC === 0) {
-  //       dispatch(setNotifications([]));
-  //     } else {
-  //       Alert.alert("Error", EM);
-  //     }
-  //   } catch (error) {
-  //     Alert.alert("Error", error.message);
-  //   }
-  // };
-
+  const handleReadNotification = async () => {
+    try {
+      if (receiver) {
+        const response = await readNotificationService(receiver);
+        const { EM, EC } = response;
+        if (EM === "Success" && EC === 0) {
+          getNotifications();
+        } else {
+          Alert.alert("Error", EM);
+        }
+      }
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
+  const getNotifications = async () => {
+    try {
+      if (receiver) {
+        const response = await getNotificationService(receiver);
+        const { EM, EC, DT } = response;
+        if (EM === "Success" && EC === 0) {
+          setNotifications(DT);
+        } else {
+          Alert.alert("Error", EM);
+        }
+      }
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
   // console.log("notifications:::", notifications);
+  useEffect(() => {
+    getNotifications();
+  }, [receiver]);
+
+  useEffect(() => {
+    if (item?.type === "private") {
+      setReceiver(item?._id);
+    } else {
+      setReceiver(item?._id._id);
+    }
+  }, []);
+
+  useEffect(() => {
+    handleReceiveNotification((data) => {
+      console.log("data notification is:::", data);
+      if (data?.message.senderId._id === item?._id) {
+        // setReceiver(data?.message.senderId._id);
+        // setNotification(data?.message.content);
+        setNotifications((prev) => [...prev, data.message]);
+      }
+    });
+    handleRefreshNotificationToGroup((data) => {
+      console.log("notification to group:::", data);
+      if (data?.groupId === item?._id._id ) {
+        setNotifications((prev) => [...prev, data.message]);
+      }
+    });
+  }, []);
   return (
     <Pressable
       style={({ pressed }) => [
@@ -61,10 +87,12 @@ export default function ConversationCard({ item, navigation }) {
       ]}
       onPress={() => {
         if (item?.type === "private") {
+          handleReadNotification();
           navigation.navigate("ChatScreen", {
             recevierId: item?._id,
           });
         } else {
+          handleReadNotification();
           navigation.navigate("ChatGroup", {
             group: item?._id,
           });
@@ -136,38 +164,70 @@ export default function ConversationCard({ item, navigation }) {
             alignItems: "flex-end",
           }}
         >
-          <View>
-            {item?.messageType === "text" ? (
-              item?.message.content.slice(0, 6) === "##TB##" ? (
-                <Text style={{ color: "gray" }}>
-                  {item.message.content.length > 37
-                    ? item.message.content.slice(0, 37).slice(7) + "..."
-                    : item.message.content}
-                </Text>
-              ) : (
-                <Text style={{ color: "gray" }}>
-                  {item.message.senderId !== item?._id ? "Bạn: " : ""}
-                  {item.message.content}
-                </Text>
-              )
-            ) : item?.messageType === "image" ? (
-              <Text style={{ color: "gray" }}>
-                {item.message.senderId !== item?._id ? "Bạn: " : ""}
-                [Hình ảnh]
+          {notifications.length > 0 ? (
+            <>
+              <Text style={{ fontSize: 14, fontWeight: "bold" }}>
+                {notifications[notifications.length - 1]?.content}
               </Text>
-            ) : (
-              <Text style={{ color: "gray" }}>
-                Hãy trò chuyện cùng nhau nào!
-              </Text>
-            )}
-          </View>
-          <View>
-            <Text style={{ color: "gray" }}>
-              {item.message.createdAt
-                ? formatDateOrTime(item.message.createdAt)
-                : ""}
-            </Text>
-          </View>
+              <View
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: 10,
+                  backgroundColor: "red",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: "13",
+                    color: "#fff",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    justifyContent: "center",
+                    alignItems: "center", // Add this
+                    justifyContent: "center",
+                  }}
+                >
+                  {notifications.length}
+                </Text>
+              </View>
+            </>
+          ) : (
+            <>
+              <View>
+                {item?.messageType === "text" ? (
+                  item?.message.content.slice(0, 6) === "##TB##" ? (
+                    <Text style={{ color: "gray" }}>
+                      {item.message.content.length > 37
+                        ? item.message.content.slice(0, 37).slice(7) + "..."
+                        : item.message.content}
+                    </Text>
+                  ) : (
+                    <Text style={{ color: "gray" }}>
+                      {item.message.senderId !== item?._id ? "Bạn: " : ""}
+                      {item.message.content}
+                    </Text>
+                  )
+                ) : item?.messageType === "image" ? (
+                  <Text style={{ color: "gray" }}>
+                    {item.message.senderId !== item?._id ? "Bạn: " : ""}
+                    [Hình ảnh]
+                  </Text>
+                ) : (
+                  <Text style={{ color: "gray" }}>
+                    Hãy trò chuyện cùng nhau nào!
+                  </Text>
+                )}
+              </View>
+              <View>
+                <Text style={{ color: "gray" }}>
+                  {item.message.createdAt
+                    ? formatDateOrTime(item.message.createdAt)
+                    : ""}
+                </Text>
+              </View>
+            </>
+          )}
         </View>
       </View>
     </Pressable>

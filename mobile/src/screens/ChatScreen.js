@@ -37,20 +37,27 @@ import { Entypo } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import { URL_SERVER } from "@env";
 import MessageCard from "../components/MessageCard";
 import {
   handlSendMessageSocket,
+  handleInConversation,
+  handleReceiveInConversation,
   handleRefreshMessageSenderSocket,
   handleRefreshMessageSocket,
+  handleSendNotification,
 } from "../utils/socket";
 import axios from "axios";
 import { selectToken } from "../app/tokenSlice";
 import { selectUser } from "../app/userSlice";
+import { Socket } from "socket.io-client";
+import { selectOpen, setOpen } from "../app/openSlice";
+import { useIsFocused } from "@react-navigation/native";
+import { sendNotificationService } from "../services/notification.service";
+import Loading from "../components/Loading";
 const ChatScreen = ({ navigation, route }) => {
-  const token = useSelector(selectToken);
   const [messages, setMessages] = useState([]);
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
   const { recevierId } = route.params;
@@ -62,8 +69,10 @@ const ChatScreen = ({ navigation, route }) => {
   const [modalImageVisible, setModalImageVisible] = useState(false);
   const [receiver, setReceiver] = useState({});
   const scrollViewRef = useRef(null);
+  const [activeUsers, setActiveUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const user = useSelector(selectUser);
-
+  const dispatch = useDispatch();
   const scrollToBottom = () => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollToEnd({ animated: false });
@@ -99,6 +108,7 @@ const ChatScreen = ({ navigation, route }) => {
           name: filename,
           type,
         });
+        const token = await AsyncStorage.getItem("accessToken");
         formData.append("receiverId", recevierId);
         const response = await axios.post(
           `${URL_SERVER}/api/message/sendImage`,
@@ -118,19 +128,21 @@ const ChatScreen = ({ navigation, route }) => {
           });
           setMessage("");
           getMessages();
-        }else{
-          Alert.alert("Cảnh báo", EM)
+        } else {
+          Alert.alert("Cảnh báo", EM);
         }
       }
     } catch (error) {
       Alert.alert("Cảnh báo", error.message);
     }
   };
+
   // get all messages of conversation
   const getMessages = async () => {
     try {
-      const response = await getMessagesService(token, recevierId);
+      const response = await getMessagesService(recevierId);
       setMessages(response);
+      setIsLoading(false);
     } catch (error) {
       console.log("error:::", error);
     }
@@ -139,7 +151,7 @@ const ChatScreen = ({ navigation, route }) => {
   const getReceiver = async () => {
     try {
       // const token = await AsyncStorage.getItem("token");
-      const response = await getReceiverService(token, recevierId);
+      const response = await getReceiverService(recevierId);
       setReceiver(response);
     } catch (error) {
       console.log("error:::", error);
@@ -162,19 +174,35 @@ const ChatScreen = ({ navigation, route }) => {
   useEffect(() => {
     getMessages();
   }, []);
+  console.log("Active users:::", activeUsers);
 
   const handleSend = async () => {
     try {
-      const { DT, EC, EM } = await sendMessageService(
-        token,
-        recevierId,
-        message
-      );
+      const { DT, EC, EM } = await sendMessageService(recevierId, message);
       if (EC === 0 && EM === "Success") {
         handlSendMessageSocket({
           sender: { phone: user.phoneNumber, userId: user._id },
           receiver: { phone: receiver.phoneNumber, userId: receiver._id },
         });
+        // check user online or offline to send notification
+        if (
+          !activeUsers.some((user) => user.customId === receiver.phoneNumber)
+        ) {
+          handleSendNotification({ receiver, message: DT });
+          const response = await sendNotificationService(
+            recevierId,
+            null,
+            "text",
+            message
+          );
+          const { EC, EM } = response;
+          if (EC === 0 && EM === "Success") {
+            console.log("Send notification success");
+          } else {
+            console.log("Send notification failed");
+            throw new Error(EM);
+          }
+        }
         setMessage("");
       }
     } catch (error) {
@@ -190,23 +218,19 @@ const ChatScreen = ({ navigation, route }) => {
     scrollToBottom();
   }, [messages]);
 
-  const formatDate = (date) => {
-    const options = { hour: "2-digit", minute: "2-digit" };
-    const formattedTime = new Date(date).toLocaleTimeString("vi-VN", options);
-    return formattedTime;
-  };
-  const formatDateOrTime = (updatedAt) => {
-    const today = new Date();
-    const updatedAtDate = new Date(updatedAt);
+  useEffect(() => {
+    handleInConversation({
+      customId: user.phoneNumber,
+    });
+  }, [user]);
 
-    if (updatedAtDate.toDateString() === today.toDateString()) {
-      // Display time if updatedAt is today
-      return formatDate(updatedAt);
-    } else {
-      // Display full date if updatedAt is not today
-      return updatedAtDate.toLocaleDateString("en-US");
-    }
-  };
+  useEffect(() => {
+    handleReceiveInConversation((data) => {
+      console.log("data user avtive is:::", data);
+      setActiveUsers(data);
+    });
+  }, []);
+
   const handleRecallMessage = (messageID) => {
     Alert.alert("Cảnh báo", "Bạn có muốn thu hồi nhắn này không?", [
       {
@@ -217,7 +241,7 @@ const ChatScreen = ({ navigation, route }) => {
       {
         text: "Có",
         onPress: async () => {
-          const response = await recallMessageService(token, selectMessage._id);
+          const response = await recallMessageService(selectMessage._id);
           const { EC, EM, DT } = response;
           setModalVisible(false);
           if (EC === 0 && EM === "Success") {
@@ -236,7 +260,7 @@ const ChatScreen = ({ navigation, route }) => {
   };
   const handleDeleteMessage = async () => {
     try {
-      const response = await deleteMessageService(token, selectMessage._id);
+      const response = await deleteMessageService(selectMessage._id);
       const { EC, EM, DT } = response;
       if (EC === 0 && EM === "Success") {
         getMessages();
@@ -306,7 +330,11 @@ const ChatScreen = ({ navigation, route }) => {
         </View>
       ),
     });
-  }, [navigation, receiver]);
+  }, [navigation]);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <KeyboardAvoidingView
@@ -488,7 +516,10 @@ const ChatScreen = ({ navigation, route }) => {
           <Ionicons name="mic" size={24} color="gray" />
         </View>
 
-        <Pressable onPress={() => handleSend()} style={({pressed}) => ({opacity: pressed ? 0.5 : 1 })}>
+        <Pressable
+          onPress={() => handleSend()}
+          style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}
+        >
           <Ionicons name="send" size={24} color="#33D1FF" />
         </Pressable>
       </View>

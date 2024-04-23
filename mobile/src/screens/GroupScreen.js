@@ -13,20 +13,24 @@ import { getGroupsService } from "../services/group.service";
 import GroupCard from "../components/GroupCard";
 import { Ionicons } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
+import { selectUser } from "../app/userSlice";
+import { handleOutConversation } from "../utils/socket";
 export default function GroupScreen({ navigation, route }) {
-  const token = useSelector((state) => state.token.token);
   const [groups, setGroups] = useState([]);
-
   const isFocused = useIsFocused();
+  const user = useSelector(selectUser);
 
   useEffect(() => {
     if (isFocused) {
       getGroups();
+      handleOutConversation({
+        phone: user.phoneNumber,
+      });
     }
   }, [isFocused]);
   const getGroups = async () => {
     try {
-      const response = await getGroupsService(token);
+      const response = await getGroupsService();
       const { EC, EM, DT } = response;
       if (EC === 0) {
         setGroups(DT);
@@ -34,6 +38,7 @@ export default function GroupScreen({ navigation, route }) {
         Alert.alert("Cảnh báo", EM);
       }
     } catch (error) {
+      throw new Error(error);
       Alert.alert("Cảnh báo", "Có một sự cố sảy ra");
     }
   };
@@ -95,14 +100,28 @@ export default function GroupScreen({ navigation, route }) {
           onPress={() => {
             navigation.navigate("CreateGroup");
           }}
-          style={({pressed}) => ({opacity: pressed ? 0.5 : 1})}
+          style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}
         >
-          <View style={{ paddingVertical: 5, paddingHorizontal: 15, backgroundColor: "#ddd", borderRadius: 7}}>
-          <AntDesign name="addusergroup" size={25} color="#444444" />
+          <View
+            style={{
+              paddingVertical: 5,
+              paddingHorizontal: 15,
+              backgroundColor: "#ddd",
+              borderRadius: 7,
+            }}
+          >
+            <AntDesign name="addusergroup" size={25} color="#444444" />
           </View>
         </Pressable>
       </View>
-      <Text style={{ fontSize: 13, fontWeight: "bold", marginBottom: 10, marginLeft: 10 }}>
+      <Text
+        style={{
+          fontSize: 13,
+          fontWeight: "bold",
+          marginBottom: 10,
+          marginLeft: 10,
+        }}
+      >
         Nhóm đã tham gia: {groups.length}
       </Text>
       {/* <View>

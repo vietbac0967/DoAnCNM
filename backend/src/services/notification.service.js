@@ -29,12 +29,15 @@ export const createNotificationService = async (
     };
   }
 };
-export const getNotificationsService = async (receiver) => {
+export const getNotificationsService = async (receiver, userId) => {
   try {
     const notifications = await Notification.find({
       $and: [
         {
-          $or: [{ receiverId: receiver }, { groupId: receiver }],
+          $or: [
+            { receiverId: userId, senderId: receiver },
+            { groupId: receiver, senderId: { $ne: userId } },
+          ],
         },
         { read: false },
       ],
@@ -52,11 +55,14 @@ export const getNotificationsService = async (receiver) => {
     };
   }
 };
-export const readNotificationService = async (receiver) => {
+export const readNotificationService = async (receiver, userId) => {
   try {
     const notifications = await Notification.updateMany(
       {
-        $or: [{ receiverId: receiver }, { groupId: receiver }],
+        $or: [
+          { receiverId: userId, senderId: receiver },
+          { groupId: receiver, senderId: { $ne: userId } },
+        ],
       },
       { read: true }
     );

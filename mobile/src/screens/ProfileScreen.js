@@ -12,31 +12,33 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from "@expo/vector-icons";
-import { baseURL } from "../api/baseURL";
+import api, { baseURL } from "../api/baseURL";
 import { useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import Loading from "../components/Loading";
-import { handleLogoutUser, handleLogoutUserSocket } from "../utils/socket";
+import {
+  handleLogoutUser,
+  handleLogoutUserSocket,
+  handleOutConversation,
+} from "../utils/socket";
 import { selectUser } from "../app/userSlice";
+import { getUserInfo } from "../services/user.service";
+import { useIsFocused } from "@react-navigation/native";
 export default function ProfileScreen({ navigation }) {
-  const token = useSelector((state) => state.token.token);
   const [modalVisible, setModalVisible] = useState(false);
   const [user, setUser] = useState({});
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const userRedux = useSelector(selectUser);
+  const isFocused = useIsFocused();
   const [avatar, setAvatar] = useState(
     "https://avatar.iran.liara.run/username"
   );
   const getUser = async () => {
     try {
       // const token = await AsyncStorage.getItem("token");
-      const response = await baseURL.get("/info", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const { DT, EM, EC } = response.data;
+      const response = await getUserInfo();
+      const { DT, EM, EC } = response;
       if (EC === 0 && EM === "Success") {
         setUser(DT);
       } else {
@@ -47,26 +49,25 @@ export default function ProfileScreen({ navigation }) {
     }
   };
   useEffect(() => {
-    getUser();
-  }, []);
+    if (isFocused) {
+      getUser();
+      handleOutConversation({
+        phone: user.phoneNumber,
+      });
+    }
+  }, [isFocused]);
+
   const backgroundImage = require("../assets/bg.jpg");
 
   const handleLogout = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await baseURL.post(
-        "/auth/logout",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const token = await AsyncStorage.getItem("refreshToken");
+      const response = await baseURL.post("/auth/logout", { token });
       const { EC, EM } = response.data;
       console.log("Logout:", response.data);
       if (EC === 0) {
-        await AsyncStorage.removeItem("token");
+        await AsyncStorage.removeItem("accessToken");
+        await AsyncStorage.removeItem("refreshToken");
         handleLogoutUserSocket({
           customId: userRedux.phoneNumber,
         });
@@ -76,7 +77,8 @@ export default function ProfileScreen({ navigation }) {
       }
     } catch (error) {
       console.log("Error getting user:", error);
-      await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem("accessToken");
+      await AsyncStorage.removeItem("refreshToken");
       navigation.navigate("Login");
     }
   };
@@ -99,9 +101,8 @@ export default function ProfileScreen({ navigation }) {
           name: filename,
           type,
         });
-        const response = await baseURL.post("/user/updateImage", formData, {
+        const response = await api.post("/user/updateImage", formData, {
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
         });
@@ -178,27 +179,62 @@ export default function ProfileScreen({ navigation }) {
             <Text style={styles.bottomButtonText}>Tài khoản và bảo mật</Text>
           </Pressable>
 
-          <Pressable style={styles.bottomButton} onPress={() => navigation.navigate("FunctionUnavailable", { screenTitle: "Quyền riêng tư" })}>
+          <Pressable
+            style={styles.bottomButton}
+            onPress={() =>
+              navigation.navigate("FunctionUnavailable", {
+                screenTitle: "Quyền riêng tư",
+              })
+            }
+          >
             <Feather name="settings" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Quyền riêng tư</Text>
           </Pressable>
 
-          <Pressable style={styles.bottomButton} onPress={() => navigation.navigate("FunctionUnavailable", { screenTitle: "Thông báo" })}>
+          <Pressable
+            style={styles.bottomButton}
+            onPress={() =>
+              navigation.navigate("FunctionUnavailable", {
+                screenTitle: "Thông báo",
+              })
+            }
+          >
             <Feather name="bell" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Thông báo</Text>
           </Pressable>
 
-          <Pressable style={styles.bottomButton} onPress={() => navigation.navigate("FunctionUnavailable", { screenTitle: "Danh bạ" })}>
+          <Pressable
+            style={styles.bottomButton}
+            onPress={() =>
+              navigation.navigate("FunctionUnavailable", {
+                screenTitle: "Danh bạ",
+              })
+            }
+          >
             <Feather name="users" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Danh bạ</Text>
           </Pressable>
 
-          <Pressable style={styles.bottomButton} onPress={() => navigation.navigate("FunctionUnavailable", { screenTitle: "Nhật ký" })}>
+          <Pressable
+            style={styles.bottomButton}
+            onPress={() =>
+              navigation.navigate("FunctionUnavailable", {
+                screenTitle: "Nhật ký",
+              })
+            }
+          >
             <Feather name="bookmark" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Nhật ký</Text>
           </Pressable>
 
-          <Pressable style={styles.bottomButton} onPress={() => navigation.navigate("FunctionUnavailable", { screenTitle: "Sao lưu và ngôn ngữ" })}>
+          <Pressable
+            style={styles.bottomButton}
+            onPress={() =>
+              navigation.navigate("FunctionUnavailable", {
+                screenTitle: "Sao lưu và ngôn ngữ",
+              })
+            }
+          >
             <Feather name="archive" size={15} color="#33CCFF" />
             <Text style={styles.bottomButtonText}>Sao lưu và ngôn ngữ</Text>
           </Pressable>

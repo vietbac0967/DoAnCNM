@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import http from "http";
 import app from "../../app.js";
+import { group } from "console";
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -10,6 +11,8 @@ const io = new Server(server, {
 });
 global.onlineUsers = new Map();
 let clients = [];
+let activeUsers = [];
+let userInGroup = [];
 io.on("connection", (socket) => {
   // console.log("a user connected", socket.id);
   // store client info
@@ -33,6 +36,20 @@ io.on("connection", (socket) => {
         clients.push(clientInfo);
       }
       console.log(clients);
+    }
+  });
+
+  socket.on("sendNotification", (data) => {
+    console.log("data notification:::", data);
+    const receiver = data.receiver;
+    if (clients && clients.length > 0) {
+      const index = clients.findIndex(
+        (item) => item.customId.localeCompare(receiver.phoneNumber) === 0
+      );
+      console.log("index:::", index);
+      if (index !== -1) {
+        socket.to(clients[index].clientId).emit("refreshNotification", data);
+      }
     }
   });
 
@@ -65,6 +82,45 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("inConversation", (data) => {
+    // console.log("data inConversation:::", data);
+    if (data && data.customId) {
+      const existingClientIndex = activeUsers.findIndex(
+        (client) => client.customId === data.customId
+      );
+
+      if (existingClientIndex !== -1) {
+        activeUsers[existingClientIndex] = {
+          customId: data.customId,
+          clientId: socket.id,
+        };
+      } else {
+        const clientInfo = {
+          customId: data.customId,
+          clientId: socket.id,
+        };
+        activeUsers.push(clientInfo);
+      }
+      console.log("activeUsers", activeUsers);
+      socket.emit("refreshActiveUsers", activeUsers);
+    }
+  });
+
+  socket.on("outConversation", (data) => {
+    console.log("data outConversation:::", data);
+    if (activeUsers.length > 0) {
+      const index = activeUsers.findIndex(
+        (item) => item.customId.localeCompare(data.phone) === 0
+      );
+     
+      if (index !== -1) {
+        activeUsers.splice(index, 1);
+      }
+      console.log("activeUsers", activeUsers);
+      socket.emit("refreshNotActiveUsers", activeUsers);
+    }
+  });
+
   socket.on("disconnet", () => {
     if (clients && clients.length > 0) {
       let index = clients.filter(
@@ -74,6 +130,7 @@ io.on("connection", (socket) => {
       console.log(clients);
     }
   });
+
   socket.on("logout", (data) => {
     console.log("check data", data);
     if (clients && clients.length > 0) {
@@ -88,12 +145,36 @@ io.on("connection", (socket) => {
       console.log(clients);
     }
   });
+
   socket.on("joinGroup", (data) => {
     socket.join(data.groupId);
+    if (data && data.user.phoneNumber && data.groupId) {
+      const existingClientIndex = userInGroup.findIndex(
+        (client) => client.customId === data.user.phoneNumber
+      );
+
+      if (existingClientIndex !== -1) {
+        userInGroup[existingClientIndex] = {
+          customId: data.user.phoneNumber,
+          groupId: data.groupId,
+        };
+      } else {
+        const clientInfo = {
+          customId: data.user.phoneNumber,
+          groupId: data.groupId,
+        };
+        userInGroup.push(clientInfo);
+      }
+      console.log("user in group is", userInGroup);
+      socket.emit(
+        "refreshUserInGroup",
+        userInGroup.filter((item) => item.groupId === data.groupId)
+      );
+    }
     if (data && data.user && data.name && data.groupId) {
-      console.log(`User ${data.user} joined room: ${data.name}`);
+      console.log(`User ${data.user.name} joined room: ${data.name}`);
     } else {
-      console.log(`User ${data.user} is ready`);
+      console.log(`User ${data.user.name} is ready`);
     }
   });
 
@@ -101,11 +182,30 @@ io.on("connection", (socket) => {
     console.log(data);
     socket.to(data.groupId).emit("receiveMessageInGroup", data);
   });
+
+  socket.on("sendNotificationInGroup", (data) => {
+    console.log("data send notification in group:::", data);
+    const groupId = data.groupId;
+    // send notification to all user in group is offline
+    if (userInGroup.length > 0) {
+      const users = userInGroup.filter((item) => item.groupId === groupId);
+      users.forEach((user) => {
+        const index = clients.findIndex(
+          (item) => item.customId.localeCompare(user.customId) === 0
+        );
+        if (index !== -1) {
+          socket
+            .to(clients[index].clientId)
+            .emit("refreshNotificationInGroup", data);
+        }
+      });
+    }
+  });
+
   socket.on("leaveGroup", (data) => {
     socket.leave(data.groupId);
     console.log(`User ${data.user} left room: ${data.groupId}`);
-  })
-
+  });
 });
 
 export { io, server };

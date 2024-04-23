@@ -27,9 +27,9 @@ export default function LoginScreen({ navigation }) {
   const user = useSelector(selectUser);
 
   // get user and save info user to async storage
-  const getUser = async (token) => {
+  const getUser = async () => {
     try {
-      const response = await getUserInfo(token);
+      const response = await getUserInfo();
       const { EC, EM, DT } = response;
       if (EC === 0 && EM === "Success") {
         console.log("data in login is", DT);
@@ -43,10 +43,11 @@ export default function LoginScreen({ navigation }) {
   };
   useEffect(() => {
     const checkToken = async () => {
-      const token = await AsyncStorage.getItem("token");
-      if (token) {
+      const token = await AsyncStorage.getItem("accessToken");
+      const refreshToken = await AsyncStorage.getItem("refreshToken");
+      if (token && refreshToken) {
         dispatch(setToken(token));
-        getUser(token);
+        getUser();
         navigation.navigate("Main");
       }
     };
@@ -72,10 +73,12 @@ export default function LoginScreen({ navigation }) {
       if (EM === "Success" && EC === 0 && DT) {
         setPassword("");
         setUsername("");
-        await AsyncStorage.setItem("token", DT);
-        const accessToken = await AsyncStorage.getItem("token");
-        getUser(accessToken);
-        dispatch(setToken(accessToken));
+        const { accessToken, refreshToken } = DT;
+        await AsyncStorage.setItem("accessToken", accessToken);
+        await AsyncStorage.setItem("refreshToken", refreshToken);
+        const token = await AsyncStorage.getItem("accessToken");
+        getUser();
+        dispatch(setToken(token));
         navigation.navigate("Main");
       }
       if (EC == 1 && EM == "User not found") {

@@ -1,63 +1,40 @@
-import { baseURL } from "../api/baseURL";
+import api, { baseURL } from "../api/baseURL";
 
 export const sendNotificationService = async (
   receiverId,
   groupId,
   messageType,
-  content,
-  token
+  content
 ) => {
   try {
-    const response = await baseURL.post(
-      "/notification/sendNotification",
-      {
-        receiverId,
-        groupId,
-        messageType,
-        content,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await api.post("/notification/sendNotification", {
+      receiverId,
+      groupId,
+      messageType,
+      content,
+    });
     return response.data;
   } catch (error) {
     console.log(error);
   }
 };
-export const getNotificationService = async (token, receiver) => {
+export const getNotificationService = async (receiver) => {
   try {
-    const response = await baseURL.get(
-      "/notification/getNotifications",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    const response = await api.get("/notification/getNotifications", {
+      params: {
+        receiver,
       },
-      {
-        params: {
-          receiver,
-        },
-      }
-    );
+    });
     return response.data;
   } catch (error) {
     console.log(error);
   }
 };
-export const readNotificationService = async (token, receiver) => {
+export const readNotificationService = async (receiver) => {
   try {
-    const response = await baseURL.post(
-      "/notification/readNotification",
-      { receiver },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await api.post("/notification/readNotification", {
+      receiver,
+    });
     return response.data;
   } catch (error) {
     console.log(error);

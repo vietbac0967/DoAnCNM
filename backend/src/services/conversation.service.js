@@ -121,9 +121,7 @@ export const getConversationService = async (userId) => {
         avatar: participants ? participants.avatar : null,
         members: conversation.participantsGroup[0]?.members || [],
         type,
-        message:
-          conversation.messages[conversation.messages.length - 1] ||
-          "",
+        message: conversation.messages[conversation.messages.length - 1] || "",
         messageType:
           conversation.messages[conversation.messages.length - 1]
             ?.messageType || "",
