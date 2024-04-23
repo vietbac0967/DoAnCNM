@@ -27,14 +27,14 @@ export const verifyAccount = async (req, res, next) => {
       }
       const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
       if (!decoded) {
-        return res.status(400).json({ message: "Invalid token" });
+        return res.status(401).json({ message: "Invalid token" });
       }
       if (decoded.exp < Date.now().valueOf() / 1000) {
-        return res.status(400).json({ message: "Token expired" });
+        return res.status(401).json({ message: "Token expired" });
       }
       const user = await User.findById(decoded.id);
       if (!user) {
-        return res.status(400).json({ message: "User not found" });
+        return res.status(404).json({ message: "User not found" });
       }
       req.user = user;
       next();
@@ -69,6 +69,6 @@ export const verifyAccount = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({ message: error.message });
+    res.status(401).json({ EC: 1, EM: error.message, DT: "" });
   }
 };

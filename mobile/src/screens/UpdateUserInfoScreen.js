@@ -11,9 +11,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import { baseURL } from "../api/baseURL";
 import { RadioButton } from "react-native-paper";
+import { getUserInfo } from "../services/user.service";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const UpdateUserInfoScreen = ({ navigation }) => {
-  const token = useSelector((state) => state.token.token);
   const [userInfo, setUserInfo] = useState({
     name: "",
     gender: "",
@@ -32,12 +33,8 @@ const UpdateUserInfoScreen = ({ navigation }) => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const response = await baseURL.get("/info", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const { DT, EM, EC } = response.data;
+        const response = await getUserInfo();
+        const { DT, EM, EC } = response;
         if (EC === 0 && EM === "Success") {
           setUserInfo(DT);
           setUpdatedUserInfo(DT);
@@ -58,6 +55,7 @@ const UpdateUserInfoScreen = ({ navigation }) => {
 
   const handleSaveChanges = async () => {
     try {
+      const token = await AsyncStorage.getItem("accessToken");
       const response = await baseURL.post("/update", updatedUserInfo, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -72,8 +70,6 @@ const UpdateUserInfoScreen = ({ navigation }) => {
         console.log("Error updating user info:", EM);
       }
 
-
-      
       console.log("Updated user info:", updatedUserInfo);
       setIsChanged(false);
     } catch (error) {

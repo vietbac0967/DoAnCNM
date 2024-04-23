@@ -10,19 +10,17 @@ import {
   Alert,
 } from "react-native";
 import { getFriends } from "../services/user.service";
-import { useSelector } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { RadioButton } from "react-native-paper";
-import { baseURL } from "../api/baseURL";
+import { createGroupService } from "../services/group.service";
 export default function CreateGroupScreen({ navigation }) {
-  const token = useSelector((state) => state.token.token);
   const [groupName, setGroupName] = useState("");
   const [members, setMembers] = useState([]);
   const [friends, setFriends] = useState([]);
   const getListFriend = async () => {
     try {
-      const response = await getFriends(token);
+      const response = await getFriends();
       if (response) {
         setFriends(response);
       }
@@ -53,9 +51,6 @@ export default function CreateGroupScreen({ navigation }) {
       ),
     });
   }, [navigation]);
-
-
-
 
   const handleSelectMember = (friendId) => {
     // Check if the friendId is already in the members list
@@ -113,19 +108,8 @@ export default function CreateGroupScreen({ navigation }) {
         Alert.alert("Thông báo", "Vui lòng nhập tên nhóm");
         return;
       }
-      const res = await baseURL.post(
-        "/group/create",
-        {
-          groupName,
-          members,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const { EC, EM } = res.data;
+      const res = await createGroupService(groupName, members);
+      const { EC, EM } = res;
       if (EC === 0) {
         Alert.alert("Thông báo", "Tạo nhóm thành công");
         navigation.navigate("Group", { isLoading: true });
@@ -176,8 +160,8 @@ export default function CreateGroupScreen({ navigation }) {
             backgroundColor: pressed ? "gray" : "#00B4EA", // Màu nền thay đổi khi nhấn
             opacity: pressed ? 0.5 : 1, // Độ mờ thay đổi khi nhấn
             borderRadius: 10, // Bo góc
-            padding: 10, 
-          }
+            padding: 10,
+          },
         ]}
       >
         <Text

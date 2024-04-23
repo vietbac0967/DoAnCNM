@@ -11,14 +11,13 @@ export default function FriendRequestCard({
   const navigation = useNavigation();
   const handleAccept = async (senderId) => {
     try {
-      const token = await AsyncStorage.getItem("token");
-      const accpect = await acceptFriendRequest(token, senderId);
+      const accpect = await acceptFriendRequest(senderId);
       if (accpect) {
         setFriendRequests(
           friendRequests.filter((item) => item._id !== senderId)
         );
-        navigation.navigate("Message",{
-          isLoading: true
+        navigation.navigate("Message", {
+          isLoading: true,
         });
       }
     } catch (err) {

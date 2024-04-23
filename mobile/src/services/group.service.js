@@ -1,41 +1,38 @@
-import { baseURL } from "../api/baseURL";
+import api, { baseURL } from "../api/baseURL";
 
-export const getGroupsService = async (token) => {
+export const createGroupService = async (groupName, members) => {
   try {
-    const response = await baseURL.get("/group/getGroups", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const response = await api.post("/group/create", {
+      groupName,
+      members,
     });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+export const getGroupsService = async () => {
+  try {
+    const response = await api.get("/group/getGroups");
     return response.data;
   } catch (error) {
     console.log("error:::", error);
     return [];
   }
 };
-export const deleteGroupService = async (token, groupId) => {
+export const deleteGroupService = async (groupId) => {
   try {
-    const response = await baseURL.post(
-      "/group/deleteGroup",
-      { groupId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await api.post("/group/deleteGroup", { groupId });
     return response.data;
   } catch (error) {
     console.log("error:::", error);
     return {};
   }
 };
-export const getFriendsInNotGroupService = async (token, groupId) => {
+export const getFriendsInNotGroupService = async (groupId) => {
   try {
-    const response = await baseURL.get("/user/getFriendsInNotGroup", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const response = await api.get("/user/getFriendsInNotGroup", {
       params: {
         groupId,
       },
@@ -47,12 +44,9 @@ export const getFriendsInNotGroupService = async (token, groupId) => {
   }
 };
 
-export const getUserForGroupService = async (token, groupId) => {
+export const getUserForGroupService = async (groupId) => {
   try {
-    const response = await baseURL.get("/group/getUserForGroup", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const response = await api.get("/group/getUserForGroup", {
       params: {
         groupId,
       },
@@ -63,12 +57,9 @@ export const getUserForGroupService = async (token, groupId) => {
     return [];
   }
 };
-export const getLeadForGroupService = async (token, groupId) => {
+export const getLeadForGroupService = async (groupId) => {
   try {
-    const response = await baseURL.get("/group/lead", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const response = await api.get("/group/lead", {
       params: {
         groupId,
       },
@@ -80,20 +71,12 @@ export const getLeadForGroupService = async (token, groupId) => {
   }
 };
 
-export const addMemberToGroup = async (token, groupId, members) => {
+export const addMemberToGroup = async (groupId, members) => {
   try {
-    const response = await baseURL.post(
-      "/group/addMember",
-      {
-        groupId,
-        members,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await baseURL.post("/group/addMember", {
+      groupId,
+      members,
+    });
     return response.data;
   } catch (error) {
     console.log("error:::", error);
@@ -101,40 +84,12 @@ export const addMemberToGroup = async (token, groupId, members) => {
   }
 };
 
-export const deleteMemeberFromGroup = async (token, groupId, userId) => {
+export const deleteMemeberFromGroup = async (groupId, userId) => {
   try {
-    const response = await baseURL.post(
-      "/group/deleteMember",
-      {
-        groupId,
-        userId,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.log("error:::", error);
-    return {};
-  }
-};
-export const updateDeputyLeader = async (token, groupId, userId) => {
-  try {
-    const response = await baseURL.post(
-      "/group/updateDeputyLeader",
-      {
-        groupId,
-        userId,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await api.post("/group/deleteMember", {
+      groupId,
+      userId,
+    });
     return response.data;
   } catch (error) {
     console.log("error:::", error);
@@ -142,17 +97,12 @@ export const updateDeputyLeader = async (token, groupId, userId) => {
   }
 };
 
-export const leaveGroupService = async (token, groupId) => {
+export const updateDeputyLeader = async (groupId, userId) => {
   try {
-    const response = await baseURL.post(
-      "/group/leaveGroup",
-      { groupId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await api.post("/group/updateDeputyLeader", {
+      groupId,
+      userId,
+    });
     return response.data;
   } catch (error) {
     console.log("error:::", error);
@@ -160,17 +110,9 @@ export const leaveGroupService = async (token, groupId) => {
   }
 };
 
-export const updateNameGroupService = async (token, groupId, name) => {
+export const leaveGroupService = async (groupId) => {
   try {
-    const response = await baseURL.post(
-      "/group/updateNameGroup",
-      { groupId, name },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await api.post("/group/leaveGroup", { groupId });
     return response.data;
   } catch (error) {
     console.log("error:::", error);
@@ -178,12 +120,22 @@ export const updateNameGroupService = async (token, groupId, name) => {
   }
 };
 
-export const getGroupByIdService = async (token, groupId) => {
+export const updateNameGroupService = async (groupId, name) => {
   try {
-    const group = await baseURL.get("/group/byId", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const response = await api.post("/group/updateNameGroup", {
+      groupId,
+      name,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("error:::", error);
+    return {};
+  }
+};
+
+export const getGroupByIdService = async (groupId) => {
+  try {
+    const group = await api.get("/group/byId", {
       params: {
         groupId,
       },

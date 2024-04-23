@@ -15,7 +15,7 @@ import {
   addMemberToGroup,
   getFriendsInNotGroupService,
 } from "../services/group.service";
-import { Button, RadioButton } from "react-native-paper";
+import { RadioButton } from "react-native-paper";
 export default function AddMemberScreen({ navigation, route }) {
   const groupId = route.params?.groupId;
   console.log("groupId:::", groupId);
@@ -26,7 +26,7 @@ export default function AddMemberScreen({ navigation, route }) {
   const [members, setMembers] = useState([]);
   const getFriendsInNotGroup = async () => {
     try {
-      const response = await getFriendsInNotGroupService(token, groupId);
+      const response = await getFriendsInNotGroupService(groupId);
       const { EM, EC, DT } = response;
       if (EC === 0) {
         setFriends(DT);
@@ -38,7 +38,7 @@ export default function AddMemberScreen({ navigation, route }) {
   const handleAddMember = async () => {
     try {
       const membersCast = members.map((member) => member._id);
-      const response = await addMemberToGroup(token,groupId, membersCast);
+      const response = await addMemberToGroup(groupId, membersCast);
       const { EC, EM } = response;
       if (EC === 0) {
         navigation.goBack();

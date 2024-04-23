@@ -9,7 +9,7 @@ export default function UserChat({ item }) {
 
   const getMessages = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
+      const token = await AsyncStorage.getItem("accessToken");
       const response = await baseURL.post(
         "message/getMessages",
         { receiverId: item._id },
@@ -51,7 +51,7 @@ export default function UserChat({ item }) {
   };
 
   const lastMessage = getLastMessage();
-  
+
   const formatDate = (date) => {
     const options = { hour: "2-digit", minute: "2-digit" };
     const formattedTime = new Date(date).toLocaleTimeString("vi-VN", options);

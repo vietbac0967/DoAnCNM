@@ -20,8 +20,9 @@ import { Entypo } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { baseURL } from "../api/baseURL";
 import { sendMessageGroupService } from "../services/message.service";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getUserInfo } from "../services/user.service";
 export default function MemberInfoScreen({ navigation, route }) {
-  const token = useSelector((state) => state.token.token);
   const groupId = route.params?.groupId;
   const [members, setMembers] = useState([]);
   const [status, setStaus] = useState(false);
@@ -31,13 +32,8 @@ export default function MemberInfoScreen({ navigation, route }) {
   const [user, setUser] = useState({});
   const getUser = async () => {
     try {
-      // const token = await AsyncStorage.getItem("token");
-      const response = await baseURL.get("/info", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const { DT, EM, EC } = response.data;
+      const response = await getUserInfo();
+      const { DT, EM, EC } = response;
       console.log("resonse user:::", response.data);
       if (EC === 0 && EM === "Success") {
         setUser(DT);
@@ -54,7 +50,7 @@ export default function MemberInfoScreen({ navigation, route }) {
   console.log("user:::", user);
   const getUserForGroup = async () => {
     try {
-      const response = await getUserForGroupService(token, groupId);
+      const response = await getUserForGroupService(groupId);
       console.log("response groups:::", response);
       const { EM, EC, DT } = response;
       if (EC === 0 && EM === "Success") {
@@ -66,7 +62,7 @@ export default function MemberInfoScreen({ navigation, route }) {
   };
   const getLeadForGroup = async () => {
     try {
-      const response = await getLeadForGroupService(token, groupId);
+      const response = await getLeadForGroupService(groupId);
       const { EM, EC, DT } = response;
       console.log("response lead:::", response);
 
@@ -80,25 +76,25 @@ export default function MemberInfoScreen({ navigation, route }) {
   };
   const handleSendMessage = async (message) => {
     try {
-      const response = await sendMessageGroupService(token, groupId, message);
+      const response = await sendMessageGroupService(groupId, message);
       const { EM, EC } = response;
       if (EC === 0 && EM === "Success") {
         console.log("send noti success");
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.log("Error sending message:", error);
     }
   };
   const handleDeleteUserForGroup = async (userId) => {
     try {
-      const response = await deleteMemeberFromGroup(token, groupId, userId);
+      const response = await deleteMemeberFromGroup(groupId, userId);
       const { EM, EC } = response;
       if (EC === 0 && EM === "Success") {
         Alert.alert("Success", "Xóa thành công");
         const announceMessage = `##TB##: Trưởng nhóm đã xóa một thành viên ra khỏi nhóm`;
-      setAnnounce(announceMessage);
-      handleSendMessage(announceMessage);
+        getUserForGroup();
+        setAnnounce(announceMessage);
+        handleSendMessage(announceMessage);
       }
     } catch (error) {
       Alert.alert("Error", error.message);
@@ -154,8 +150,7 @@ export default function MemberInfoScreen({ navigation, route }) {
                 <Text style={{ color: "red" }}>Xóa</Text>
               </Pressable>
             ) : null}
-            {item?._id !== author._id ?
-            (
+            {item?._id !== author._id ? (
               <Pressable
                 style={{ flexDirection: "row" }}
                 onPress={() => {
@@ -174,11 +169,11 @@ export default function MemberInfoScreen({ navigation, route }) {
 
   const handleUpdateDeputyLeader = async (userId) => {
     try {
-      const response = await updateDeputyLeader(token, groupId, userId);
+      const response = await updateDeputyLeader(groupId, userId);
       const { EM, EC } = response;
       if (EC === 0 && EM === "Success") {
         Alert.alert("Success", "Cập nhật thành công");
-        getUserForGroup();
+        navigation.goBack();
       }
     } catch (error) {
       Alert.alert("Error", error.message);

@@ -16,35 +16,44 @@ import { useDispatch, useSelector } from "react-redux";
 import { useIsFocused } from "@react-navigation/native";
 import ConversationCard from "../components/ConversationCard";
 import { getConversationsService } from "../services/conversation.service";
-import { handleCusttomClientSocket } from "../utils/socket";
+import {
+  handleCusttomClientSocket,
+  handleInConversation,
+  handleLeaveConversationInGroup,
+  handleOutConversation,
+} from "../utils/socket";
 import { selectUser } from "../app/userSlice";
+import { selectOpen, setOpen } from "../app/openSlice";
+import Loading from "../components/Loading";
 export default function HomeScreen({ navigation, route }) {
-  const token = useSelector((state) => state.token.token);
+  // const token = useSelector((state) => state.token.token);
   const [conversations, setConversations] = useState([]);
   const user = useSelector(selectUser);
   const isFocused = useIsFocused();
-  console.log("user in home screen is:::", user);
+  const [isLoading, setIsLoading] = useState(true);
   const getConversations = async () => {
     try {
-      const conversations = await getConversationsService(token);
+      const conversations = await getConversationsService();
       const { EM, EC, DT } = conversations;
       if (EC === 0 && EM === "Success") {
         setConversations(DT);
+        setIsLoading(false);
       } else {
         Alert.alert("Error", EM);
       }
     } catch (error) {
+      if (error.message === "Refresh token error") {
+        navigation.navigate("Login");
+      }
       Alert.alert("Error", error.message);
     }
   };
-
   useEffect(() => {
     getConversations();
   }, []);
 
   useEffect(() => {
     if (user) {
-      console.log("phone number:::", user.phoneNumber);
       handleCusttomClientSocket({ customId: user.phoneNumber });
     }
   }, [user]);
@@ -52,10 +61,12 @@ export default function HomeScreen({ navigation, route }) {
   useEffect(() => {
     if (isFocused) {
       getConversations();
+      handleOutConversation({
+        phone: user.phoneNumber,
+      });
     }
   }, [isFocused]);
 
-  console.log("conversations:::", conversations.length);
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: "",
@@ -99,6 +110,11 @@ export default function HomeScreen({ navigation, route }) {
       ),
     });
   }, []);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <View style={styles.container}>
       <FlatList

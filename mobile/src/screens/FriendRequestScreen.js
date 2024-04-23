@@ -26,10 +26,9 @@ export default function FriendRequestScreen( {navigation} ) {
   }, []);
 
   const fetchData = async () => {
-    const token = await AsyncStorage.getItem("token");
-    const friends = await getFriends(token);
-    const friendRequests = await getFriendRequests(token);
-    const sendFriendRequests = await getSendFriendRequests(token);
+    const friends = await getFriends();
+    const friendRequests = await getFriendRequests();
+    const sendFriendRequests = await getSendFriendRequests();
     setFriendRequests(friendRequests);
     setSendFriendRequests(sendFriendRequests);
   };

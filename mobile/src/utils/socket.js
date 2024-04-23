@@ -68,7 +68,30 @@ const handleJoinGroupSocket = (data) => {
 const handleLeaveGroupUserSocket = (data) => {
   socket.emit("leaveGroup", data);
 };
-
+const handleSendNotification = (data) => {
+  socket.emit("sendNotification", data);
+};
+const handleReceiveNotification = (callback) => {
+  socket.on("refreshNotification", callback);
+};
+const handleInConversation = (data) => {
+  socket.emit("inConversation", data);
+};
+const handleReceiveInConversation = (callback) => {
+  socket.on("refreshActiveUsers", callback);
+};
+const handleOutConversation = (data) => {
+  socket.emit("outConversation", data);
+};
+const handleSendNotificationToGroup = (data) => {
+  socket.emit("sendNotificationInGroup", data);
+};
+const handleRefreshNotificationToGroup = (callback) => {
+  socket.on("refreshNotificationInGroup", callback);
+};
+const handleRefreshUserInGroup = (callback) => {
+  socket.on("refreshNotificationInGroup", callback);
+};
 export {
   handleCusttomClientSocket,
   handlSendMessageSocket,
@@ -80,6 +103,14 @@ export {
   handleLogoutUserSocket,
   handleDisconnectSocket,
   handleLeaveGroupUserSocket,
+  handleSendNotification,
+  handleReceiveNotification,
+  handleInConversation,
+  handleReceiveInConversation,
+  handleOutConversation,
+  handleSendNotificationToGroup,
+  handleRefreshNotificationToGroup,
+  handleRefreshUserInGroup,
   // handlerefreshAccount,
   // handlerefreshMessange,
   // handleoffrefreshAccount,

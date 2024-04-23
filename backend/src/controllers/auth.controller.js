@@ -1,17 +1,17 @@
-import User from "../models/user.model.js";
 import {
   resetPasswordService,
   loginService,
   registerService,
   verifyOTPService,
   changePasswordService,
+  refreshTokenService,
 } from "../services/auth.service.js";
 import otpGenerator from "otp-generator";
-import { generateRefreshToken } from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
 import { sendOTPForUser } from "../services/sendMail.service.js";
 import { insertOTP } from "../services/otp.service.js";
 import { forgotPasswordService } from "../services/auth.service.js";
+import { client } from "../config/connectToRedis.js";
 
 // endpoint to register user
 export const register = async (req, res) => {
@@ -73,14 +73,31 @@ export const login = async (req, res) => {
 // endpoint to logout user
 export const logout = async (req, res) => {
   try {
-    const user = req.user._id;
-    if (!user) {
-      return res.status(404).json({
+    const token = req.body.token;
+    const verify = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    if (!verify) {
+      return res.status(403).json({
         EC: 1,
-        EM: "User not found",
+        EM: "Invalid token",
         DT: "",
       });
     }
+    const existToken = await client.get(verify.id);
+    if (!existToken) {
+      return res.status(404).json({
+        EC: 1,
+        EM: "Token not found",
+        DT: "",
+      });
+    }
+    if (existToken !== token) {
+      return res.status(404).json({
+        EC: 1,
+        EM: "Token not match",
+        DT: "",
+      });
+    }
+    await client.del(verify.id);
     res.status(200).json({
       EC: 0,
       EM: "Success",
@@ -99,15 +116,12 @@ export const logout = async (req, res) => {
 export const refreshToken = async (req, res) => {
   try {
     const token = req.body.token;
-    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-    const refreshToken = generateRefreshToken(
-      decoded.id,
-      process.env.REFRESH_SECRET
-    );
-    res.status(200).json({ message: "Token refreshed", token: refreshToken });
+    console.log("token is::", token);
+    const refreshToken = await refreshTokenService(token);
+    return res.status(200).json(refreshToken);
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ EC: 1, EM: error.message, DT: "" });
   }
 };
 // endpoint to forgot password
@@ -146,7 +160,11 @@ export const resetPassword = async (req, res) => {
     const email = req.body.email;
     const newPassword = req.body.newPassword;
     const confirmPassword = req.body.confirmPassword;
-    const response = await resetPasswordService(email, newPassword, confirmPassword);
+    const response = await resetPasswordService(
+      email,
+      newPassword,
+      confirmPassword
+    );
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({

@@ -22,8 +22,9 @@ export const sendNotification = async (req, res) => {
 };
 export const getNotifications = async (req, res) => {
   try {
+    const userId = req.user._id;
     const { receiver } = req.query;
-    const notifications = await getNotificationsService(receiver);
+    const notifications = await getNotificationsService(receiver, userId);
     res.status(200).json(notifications);
   } catch (error) {
     res.status(500).json({ EC: 1, EM: error.message, DT: "" });
@@ -31,8 +32,9 @@ export const getNotifications = async (req, res) => {
 };
 export const readNotification = async (req, res) => {
   try {
+    const userId = req.user._id
     const { receiver } = req.body;
-    const notifications = await readNotificationService(receiver);
+    const notifications = await readNotificationService(receiver, userId);
     res.status(200).json(notifications);
   } catch (error) {
     res.status(500).json({ EC: 1, EM: error.message, DT: "" });

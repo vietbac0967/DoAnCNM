@@ -11,9 +11,10 @@ import React, { useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { validatePhoneNumber } from "../utils/validate";
-import { baseURL } from "../api/baseURL";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { searchUser, sendFriendRequest } from "../services/user.service";
+import {
+  searchUser,
+  sendFriendRequestService,
+} from "../services/user.service";
 import { useSelector } from "react-redux";
 export default function AddFriendScreen({ navigation }) {
   const token = useSelector((state) => state.token.token);
@@ -35,7 +36,7 @@ export default function AddFriendScreen({ navigation }) {
       );
       return;
     }
-    const res = await searchUser(token, phone);
+    const res = await searchUser(phone);
     if (res.EC === 1 && res.EM === "User not found") {
       Alert.alert("Thông báo", "Người dùng không tồn tại", [{ text: "OK" }]);
       return;
@@ -49,15 +50,10 @@ export default function AddFriendScreen({ navigation }) {
   console.log(user);
   const handleSendRequest = async () => {
     try {
-      const res = await baseURL.post(
-        "/user/sendFriendRequest",
-        { receiver: user._id },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      // const res = await api.post("/user/sendFriendRequest", {
+      //   receiver: user._id,
+      // });
+      const res = await sendFriendRequestService(user._id);
       const { EC, EM, DT } = res.data;
       if (EC === 0 && EM === "Success") {
         Alert.alert("Thông báo", "Gửi lời mời thành công", [{ text: "OK" }]);
@@ -70,7 +66,7 @@ export default function AddFriendScreen({ navigation }) {
       Alert.alert("Thông báo", error, [{ text: "OK" }]);
     }
   };
-  
+
   return (
     <View style={styles.container}>
       <View style={{ flexDirection: "row", marginTop: 20 }}>

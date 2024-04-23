@@ -20,6 +20,7 @@ import { Entypo, Feather, FontAwesome } from "@expo/vector-icons";
 import { URL_SERVER } from "@env";
 import {
   deleteMessageService,
+  getMessagesGroupService,
   recallMessageService,
   sendMessageGroupService,
 } from "../services/message.service";
@@ -27,15 +28,20 @@ import * as ImagePicker from "expo-image-picker";
 import MessageGroupCard from "../components/MessageGroupCard";
 import Loading from "../components/Loading";
 import {
+  handleInConversation,
   handleJoinGroupSocket,
+  handleReceiveInConversation,
   handleReceiveMessageInGroup,
   handleReceiveMessageInGroupSocket,
+  handleRefreshUserInGroup,
   handleSendMessageInGroupSocket,
+  handleSendNotificationToGroup,
 } from "../utils/socket";
 import { selectUser } from "../app/userSlice";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { sendNotificationService } from "../services/notification.service";
 export default function ChatGroupScreen({ route, navigation }) {
-  const token = useSelector((state) => state.token.token);
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -47,18 +53,12 @@ export default function ChatGroupScreen({ route, navigation }) {
   const group = route.params?.group;
   const scrollViewRef = useRef(null);
   const user = useSelector(selectUser);
+  const [activeUsers, setActiveUsers] = useState([]);
 
   const getMessagesGroup = async () => {
     try {
-      const response = await baseURL.get("/message/messagesGroup", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params: {
-          groupId: group._id,
-        },
-      });
-      const { EM, EC, DT } = response.data;
+      const response = await getMessagesGroupService(group._id);
+      const { EM, EC, DT } = response;
       if (EC === 0 && EM === "Success") {
         setMessages(DT);
       }
@@ -67,9 +67,6 @@ export default function ChatGroupScreen({ route, navigation }) {
       Alert.alert("Error", "Something went wrong");
     }
   };
-
-
-  console.log("Group:::", group);
 
   const handleEmojiPress = () => {
     setShowEmojiSelector(!showEmojiSelector);
@@ -94,6 +91,7 @@ export default function ChatGroupScreen({ route, navigation }) {
           name: filename,
           type,
         });
+        const token = await AsyncStorage.getItem("accessToken");
         formData.append("groupId", group._id);
         const response = await axios.post(
           `${URL_SERVER}/api/message/sendImageGroup`,
@@ -121,12 +119,10 @@ export default function ChatGroupScreen({ route, navigation }) {
       Alert.alert("Cảnh báo", error.message);
     }
   };
-  // if (isLoading) {
-  //   return <Loading />;
-  // }
+
   const handleSendMessage = async () => {
     try {
-      const response = await sendMessageGroupService(token, group._id, message);
+      const response = await sendMessageGroupService(group._id, message);
       const { EM, EC, DT } = response;
       console.log("DT:::", DT);
       if (EC === 0 && EM === "Success") {
@@ -134,6 +130,23 @@ export default function ChatGroupScreen({ route, navigation }) {
           groupId: group._id,
           message: DT,
         });
+        if (message.startsWith("@All")) {
+          const response = await sendNotificationService(
+            null,
+            group._id,
+            "text",
+            message
+          );
+          const { EM, EC, DT } = response;
+          if (EM === 0 && EC === "Success") {
+            handleSendNotificationToGroup({
+              groupId: group._id,
+              message: DT,
+            });
+          } else {
+            Alert.alert("Thông báo", "Gửi thông báo không thành công");
+          }
+        }
         setMessage("");
         getMessagesGroup();
       }
@@ -154,7 +167,7 @@ export default function ChatGroupScreen({ route, navigation }) {
 
   const handleDeleteMessage = async () => {
     try {
-      const response = await deleteMessageService(token, selectMessage?._id);
+      const response = await deleteMessageService(selectMessage?._id);
       const { EC, EM, DT } = response;
       console.log("response:::", response);
       if (EC === 0 && EM === "Success") {
@@ -180,10 +193,7 @@ export default function ChatGroupScreen({ route, navigation }) {
           text: "Có",
           onPress: async () => {
             try {
-              const response = await recallMessageService(
-                token,
-                selectMessage?._id
-              );
+              const response = await recallMessageService(selectMessage?._id);
               console.log("response:::", response);
               const { EC, EM, DT } = response;
               if (EC === 0 && EM === "Success") {
@@ -206,18 +216,23 @@ export default function ChatGroupScreen({ route, navigation }) {
   };
 
   useEffect(() => {
-    getMessagesGroup();
-  }, []);
-  // add group id to socket
-  useEffect(() => {
     if (group._id && user) {
       handleJoinGroupSocket({
         groupId: group._id,
         name: group.name,
-        user: user.name,
+        user: user,
       });
     }
+    getMessagesGroup();
   }, []);
+
+  useEffect(() => {
+    handleRefreshUserInGroup((data) => {
+      console.log("user in group:::", data);
+    });
+  }, []);
+
+  // add group id to socket
 
   useEffect(() => {
     handleReceiveMessageInGroupSocket((data) => {
@@ -248,7 +263,9 @@ export default function ChatGroupScreen({ route, navigation }) {
               >
                 {group?.name}
               </Text>
-              <Text style={{ marginLeft: 10, color: "#fff" }}>{group?.members.length + 1} Thành viên</Text>
+              <Text style={{ marginLeft: 10, color: "#fff" }}>
+                {group?.members.length + 1} Thành viên
+              </Text>
             </View>
           </View>
         </View>

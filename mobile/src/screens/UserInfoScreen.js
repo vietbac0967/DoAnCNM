@@ -7,17 +7,16 @@ import {
   Pressable,
   SafeAreaView,
   TextInput,
-  Alert
+  Alert,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { baseURL } from "../api/baseURL";
 import { useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-
-
+import { getUserInfo } from "../services/user.service";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const UserInfoScreen = ({ navigation }) => {
-  const token = useSelector((state) => state.token.token);
   const [data, setData] = useState([]);
   const [changePasswordVisible, setChangePasswordVisible] = useState(false);
   const [buttonText, setButtonText] = useState("Đổi mật khẩu");
@@ -28,12 +27,8 @@ const UserInfoScreen = ({ navigation }) => {
 
   const getUser = async () => {
     try {
-      const response = await baseURL.get("/info", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const { DT, EM, EC } = response.data;
+      const response = await getUserInfo();
+      const { DT, EM, EC } = response;
       if (EC === 0 && EM === "Success") {
         setData(DT);
         setEmail(DT.email);
@@ -66,6 +61,7 @@ const UserInfoScreen = ({ navigation }) => {
           name: filename,
           type,
         });
+        const token = await AsyncStorage.getItem("accessToken");
         const response = await baseURL.post("/user/updateImage", formData, {
           headers: {
             Authorization: `Bearer ${token}`,
