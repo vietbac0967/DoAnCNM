@@ -47,7 +47,11 @@ api.interceptors.response.use(
 
     // If the error status is 401 and there is no originalRequest._retry flag,
     // it means the token has expired and we need to refresh it
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry
+    ) {
       if (isRefreshing) {
         return new Promise(function (resolve, reject) {
           failedQueue.push({ resolve, reject });
@@ -79,8 +83,10 @@ api.interceptors.response.use(
           await AsyncStorage.setItem("refreshToken", refreshToken);
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           processQueue(null, accessToken);
-          return axios(originalRequest);
+          return api(originalRequest);
         } else {
+          await AsyncStorage.removeItem("accessToken");
+          await AsyncStorage.removeItem("refreshToken");
           throw new Error(EM);
         }
         // Retry the original request with the new token
@@ -89,6 +95,8 @@ api.interceptors.response.use(
         // await AsyncStorage.removeItem("refreshToken");
         // Handle refresh token error or redirect to login
         processQueue(error, null);
+        await AsyncStorage.removeItem("accessToken");
+        await AsyncStorage.removeItem("refreshToken");
         console.log("Refresh token error", error);
         // Redirect to login
         throw new Error("Refresh token error");

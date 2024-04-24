@@ -8,18 +8,9 @@ import _ from 'lodash';
 
 const ChooseAction = (props) => {
 
-    const { listaction, setlistaction, defaultInput } = props;
+    const { listaction, setlistaction, defaultInput, handleClick } = props;
 
-    const handleClick = (id) => {
-        let cplistaction = _.cloneDeep(defaultInput);
-        let index = cplistaction.findIndex(item => +item.id === +id);
-        if (index !== -1) {
-            cplistaction[index].action = true;
-        }
 
-        setlistaction(cplistaction)
-
-    }
 
     return (
         <Box className="choose-action-container">

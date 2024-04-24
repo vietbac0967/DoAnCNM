@@ -5,58 +5,145 @@ import Divider from '@mui/material/Divider';
 import InfoChat from './infochat/InfoChat'
 import ContentChat from './contentchat/ContentChat';
 import HeaderChat from './headerchat/HeaderChat';
-import { handlerefreshMessange, handlerefreshMessangesennder } from '../../../socket/socket';
-import { getAllMessage } from '../../../service/MessageService';
+import { handlerefreshMessange, handlerefreshMessangeingroup, handlerefreshMessangesennder } from '../../../socket/socket';
+import { getAllMessage, getMessagesGroup } from '../../../service/MessageService';
 import _ from 'lodash';
 
 const Message = (props) => {
 
-    const { listfrient } = props;
+    const { users, setshowchat, showchat, mdup } = props;
 
     const user = useRef({});
 
-
     useEffect(() => {
-        if (user.current && user.current.length > 0) {
-            if (user.current[0].phoneNumber) {
+        if (user.current) {
+            if (user.current.type === "private") {
                 handlerefreshMessange(async (data) => {
-                    if (data.phone === user.current[0].phoneNumber) {
-                        await handleGetAllMessage()
+                    console.log("data is::", data);
+                    if (data.phone === user.current.phoneNumber) {
+                        await handleGetAllMessage({ userId: data.userId })
+
                     }
+
                 })
-                handlerefreshMessangesennder(async () => {
-                    await handleGetAllMessage()
+                handlerefreshMessangesennder(async (data) => {
+                    await handleGetAllMessage({ userId: data.userId })
+
                 })
-            } else {
+
+            }
+            // if (user.current[0].type === "group") {
+            //     handlerefreshMessangeingroup(async (data) => {
+            //         if (listfrient && listfrient.length > 0) {
+            //             let datagr = listfrient.find((item) => item.click === true);
+            //             if (datagr && data.groupId === datagr._id._id) {
+            //                 await handleGetAllMessageinGroup({ groupId: data.groupId })
+
+            //             }
+            //         }
+            //     })
+
+            // }
+            if (user.current.type === "group") {
                 handlerefreshMessangeingroup(async (data) => {
-                    if (data.groupId === user.current[0]._id) {
-                        await handlegetAllchatgroup()
+                    if (users && !_.isEmpty(users)) {
+                        if (data.groupId === users._id._id) {
+                            await handleGetAllMessageinGroup({ groupId: data.groupId })
+
+                        }
                     }
                 })
 
             }
 
+
         }
-    }, [user.current[0]])
+    }, [user.current])
+
+
+    // useEffect(() => {
+    //     if (listfrient && listfrient.length > 0) {
+    //         let data = listfrient.filter((item) => item.click === true)
+    //         user.current = data
+    //         let index = listfrient.findIndex(item => item.click === true);
+    //         if (index !== -1) {
+    //             if (listfrient[index] && listfrient[index].type === "private") {
+    //                 handleGetAllMessage({ userId: listfrient[index]._id })
+    //             }
+    //             else {
+    //                 handleGetAllMessageinGroup({ groupId: listfrient[index]._id._id })
+    //             }
+    //         }
+
+    //     }
+    // }, [listfrient])
 
     useEffect(() => {
-        if (listfrient && listfrient.length > 0) {
-            let data = listfrient.filter((item) => item.click === true)
+        if (users && !_.isEmpty(users)) {
+            let data = users
             user.current = data
+            if (users && users.type === "private") {
+                handleGetAllMessage({ userId: users._id })
+            }
+            else {
+                handleGetAllMessageinGroup({ groupId: users._id._id })
+            }
+
         }
-    }, [listfrient])
+    }, [users])
 
 
     const [listmessage, setlistmessage] = useState([])
 
-    const handleGetAllMessage = async () => {
-        if (listfrient && listfrient.length > 0) {
-            let res = await getAllMessage({ receiverId: listfrient[0]._id })
+    const handleGetAllMessage = async (data) => {
+        // if (listfrient && listfrient.length > 0) {
+        //     let index = listfrient.findIndex(item => item.click === true);
+        //     if (index !== -1) {
+        //         let res = await getAllMessage({ receiverId: data.userId })
+        //         if (res && res.EC === 0) {
+        //             setlistmessage(res.DT)
+        //         } else {
+        //             setlistmessage([])
+        //         }
+        //     }
+
+        // }
+
+        if (users && !_.isEmpty(users)) {
+            let res = await getAllMessage({ receiverId: data.userId })
             if (res && res.EC === 0) {
                 setlistmessage(res.DT)
             } else {
                 setlistmessage([])
             }
+
+        }
+    }
+
+
+    const handleGetAllMessageinGroup = async (data) => {
+        // if (listfrient && listfrient.length > 0) {
+        //     let index = listfrient.findIndex(item => item.click === true);
+        //     if (index !== -1) {
+        //         let res = await getMessagesGroup(data.groupId);
+        //         if (res && res.EC === 0) {
+        //             setlistmessage(res.DT)
+        //         } else {
+        //             setlistmessage([])
+        //         }
+        //     }
+
+        // }
+
+        if (users && !_.isEmpty(users)) {
+            let res = await getMessagesGroup(data.groupId);
+
+            if (res && res.EC === 0) {
+                setlistmessage(res.DT)
+            } else {
+                setlistmessage([])
+            }
+
         }
     }
 
@@ -64,24 +151,34 @@ const Message = (props) => {
         <Box className='message-container'>
             <Box className="message-header">
                 <HeaderChat
-                    listfrient={listfrient}
+                    users={users}
+                    setshowchat={setshowchat}
                 />
             </Box>
             <Divider orientation="horizontal" />
 
             <Box className="message-info">
                 <InfoChat
-                    listfrient={listfrient}
+                    users={users}
                     handleGetAllMessage={handleGetAllMessage}
+                    setlistmessage={setlistmessage}
                     listmessage={listmessage}
+                    user={user.current}
+                    handleGetAllMessageinGroup={handleGetAllMessageinGroup}
+
                 />
             </Box>
             <Divider orientation="horizontal" />
 
             <Box className="message-content">
                 <ContentChat
-                    listfrient={listfrient}
+                    users={users}
                     user={user.current}
+                    // handleGetAllFriend={handleGetAllFriend}
+                    showchat={showchat}
+                    setshowchat={setshowchat}
+                    mdup={mdup}
+                // handleGeAllFriendUpdate={handleGeAllFriendUpdate}
                 />
             </Box>
         </Box>

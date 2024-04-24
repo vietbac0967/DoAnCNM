@@ -1,12 +1,8 @@
 import { StyleSheet, Text, View, Image, Pressable, Alert } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
-import { URL_SERVER } from "@env";
-import { selectToken } from "../app/tokenSlice";
 import formatDateOrTime from "../utils/formatDateOrTime";
 import {
-  handleCleanNotification,
-  handleReceiveCleanNotification,
   handleReceiveNotification,
   handleRefreshNotificationToGroup,
 } from "../utils/socket";
@@ -179,7 +175,7 @@ export default function ConversationCard({ item, navigation }) {
               >
                 <Text
                   style={{
-                    fontSize: "13",
+                    fontSize: 13,
                     color: "#fff",
                     fontWeight: "bold",
                     textAlign: "center",

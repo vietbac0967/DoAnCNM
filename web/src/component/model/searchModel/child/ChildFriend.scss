@@ -1,0 +1,28 @@
+.child-friend-container {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+
+    &:hover {
+        cursor: pointer;
+        background-color: #eeeeee;
+    }
+
+    &.active {
+        background-color: #e5efff;
+    }
+
+
+    .child-friend-name {
+        margin-left: 5px;
+
+        .text-name {
+            font-style: inherit;
+            font-weight: 600;
+            font-size: 18px;
+            line-height: 19.36px;
+            color: black;
+        }
+    }
+}

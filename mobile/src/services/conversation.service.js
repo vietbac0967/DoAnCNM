@@ -1,6 +1,6 @@
 import api, { baseURL } from "../api/baseURL";
 
-export const getConversationsService = async (token) => {
+export const getConversationsService = async () => {
   try {
     // const response = await baseURL.get("/conversation/getAll", {
     //   headers: {

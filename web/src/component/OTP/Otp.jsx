@@ -3,13 +3,15 @@ import React, { useEffect, useState } from 'react'
 import OtpInput from 'react-otp-input';
 import { CgSpinner } from 'react-icons/cg';
 import './OTP.scss'
-import img from '../../assets/img/3385494.png'
+import img from '../../assets/img/backgroudOTP.png'
 import { useNavigate, useParams } from 'react-router-dom';
 import { resendEmail, verifyOTP } from '../../service/UserService';
 import { toast } from 'react-toastify';
-function Otp() {
+
+const OTP = () => {
 
     const { email } = useParams();
+
     const navigate = useNavigate();
 
     const [otp, setOtp] = useState('');
@@ -24,28 +26,28 @@ function Otp() {
     }, [countdown]);
 
 
-
     const onOTPVerify = async () => {
         let res = await verifyOTP({
             email: email,
             otp: otp
         })
         if (res && res.EC === 0) {
-            toast.success(res.EM)
-            navigate("/login")
+            toast.success(res.EM);
+            navigate("/login");
         } else {
             toast.error(res.EM)
         }
     }
 
     const handleSendEmail = async () => {
-        let res = await resendEmail({ email: email });
+        let res = await resendEmail({ email: email })
         if (res && res.EC === 0) {
-            setCountdown(60)
+            setCountdown(60);
         } else {
-            toast.error(res.EC)
+            toast.error(res.EM)
         }
     }
+
     return (
         <Box sx={{
             width: '100%',
@@ -99,6 +101,6 @@ function Otp() {
             </Box>
         </Box >
     )
-}
+};
 
-export default Otp
+export default OTP;

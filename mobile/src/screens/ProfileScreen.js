@@ -27,10 +27,10 @@ import { useIsFocused } from "@react-navigation/native";
 export default function ProfileScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [user, setUser] = useState({});
-  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const userRedux = useSelector(selectUser);
   const isFocused = useIsFocused();
+  // const user = useSelector(selectUser);
   const [avatar, setAvatar] = useState(
     "https://avatar.iran.liara.run/username"
   );
@@ -73,6 +73,8 @@ export default function ProfileScreen({ navigation }) {
         });
         navigation.navigate("Login");
       } else {
+        await AsyncStorage.removeItem("accessToken");
+        await AsyncStorage.removeItem("refreshToken");
         Alert.alert("Error", EM);
       }
     } catch (error) {

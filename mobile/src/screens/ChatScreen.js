@@ -50,11 +50,7 @@ import {
   handleSendNotification,
 } from "../utils/socket";
 import axios from "axios";
-import { selectToken } from "../app/tokenSlice";
 import { selectUser } from "../app/userSlice";
-import { Socket } from "socket.io-client";
-import { selectOpen, setOpen } from "../app/openSlice";
-import { useIsFocused } from "@react-navigation/native";
 import { sendNotificationService } from "../services/notification.service";
 import Loading from "../components/Loading";
 const ChatScreen = ({ navigation, route }) => {
@@ -72,14 +68,12 @@ const ChatScreen = ({ navigation, route }) => {
   const [activeUsers, setActiveUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const user = useSelector(selectUser);
-  const dispatch = useDispatch();
+
   const scrollToBottom = () => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollToEnd({ animated: false });
     }
   };
-
-  console.log("user in chat screen:::", user);
 
   const handleContentSizeChange = () => {
     scrollToBottom();
@@ -136,50 +130,12 @@ const ChatScreen = ({ navigation, route }) => {
       Alert.alert("Cảnh báo", error.message);
     }
   };
-
-  // get all messages of conversation
-  const getMessages = async () => {
-    try {
-      const response = await getMessagesService(recevierId);
-      setMessages(response);
-      setIsLoading(false);
-    } catch (error) {
-      console.log("error:::", error);
-    }
-  };
-
-  const getReceiver = async () => {
-    try {
-      // const token = await AsyncStorage.getItem("token");
-      const response = await getReceiverService(recevierId);
-      setReceiver(response);
-    } catch (error) {
-      console.log("error:::", error);
-    }
-  };
-
-  useEffect(() => {
-    if (user) {
-      handleRefreshMessageSocket(async (data) => {
-        console.log("data refresh message:::", data);
-        getMessages();
-      });
-      handleRefreshMessageSenderSocket(async (data) => {
-        console.log("data message sender:::", data);
-        getMessages();
-      });
-    }
-  }, []);
-
-  useEffect(() => {
-    getMessages();
-  }, []);
-  console.log("Active users:::", activeUsers);
-
+  console.log("user current is:::", user);
   const handleSend = async () => {
     try {
       const { DT, EC, EM } = await sendMessageService(recevierId, message);
       if (EC === 0 && EM === "Success") {
+        await getMessages();
         handlSendMessageSocket({
           sender: { phone: user.phoneNumber, userId: user._id },
           receiver: { phone: receiver.phoneNumber, userId: receiver._id },
@@ -210,27 +166,6 @@ const ChatScreen = ({ navigation, route }) => {
     }
   };
 
-  useEffect(() => {
-    getReceiver();
-  }, []);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  useEffect(() => {
-    handleInConversation({
-      customId: user.phoneNumber,
-    });
-  }, [user]);
-
-  useEffect(() => {
-    handleReceiveInConversation((data) => {
-      console.log("data user avtive is:::", data);
-      setActiveUsers(data);
-    });
-  }, []);
-
   const handleRecallMessage = (messageID) => {
     Alert.alert("Cảnh báo", "Bạn có muốn thu hồi nhắn này không?", [
       {
@@ -258,6 +193,7 @@ const ChatScreen = ({ navigation, route }) => {
       },
     ]);
   };
+
   const handleDeleteMessage = async () => {
     try {
       const response = await deleteMessageService(selectMessage._id);
@@ -272,6 +208,64 @@ const ChatScreen = ({ navigation, route }) => {
       console.log(error);
     }
   };
+
+  const getMessages = async () => {
+    try {
+      const response = await getMessagesService(recevierId);
+      setMessages(response);
+      setIsLoading(false);
+    } catch (error) {
+      console.log("error:::", error);
+    }
+  };
+
+  const getReceiver = async () => {
+    try {
+      const response = await getReceiverService(recevierId);
+      setReceiver(response);
+    } catch (error) {
+      console.log("error:::", error);
+    }
+  };
+  // fetching data
+  useEffect(() => {
+    if (user) {
+      handleRefreshMessageSocket(async (data) => {
+        console.log("data refresh message:::", data);
+        getMessages();
+      });
+      // handleRefreshMessageSenderSocket(async (data) => {
+      //   console.log("data message sender:::", data);
+      //   getMessages();
+      // });
+    }
+  }, []);
+
+  useEffect(() => {
+    getMessages();
+  }, []);
+
+  useEffect(() => {
+    getReceiver();
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    handleInConversation({
+      customId: user.phoneNumber,
+    });
+  }, [user]);
+
+  useEffect(() => {
+    handleReceiveInConversation((data) => {
+      console.log("data user avtive is:::", data);
+      setActiveUsers(data);
+    });
+  }, []);
+  // info receiver
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: "",
@@ -330,7 +324,7 @@ const ChatScreen = ({ navigation, route }) => {
         </View>
       ),
     });
-  }, [navigation]);
+  }, [navigation, receiver]);
 
   if (isLoading) {
     return <Loading />;
