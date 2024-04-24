@@ -1,36 +1,44 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/material'
 import './SearchModel.scss'
+import ChildFriend from './child/ChildFriend';
 
-const SearchModel = () => {
+const SearchModel = (props) => {
+
+    const { dataredux, handleClick } = props
+
+    const [listuser, setlistuser] = useState([]);
+
+    useEffect(() => {
+        if (dataredux) {
+            if (dataredux.friends && dataredux.friends.length > 0) {
+                setlistuser(dataredux.friends)
+            }
+        }
+    }, [])
+
+    useEffect(() => {
+        if (dataredux) {
+            if (dataredux.friends && dataredux.friends.length > 0) {
+                setlistuser(dataredux.friends)
+            }
+        }
+    }, [dataredux])
+
     return (
         <Box className="search-form-container">
-            {/* {
-                usersearch && !_.isEmpty(usersearch) ?
-                    <>
-                        <ChildFriend
-                            item={usersearch}
-                            textsearch={props.textsearch}
-                            handleCloses={props.handleClose}
-                        />
-                    </>
-                    :
-                    <>
-                        {
-                            dataredux && dataredux.listfriend &&
-                            dataredux.listfriend.map((item, index) => {
-                                return (
-                                    <ChildFriend key={`friend-${index}`}
-                                        item={item}
-                                        textsearch={props.textsearch}
-                                        handleCloses={props.handleClose}
-
-                                    />
-                                )
-                            })
-                        }
-                    </>
-            } */}
+            {
+                listuser.map((item, index) => {
+                    return (
+                        <Box key={`search-form-${index}`}>
+                            <ChildFriend
+                                user={item}
+                                handleClick={handleClick}
+                            />
+                        </Box>
+                    )
+                })
+            }
         </Box>
     );
 };

@@ -1,0 +1,100 @@
+.modal-group-container {
+    height: 600px;
+
+    .module-group-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        height: 5%;
+
+        .btn-show-drawer {
+            position: relative;
+
+            .number-container {
+                position: absolute;
+                top: 0;
+                right: 0;
+                height: 20px;
+                width: 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 50%;
+                background-color: #eb0014;
+
+
+                .text-index {
+                    font-size: 13px;
+                    color: white;
+
+                }
+            }
+        }
+    }
+
+    .module-group-body {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        height: 80%;
+
+        .input-name-group {
+
+            width: 100%;
+        }
+
+        .box-find {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            height: 40px;
+            padding-left: 5px;
+            padding-right: 5px;
+            margin-bottom: 10px;
+
+            .icon-search {
+                text-align: center;
+                color: #bdbdbd;
+            }
+
+            .input-find-sdt {
+                width: 100%;
+            }
+        }
+
+        .list-friend-checkbox {
+            height: 75%;
+
+            .title-list-friend-checkbox {
+                margin-bottom: 5px;
+            }
+
+            .list-friend-checkbox-child {
+                height: 100%;
+
+                .list-friend-checkbox-child-left {
+                    width: 100%;
+                    height: 100%;
+                }
+
+
+            }
+        }
+
+    }
+
+    .module-group-footer {
+        margin-top: 5px;
+        height: 15%;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+
+        .btn-cancel {
+            margin-right: 5px;
+        }
+    }
+}

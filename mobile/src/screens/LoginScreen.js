@@ -13,9 +13,8 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { baseURL } from "../api/baseURL";
+import api, { baseURL } from "../api/baseURL";
 import { useDispatch, useSelector } from "react-redux";
-import { setToken } from "../app/tokenSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getUserInfo } from "../services/user.service";
 import { selectUser, setUser } from "../app/userSlice";
@@ -35,19 +34,19 @@ export default function LoginScreen({ navigation }) {
         console.log("data in login is", DT);
         const { _id, name, email, phoneNumber, avatar } = DT;
         dispatch(setUser({ _id, name, email, phoneNumber, avatar }));
-        console.log("user in login is", user);
       }
     } catch (error) {
-      console.log("error", error);
+      Alert.alert("Error", error.message);
     }
   };
   useEffect(() => {
     const checkToken = async () => {
       const token = await AsyncStorage.getItem("accessToken");
       const refreshToken = await AsyncStorage.getItem("refreshToken");
+      console.log("token is", token);
+      console.log("refresh token is", refreshToken);
       if (token && refreshToken) {
-        dispatch(setToken(token));
-        getUser();
+        await getUser();
         navigation.navigate("Main");
       }
     };
@@ -76,9 +75,7 @@ export default function LoginScreen({ navigation }) {
         const { accessToken, refreshToken } = DT;
         await AsyncStorage.setItem("accessToken", accessToken);
         await AsyncStorage.setItem("refreshToken", refreshToken);
-        const token = await AsyncStorage.getItem("accessToken");
-        getUser();
-        dispatch(setToken(token));
+        await getUser();
         navigation.navigate("Main");
       }
       if (EC == 1 && EM == "User not found") {

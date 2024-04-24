@@ -5,27 +5,29 @@ import ChatInfo from './child/ChatInfo';
 
 const ListChatFrient = (props) => {
 
-    const { dataredux, handleClick, listfrient } = props;
+    const { dataredux, handleClick, listfrient, currentMessange } = props;
 
 
     return (
         <Box>
             {
-                dataredux && dataredux.friends && dataredux.friends.length > 0
-                && dataredux.friends.map((item, index) => {
+                listfrient && listfrient.length > 0
+                && listfrient.map((item, index) => {
                     return (
-                        <Box className={
-                            listfrient && listfrient.length > 0
-                                && (listfrient.findIndex(items => items.click === true) !== -1)
-                                ? "chatfrient active" : "chatfrient"
-                        } key={`friend-${index}`}
-                            onClick={() => handleClick(item)}
-                        >
-                            <ChatInfo
-                                avatar={item.avatar}
-                                name={item.name}
-                            />
+                        <Box key={`friend-${index}`}>
+                            <Box className="chatfrient"
+                                onClick={() => handleClick(item)}
+                            >
+                                <ChatInfo
+                                    avatar={item.avatar}
+                                    name={item.name}
+                                    click={item.click}
+                                    currentMessange={currentMessange}
+                                    user={item}
+                                />
+                            </Box>
                         </Box>
+
                     )
                 })
             }

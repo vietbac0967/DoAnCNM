@@ -1,7 +1,6 @@
 import { Server } from "socket.io";
 import http from "http";
 import app from "../../app.js";
-import { group } from "console";
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -58,6 +57,8 @@ io.on("connection", (socket) => {
     const sender = data.sender;
     const receiver = data.receiver;
 
+    console.log("sender:::", sender);
+    console.log("receiver:::", receiver);
     if (clients && clients.length > 0) {
       const index = clients.findIndex(
         (item) => item.customId.localeCompare(receiver.phone) === 0
@@ -112,7 +113,7 @@ io.on("connection", (socket) => {
       const index = activeUsers.findIndex(
         (item) => item.customId.localeCompare(data.phone) === 0
       );
-     
+
       if (index !== -1) {
         activeUsers.splice(index, 1);
       }
@@ -184,9 +185,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendNotificationInGroup", (data) => {
-    console.log("data send notification in group:::", data);
     const groupId = data.groupId;
-    // send notification to all user in group is offline
     if (userInGroup.length > 0) {
       const users = userInGroup.filter((item) => item.groupId === groupId);
       users.forEach((user) => {
@@ -205,6 +204,35 @@ io.on("connection", (socket) => {
   socket.on("leaveGroup", (data) => {
     socket.leave(data.groupId);
     console.log(`User ${data.user} left room: ${data.groupId}`);
+  });
+
+  socket.on("sendtest", (data) => {
+    let sender = data.sender;
+    let receiver = data.receiver;
+    if (clients && clients.length > 0) {
+      let index = clients.findIndex(
+        (item) => item.customId.localeCompare(receiver) === 0
+      );
+      if (index !== -1) {
+        socket.to(clients[index].clientId).emit("refresh", () => {
+          console.log("test success");
+        });
+      } else {
+        console.log("test error");
+      }
+    }
+  });
+
+  socket.on("typing", (data) => {
+    socket.broadcast.emit("typing", { groupId: data.groupId });
+  });
+
+  socket.on("allinfo", (data) => {
+    io.emit("allinfo", data);
+  });
+
+  socket.on("sendaddgroup", () => {
+    io.emit("sendaddgroup");
   });
 });
 

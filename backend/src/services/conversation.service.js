@@ -86,7 +86,7 @@ export const getConversationService = async (userId) => {
       .populate([
         {
           path: "participants",
-          select: "avatar _id name",
+          select: "avatar _id name phoneNumber",
         },
         {
           path: "participantsGroup",
@@ -121,6 +121,7 @@ export const getConversationService = async (userId) => {
         avatar: participants ? participants.avatar : null,
         members: conversation.participantsGroup[0]?.members || [],
         type,
+        phoneNumber: participants ? participants.phoneNumber : null,
         message: conversation.messages[conversation.messages.length - 1] || "",
         messageType:
           conversation.messages[conversation.messages.length - 1]

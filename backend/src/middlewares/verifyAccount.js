@@ -15,9 +15,9 @@ const getinfobyId = async (arr) => {
 };
 export const verifyAccount = async (req, res, next) => {
   try {
-    if (!req.headers.authorization && !req.cookies.jwt)
+    if (!req.headers.authorization && !req.cookies.accessToken)
       return res
-        .status(401)
+        .status(403)
         .json({ message: "No token, authorization denied" });
     let token = "";
     if (req.headers.authorization) {
@@ -32,18 +32,20 @@ export const verifyAccount = async (req, res, next) => {
       if (decoded.exp < Date.now().valueOf() / 1000) {
         return res.status(401).json({ message: "Token expired" });
       }
+      console.log("token mobile is", token);
       const user = await User.findById(decoded.id);
+      console.log("user is verifyAccount", user);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
       req.user = user;
       next();
-    }
-    if (req.cookies?.jwt) {
-      token = req.cookies?.jwt;
+    } else if (req.cookies?.accessToken) {
+      token = req.cookies?.accessToken;
       if (token) {
         const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-        let user = await User.findById({ _id: decoded._id });
+        console.log(decoded);
+        let user = await User.findById({ _id: decoded.id });
         if (user) {
           let listfriend = await getinfobyId(user.friends);
           let listfriendRequests = await getinfobyId(user.friendRequests);
@@ -69,6 +71,6 @@ export const verifyAccount = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error.message);
-    res.status(401).json({ EC: 1, EM: error.message, DT: "" });
+    return res.status(403).json({ EC: 1, EM: error.message, DT: "" });
   }
 };

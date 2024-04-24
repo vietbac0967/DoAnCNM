@@ -23,12 +23,12 @@ import {
   handleOutConversation,
 } from "../utils/socket";
 import { selectUser } from "../app/userSlice";
-import { selectOpen, setOpen } from "../app/openSlice";
 import Loading from "../components/Loading";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function HomeScreen({ navigation, route }) {
-  // const token = useSelector((state) => state.token.token);
   const [conversations, setConversations] = useState([]);
   const user = useSelector(selectUser);
+  console.log("user home screen is", user);
   const isFocused = useIsFocused();
   const [isLoading, setIsLoading] = useState(true);
   const getConversations = async () => {
@@ -39,7 +39,8 @@ export default function HomeScreen({ navigation, route }) {
         setConversations(DT);
         setIsLoading(false);
       } else {
-        Alert.alert("Error", EM);
+        await AsyncStorage.removeItem("accessTokne");
+        await AsyncStorage.removeItem("refreshToken");
       }
     } catch (error) {
       if (error.message === "Refresh token error") {

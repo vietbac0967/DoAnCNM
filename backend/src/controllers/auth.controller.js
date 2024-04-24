@@ -61,6 +61,16 @@ export const reSendEmail = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { EC, EM, DT } = await loginService(req.body);
+    if (DT) {
+      res.cookie("accessToken", DT.accessToken, {
+        maxAge: 86400000,
+        httpOnly: true,
+      });
+      res.cookie("refreshToken", DT.refreshToken, {
+        maxAge: 86400000,
+        httpOnly: true,
+      });
+    }
     res.status(200).json({ EC, EM, DT });
   } catch (error) {
     res.status(500).json({

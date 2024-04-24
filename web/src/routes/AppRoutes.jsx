@@ -5,7 +5,7 @@ import Register from '../component/Register/Register'
 import Home from '../component/Home/Home'
 import PrivateRoute from './PrivateRoute';
 import LocalRoutes from './LocalRoutes';
-import Otp from '../component/OTP/Otp';
+import Otp from '../component/OTP/OTP';
 import PhoneBook from '../component/PhoneBook/PhoneBook';
 
 const AppRoutes = () => {

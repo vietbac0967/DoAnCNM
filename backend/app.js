@@ -13,15 +13,31 @@ import express from "express";
 import { configCORS } from "./src/config/configCORS.js";
 import swaggerSpec from "./src/helpers/swagger.js";
 import swaggerUi from "swagger-ui-express";
+import dotenv from "dotenv";
+dotenv.config();
 const app = express();
-configCORS(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
 app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(compression());
+// app.use(cors());
+// app.options("*", cors());
+app.use(
+  cors({
+    origin: [process.env.URL_CLIENT, process.env.URL_WEB],
+    methods: ["GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: [
+      "X-Requested-With",
+      "Content-Type",
+      "Accept",
+      "Authorization",
+    ],
+    exposedHeaders: ["Authorization"],
+    credentials: true,
+  })
+);
 app.use("/api/auth", authRoutes);
 app.use("/api/", userRoutes);
 app.use("/api/", messageRoutes);
@@ -29,6 +45,7 @@ app.use("/api/group/", groupRoutes);
 app.use("/api/conversation/", converstationRoutes);
 app.use("/api/notification/", notificationRoutes);
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 app.get("/docs.json", (req, res) => {
   res.setHeader("Content-Type", "application/json");
   res.send(swaggerSpec);
