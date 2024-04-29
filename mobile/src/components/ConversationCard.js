@@ -70,7 +70,7 @@ export default function ConversationCard({ item, navigation }) {
     });
     handleRefreshNotificationToGroup((data) => {
       console.log("notification to group:::", data);
-      if (data?.groupId === item?._id._id ) {
+      if (data?.groupId === item?._id._id) {
         setNotifications((prev) => [...prev, data.message]);
       }
     });
@@ -201,7 +201,9 @@ export default function ConversationCard({ item, navigation }) {
                   ) : (
                     <Text style={{ color: "gray" }}>
                       {item.message.senderId !== item?._id ? "Bạn: " : ""}
-                      {item.message.content}
+                      {item.message.content.length > 11
+                        ? item.message.content.slice(0, 11) + "..."
+                        : item.message.content}
                     </Text>
                   )
                 ) : item?.messageType === "image" ? (

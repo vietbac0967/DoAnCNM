@@ -1,4 +1,4 @@
-import upload from "../middlewares/uploadImage.js";
+import path from "path";
 import Conversation from "../models/converstation.model.js";
 import {
   deleteMessageService,
@@ -10,14 +10,7 @@ import {
   sendMessageService,
 } from "../services/message.service.js";
 import cloud from "../utils/cloudinary.js";
-// import AWS from "aws-sdk";
-// AWS.config.update({
-//   region: process.env.REGION,
-//   accessKeyId: process.env.ACCESS_KEY_ID,
-//   secretAccessKey: process.env.SECRET_ACCESS_KEY,
-// });
-// const s3 = new AWS.S3();
-// const bucketName = process.env.S3_BUCKET_NAME;
+import Message from "../models/message.model.js";
 export const sendMessage = async (req, res) => {
   try {
     const senderId = req.user._id;
@@ -112,6 +105,60 @@ export const sendImage = async (req, res) => {
  * @returns {Promise<void>} - A promise that resolves when the image is sent to the group.
  */
 
+export const sendFile = async (req, res) => {
+  try {
+    if (!req.file || !req.file.buffer) {
+      return res.status(400).json({ EC: 1, EM: "No file provided", DT: "" });
+    }
+    const senderId = req.user._id;
+    const fileName = path.parse(req.file.originalname).name;
+    cloud.uploader
+      .upload_stream(
+        { resource_type: "auto", public_id: fileName},
+        async (error, result) => {
+          if (error) {
+            return res.status(500).json({ EC: 1, EM: "Error", DT: "" });
+          } else {
+            const sendMessage = await sendMessageService(
+              req.body.receiverId,
+              senderId,
+              result.secure_url,
+              "file"
+            );
+            const message = await Message.findById(sendMessage.DT._id);
+            message.fileSize = result.bytes;
+            await message.save();
+            // push message to conversation
+            const converstation = await Conversation.findOne({
+              participants: { $all: [req.body.receiverId, senderId] },
+            });
+            if (!converstation) {
+              res.status(500).json({
+                EC: 1,
+                EM: "Error",
+                DT: "Conversation not found",
+              });
+            }
+            converstation.messages.push(sendMessage.DT._id);
+            await converstation.save();
+            return res.status(200).json({
+              EC: 0,
+              EM: "Success",
+              DT: message,
+            });
+          }
+        }
+      )
+      .end(req.file.buffer);
+  } catch (error) {
+    return res.status(500).json({
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    });
+  }
+};
+
 export const sendImageGroup = async (req, res) => {
   if (!req.file || !req.file.buffer) {
     return res.status(400).json({ EC: 1, EM: "No file provided", DT: "" });
@@ -151,9 +198,8 @@ export const getMessages = async (req, res) => {
   try {
     const senderId = req.user._id;
     const receiverId = req.body.receiverId;
-    console.log("receiverID::::", receiverId);
-    console.log("senderID::::", senderId);
-    const messages = await getMessagesService(senderId, receiverId);
+    const page = req.body.page;
+    const messages = await getMessagesService(senderId, receiverId, page);
     res.status(200).json(messages);
   } catch (error) {
     res.status(500).json({ EC: 1, EM: error.message, DT: "" });

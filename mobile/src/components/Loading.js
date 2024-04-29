@@ -8,11 +8,11 @@ import {
 } from "react-native";
 import React from "react";
 
-export default function Loading() {
+export default function Loading({ content }) {
   return (
     <SafeAreaView style={styles.loadingContainer}>
       <ActivityIndicator size="large" color="#000fff"></ActivityIndicator>
-      <Text>Loading....</Text>
+      <Text>Đang tải {content} ...</Text>
     </SafeAreaView>
   );
 }

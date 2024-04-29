@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "autocannon": "^7.15.0",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.1.0",
     "compression": "^1.7.4",
@@ -27,7 +28,10 @@
     "nodemailer": "^6.9.13",
     "otp-generator": "^4.0.1",
     "redis": "^4.6.13",
-    "socket.io": "^4.7.5"
+    "socket.io": "^4.7.5",
+    "winston": "^3.13.0",
+    "winston-daily-rotate-file": "^5.0.0",
+    "winston-mongodb": "^5.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.24.3",

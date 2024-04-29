@@ -46,7 +46,7 @@ export const sendMessageService = async (
   }
 };
 
-export const getMessagesService = async (senderId, receiverId) => {
+export const getMessagesService = async (senderId, receiverId, page = 1) => {
   try {
     const messages = await Message.find({
       $and: [
@@ -58,7 +58,11 @@ export const getMessagesService = async (senderId, receiverId) => {
         },
         { senderDelete: { $ne: senderId } },
       ],
-    }).populate("senderId", "_id name avatar");
+    })
+      .populate("senderId", "_id name avatar")
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * 20)
+      .limit(20);
 
     return {
       EC: 0,
@@ -103,7 +107,6 @@ export const deleteMessageService = async (messageId, senderID) => {
 export const recallMessageService = async (messageId) => {
   try {
     const messages = await Message.findByIdAndDelete(messageId);
-
     if (!messages) {
       return {
         EC: 1,

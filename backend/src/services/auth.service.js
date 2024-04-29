@@ -18,7 +18,7 @@ import bcrypt from "bcrypt";
 import OTP from "../models/otp.model.js";
 import { sendOTPForUser, sendOTPForgotPassword } from "./sendMail.service.js";
 import { client } from "../config/connectToRedis.js";
-
+import logger from "../helpers/winston.log.js";
 export const verifyOTPService = async ({ email, otp }) => {
   try {
     const otpHolder = await OTP.find({ email });
@@ -78,6 +78,7 @@ export const registerService = async (data) => {
       !validateField(gender) ||
       !validateField(confirmPassword)
     ) {
+      logger.error("Data is empty");
       return {
         EC: 1,
         EM: "Data is empty",
@@ -166,6 +167,7 @@ export const loginService = async (data) => {
   try {
     const { username, password } = data;
     if (username.trim() === "" || password.trim() === "") {
+      logger.error("Username or password is empty");
       return {
         EC: 1,
         EM: "Username or password is empty",

@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
+import logger from "../helpers/winston.log.js";
 const getinfobyId = async (arr) => {
   let list = [];
   if (arr && arr.length > 0) {
@@ -15,26 +16,29 @@ const getinfobyId = async (arr) => {
 };
 export const verifyAccount = async (req, res, next) => {
   try {
-    if (!req.headers.authorization && !req.cookies.accessToken)
+    if (!req.headers.authorization && !req.cookies.accessToken) {
+      logger.error("403 - No token, authorization denied");
       return res
         .status(403)
         .json({ message: "No token, authorization denied" });
+    }
     let token = "";
+    let decoded;
     if (req.headers.authorization) {
       token = req.headers.authorization.split(" ")[1];
       if (!token) {
-        return res.status(401).json({ msg: "No token, authorization denied" });
+        return res.status(401).json({ message: "Invalid token" });
       }
-      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-      if (!decoded) {
+      try {
+        decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+      } catch (error) {
+        logger.error("401 - Invalid token");
         return res.status(401).json({ message: "Invalid token" });
       }
       if (decoded.exp < Date.now().valueOf() / 1000) {
         return res.status(401).json({ message: "Token expired" });
       }
-      console.log("token mobile is", token);
       const user = await User.findById(decoded.id);
-      console.log("user is verifyAccount", user);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -70,7 +74,7 @@ export const verifyAccount = async (req, res, next) => {
       }
     }
   } catch (error) {
-    console.log(error.message);
+    logger.error(`error in middleware verifyAccount ${error.message}`);
     return res.status(403).json({ EC: 1, EM: error.message, DT: "" });
   }
 };

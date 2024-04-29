@@ -1,9 +1,10 @@
 import api, { baseURL } from "../api/baseURL";
 
-export const getMessagesService = async (friendId) => {
+export const getMessagesService = async (friendId, currentPage) => {
   try {
     const response = await api.post("/message/getMessages", {
       receiverId: friendId,
+      page: currentPage,
     });
     const { EC, EM, DT } = response.data;
     if (EC === 0 && EM === "Success") {

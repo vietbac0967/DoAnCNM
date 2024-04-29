@@ -17,7 +17,6 @@ import {
 } from "../services/user.service";
 import { useSelector } from "react-redux";
 export default function AddFriendScreen({ navigation }) {
-  const token = useSelector((state) => state.token.token);
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     navigation.setOptions({
@@ -47,7 +46,6 @@ export default function AddFriendScreen({ navigation }) {
     setPhone("");
     setUser(res.DT);
   };
-  console.log(user);
   const handleSendRequest = async () => {
     try {
       // const res = await api.post("/user/sendFriendRequest", {
@@ -66,7 +64,7 @@ export default function AddFriendScreen({ navigation }) {
       Alert.alert("Thông báo", error, [{ text: "OK" }]);
     }
   };
-
+  console.log("status current is :::",status);
   return (
     <View style={styles.container}>
       <View style={{ flexDirection: "row", marginTop: 20 }}>

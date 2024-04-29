@@ -20,6 +20,7 @@ import {
   handleCusttomClientSocket,
   handleInConversation,
   handleLeaveConversationInGroup,
+  handleOffConnectSocket,
   handleOutConversation,
 } from "../utils/socket";
 import { selectUser } from "../app/userSlice";
@@ -38,9 +39,6 @@ export default function HomeScreen({ navigation, route }) {
       if (EC === 0 && EM === "Success") {
         setConversations(DT);
         setIsLoading(false);
-      } else {
-        await AsyncStorage.removeItem("accessTokne");
-        await AsyncStorage.removeItem("refreshToken");
       }
     } catch (error) {
       if (error.message === "Refresh token error") {

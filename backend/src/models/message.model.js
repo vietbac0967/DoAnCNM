@@ -30,7 +30,10 @@ const messageSchema = new mongoose.Schema(
     },
     senderDelete: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", 
+      ref: "User",
+    },
+    fileSize: {
+      type: Number,
     },
   },
   { timestamps: true }

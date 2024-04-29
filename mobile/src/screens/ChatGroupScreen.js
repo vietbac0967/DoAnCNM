@@ -251,6 +251,11 @@ export default function ChatGroupScreen({ route, navigation }) {
             size={24}
             color="#fff"
           />
+          <Image
+            style={{ width: 40, height: 40 }}
+            resizeMode="cover"
+            source={{ uri: group?.avatar }}
+          ></Image>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <View>
               <Text
@@ -282,7 +287,7 @@ export default function ChatGroupScreen({ route, navigation }) {
         </Pressable>
       ),
     });
-  }, []);
+  }, [navigation, group]);
 
   return (
     <KeyboardAvoidingView
