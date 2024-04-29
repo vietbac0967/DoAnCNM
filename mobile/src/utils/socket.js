@@ -6,6 +6,10 @@ const handleCusttomClientSocket = (data) => {
   socket.emit("storeClientInfo", data);
 };
 
+const handleOffConnectSocket = () => {
+  socket.disconnect();
+};
+
 const handleRefreshAccount = (callback) => {
   socket.on("refresh", callback);
 };
@@ -111,6 +115,7 @@ export {
   handleSendNotificationToGroup,
   handleRefreshNotificationToGroup,
   handleRefreshUserInGroup,
+  handleOffConnectSocket
   // handlerefreshAccount,
   // handlerefreshMessange,
   // handleoffrefreshAccount,

@@ -11,6 +11,7 @@ import helmet from "helmet";
 import compression from "compression";
 import express from "express";
 import { configCORS } from "./src/config/configCORS.js";
+import adminRoutes from "./src/routes/admin.routes.js";
 import swaggerSpec from "./src/helpers/swagger.js";
 import swaggerUi from "swagger-ui-express";
 import dotenv from "dotenv";
@@ -21,12 +22,19 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(helmet());
-app.use(compression());
+app.use(compression({
+  level:6,
+  threshold: 100 * 1000,
+}));
 // app.use(cors());
 // app.options("*", cors());
 app.use(
   cors({
-    origin: [process.env.URL_CLIENT, process.env.URL_WEB],
+    origin: [
+      process.env.URL_CLIENT,
+      process.env.URL_WEB,
+      "http://localhost:8081",
+    ],
     methods: ["GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"],
     allowedHeaders: [
       "X-Requested-With",
@@ -44,6 +52,7 @@ app.use("/api/", messageRoutes);
 app.use("/api/group/", groupRoutes);
 app.use("/api/conversation/", converstationRoutes);
 app.use("/api/notification/", notificationRoutes);
+app.use("/api/admin/", adminRoutes);
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get("/docs.json", (req, res) => {

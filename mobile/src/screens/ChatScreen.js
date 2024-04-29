@@ -5,6 +5,7 @@ import React, {
   useLayoutEffect,
   useCallback,
   useRef,
+  useMemo,
 } from "react";
 import {
   View,
@@ -21,6 +22,7 @@ import {
   Modal,
   Animated,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import EmojiSelector from "react-native-emoji-selector";
@@ -35,8 +37,8 @@ import {
 import { getReceiverService, getuser } from "../services/user.service";
 import { Entypo } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
-import { EvilIcons } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
+import { EvilIcons, AntDesign } from "@expo/vector-icons";
+import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import { URL_SERVER } from "@env";
@@ -53,6 +55,8 @@ import axios from "axios";
 import { selectUser } from "../app/userSlice";
 import { sendNotificationService } from "../services/notification.service";
 import Loading from "../components/Loading";
+import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
+import * as DocumentPicker from "expo-document-picker";
 const ChatScreen = ({ navigation, route }) => {
   const [messages, setMessages] = useState([]);
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
@@ -66,32 +70,56 @@ const ChatScreen = ({ navigation, route }) => {
   const [receiver, setReceiver] = useState({});
   const scrollViewRef = useRef(null);
   const [activeUsers, setActiveUsers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const user = useSelector(selectUser);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLoadingUpload, setIsLoadingUpload] = useState(false);
+  const bottomSheetModalRef = useRef(null);
+  const snapPoints = useMemo(() => ["25%", "50%"], []);
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
 
-  const scrollToBottom = () => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToEnd({ animated: false });
-    }
-  };
+  const handleSheetChanges = useCallback((index) => {
+    console.log("handleSheetChanges", index);
+  }, []);
 
-  const handleContentSizeChange = () => {
-    scrollToBottom();
-  };
+  // const scrollToBottom = () => {
+  //   if (scrollViewRef.current) {
+  //     scrollViewRef.current.scrollToEnd({ animated: false });
+  //   }
+  // };
+
+  // const handleContentSizeChange = () => {
+  //   scrollToBottom();
+  // };
 
   const handleEmojiPress = () => {
     setShowEmojiSelector(!showEmojiSelector);
     inputRef.current.blur();
   };
 
-  const pickImage = async () => {
+  const pickImage = async (status) => {
     try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        aspect: [4, 3],
-        quality: 1,
-      });
+      let result;
+      if (status === "camera") {
+        result = await ImagePicker.launchCameraAsync({
+          mediaType: "photo",
+          aspect: [4, 3],
+          quality: 1,
+        });
+      }
+      if (status === "library") {
+        result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          aspect: [4, 3],
+          quality: 1,
+        });
+      }
       if (!result.canceled) {
+        console.log("image camera:::", result);
+        setIsLoadingUpload(true);
         let localUri = result.assets[0].uri;
         let filename = localUri.split("/").pop();
         let match = /\.(\w+)$/.exec(filename);
@@ -116,26 +144,76 @@ const ChatScreen = ({ navigation, route }) => {
         );
         const { DT, EC, EM } = response.data;
         if (EC === 0 && EM === "Success") {
+          setMessages([DT, ...messages.slice(0, -1)]);
           handlSendMessageSocket({
             sender: { phone: user.phoneNumber, userId: user._id },
             receiver: { phone: receiver.phoneNumber, userId: receiver._id },
           });
-          setMessage("");
-          getMessages();
+          setIsLoadingUpload(false);
         } else {
-          Alert.alert("Cảnh báo", EM);
+          Alert.alert("Cảnh báo", "Tải ảnh không thành công");
+          setIsLoadingUpload(false);
         }
       }
     } catch (error) {
-      Alert.alert("Cảnh báo", error.message);
+      Alert.alert("Cảnh báo", "Hình ảnh quá lớn, vui lòng chọn hình ảnh khác");
+      setIsLoadingUpload(false);
     }
   };
-  console.log("user current is:::", user);
+  // console.log("user current is:::", user);
+
+  const handleSendFile = async () => {
+    try {
+      setIsLoadingUpload(true);
+      const document = await DocumentPicker.getDocumentAsync({
+        type: "*/*",
+        copyToCacheDirectory: true,
+      });
+      if (!document.canceled) {
+        const formData = new FormData();
+        formData.append("file", {
+          uri: document.assets[0].uri,
+          name: document.assets[0].name,
+          type: document.assets[0].mimeType,
+        });
+        const token = await AsyncStorage.getItem("accessToken");
+        formData.append("receiverId", recevierId);
+        const response = await axios.post(
+          `${URL_SERVER}/api/message/sendFile`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        const { DT, EC, EM } = response.data;
+        if (EC === 0 && EM === "Success") {
+          setIsLoadingUpload(false);
+          setMessages([DT, ...messages.slice(0, -1)]);
+          handlSendMessageSocket({
+            sender: { phone: user.phoneNumber, userId: user._id },
+            receiver: { phone: receiver.phoneNumber, userId: receiver._id },
+          });
+        } else {
+          setIsLoadingUpload(false);
+          Alert.alert("Cảnh báo", "Tải file không thành công");
+        }
+      }
+    } catch (error) {
+      setIsLoadingUpload(false);
+      Alert.alert("Cảnh báo", "Tải file không thành công");
+    }
+  };
+
   const handleSend = async () => {
     try {
       const { DT, EC, EM } = await sendMessageService(recevierId, message);
       if (EC === 0 && EM === "Success") {
-        await getMessages();
+        await refreshMessages();
+        // set messages is new message is front to before end message
+        setMessages((prevMessages) => [DT, ...prevMessages.slice(0, -1)]);
         handlSendMessageSocket({
           sender: { phone: user.phoneNumber, userId: user._id },
           receiver: { phone: receiver.phoneNumber, userId: receiver._id },
@@ -159,9 +237,13 @@ const ChatScreen = ({ navigation, route }) => {
             throw new Error(EM);
           }
         }
+        setIsLoading(false);
+        setIsRefreshing(false);
         setMessage("");
       }
     } catch (error) {
+      setIsLoading(false);
+      setIsRefreshing(false);
       console.log("error:::", error);
     }
   };
@@ -177,8 +259,14 @@ const ChatScreen = ({ navigation, route }) => {
         text: "Có",
         onPress: async () => {
           const response = await recallMessageService(selectMessage._id);
-          const { EC, EM, DT } = response;
           setModalVisible(false);
+          const { EC, EM, DT } = response;
+          refreshMessages();
+          setMessages(
+            messages.filter((message) => message._id !== selectMessage._id)
+          );
+          setIsLoading(false);
+          setIsRefreshing(false);
           if (EC === 0 && EM === "Success") {
             handlSendMessageSocket({
               sender: { phone: user.phoneNumber, userId: user._id },
@@ -187,7 +275,6 @@ const ChatScreen = ({ navigation, route }) => {
                 userId: receiver._id,
               },
             });
-            getMessages();
           }
         },
       },
@@ -199,8 +286,13 @@ const ChatScreen = ({ navigation, route }) => {
       const response = await deleteMessageService(selectMessage._id);
       const { EC, EM, DT } = response;
       if (EC === 0 && EM === "Success") {
-        getMessages();
         setModalVisible(false);
+        refreshMessages();
+        setMessages(
+          messages.filter((message) => message._id !== selectMessage._id)
+        );
+        setIsLoading(false);
+        setIsRefreshing(false);
       } else {
         Alert("Thông báo", "Xóa không thành công");
       }
@@ -210,12 +302,21 @@ const ChatScreen = ({ navigation, route }) => {
   };
 
   const getMessages = async () => {
+    setIsLoading(true);
     try {
-      const response = await getMessagesService(recevierId);
-      setMessages(response);
+      const response = await getMessagesService(recevierId, currentPage);
+      if (isRefreshing) {
+        setMessages(response);
+      } else {
+        setMessages([...messages, ...response]);
+      }
       setIsLoading(false);
+      setIsRefreshing(false);
     } catch (error) {
-      console.log("error:::", error);
+      console.log("error:::", error.message);
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
     }
   };
 
@@ -240,18 +341,33 @@ const ChatScreen = ({ navigation, route }) => {
       // });
     }
   }, []);
-
+  const refreshMessages = async () => {
+    setIsRefreshing(true);
+    setCurrentPage(1);
+  };
+  const renderLoader = () => {
+    return isLoading && messages.length > 0 ? (
+      <View style={styles.loaderStyle}>
+        <ActivityIndicator size="large" color="#aaa" />
+      </View>
+    ) : null;
+  };
+  const handleLoadMore = () => {
+    if (!isLoading) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
   useEffect(() => {
     getMessages();
-  }, []);
+  }, [currentPage]);
 
   useEffect(() => {
     getReceiver();
   }, []);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  // useEffect(() => {
+  //   scrollToBottom();
+  // }, [messages]);
 
   useEffect(() => {
     handleInConversation({
@@ -265,6 +381,7 @@ const ChatScreen = ({ navigation, route }) => {
       setActiveUsers(data);
     });
   }, []);
+
   // info receiver
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -325,9 +442,8 @@ const ChatScreen = ({ navigation, route }) => {
       ),
     });
   }, [navigation, receiver]);
-
-  if (isLoading) {
-    return <Loading />;
+  if (isLoadingUpload) {
+    return <Loading content={""} />;
   }
 
   return (
@@ -404,7 +520,6 @@ const ChatScreen = ({ navigation, route }) => {
           </View>
         </Pressable>
       </Modal>
-
       <Modal
         animationType="fade"
         transparent={true}
@@ -442,7 +557,6 @@ const ChatScreen = ({ navigation, route }) => {
           </View>
         </Pressable>
       </Modal>
-
       <FlatList
         data={messages}
         renderItem={({ item }) => (
@@ -452,13 +566,15 @@ const ChatScreen = ({ navigation, route }) => {
             setModalVisible={setModalVisible}
             setModalImageVisible={setModalImageVisible}
             setSelectMessage={setSelectMessage}
-            key={item._id}
           />
         )}
         keyExtractor={(item) => item._id}
-        ref={scrollViewRef}
-        contentContainerStyle={{ flexGrow: 1 }}
-        onContentSizeChange={handleContentSizeChange}
+        ListFooterComponent={renderLoader}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.1}
+        onRefresh={refreshMessages}
+        refreshing={isRefreshing}
+        inverted
       />
       {/* </ScrollView> */}
       <View
@@ -505,8 +621,18 @@ const ChatScreen = ({ navigation, route }) => {
             marginHorizontal: 8,
           }}
         >
-          <Ionicons name="image" size={24} color="gray" onPress={pickImage} />
-
+          <Ionicons
+            name="image"
+            size={24}
+            color="gray"
+            onPress={handlePresentModalPress}
+          />
+          <AntDesign
+            name="filetext1"
+            size={20}
+            color="gray"
+            onPress={handleSendFile}
+          />
           <Ionicons name="mic" size={24} color="gray" />
         </View>
 
@@ -517,6 +643,44 @@ const ChatScreen = ({ navigation, route }) => {
           <Ionicons name="send" size={24} color="#33D1FF" />
         </Pressable>
       </View>
+
+      <BottomSheetModal
+        ref={bottomSheetModalRef}
+        index={1}
+        snapPoints={snapPoints}
+        onChange={handleSheetChanges}
+      >
+        <BottomSheetView style={styles.contentContainer}>
+          <Pressable
+            style={styles.btn}
+            onPress={() => {
+              pickImage("camera");
+            }}
+          >
+            <Feather name="camera" size={24} color="black" />
+            <Text
+              style={{ textAlign: "center", fontSize: 13, paddingLeft: 20 }}
+            >
+              Chụp Ảnh
+            </Text>
+          </Pressable>
+
+          <Pressable
+            style={styles.btn}
+            onPress={() => {
+              pickImage("library");
+            }}
+          >
+            <MaterialIcons name="library-books" size={24} color="black" />
+            <Text
+              style={{ textAlign: "center", fontSize: 13, paddingLeft: 20 }}
+            >
+              Thư viện của bạn
+            </Text>
+          </Pressable>
+        </BottomSheetView>
+      </BottomSheetModal>
+
       {showEmojiSelector && (
         <EmojiSelector
           onEmojiSelected={(emoji) => {
@@ -640,6 +804,20 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     elevation: 20,
     flexDirection: "row",
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: "center",
+  },
+  btn: {
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    backgroundColor: "#A3D8FF",
+    borderRadius: 20,
+    padding: 10,
+    marginVertical: 15,
+    width: "90%",
   },
 });
 

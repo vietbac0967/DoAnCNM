@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View, Image } from "react-native";
 import React, { useEffect } from "react";
 import formatDateOrTime from "../utils/formatDateOrTime";
-
+import { Feather } from "@expo/vector-icons";
 export default function MessageCard({
   message,
   receiverId,
@@ -58,12 +58,91 @@ export default function MessageCard({
               borderRadius: 7,
               marginRight: isCurrentUser ? 10 : 0,
             },
-            pressed && { opacity: 0.5, backgroundColor: isCurrentUser ? "#A3BA91" : "#A7A7A7" }, // Độ mờ thay đổi khi nhấn
+            pressed && {
+              opacity: 0.5,
+              backgroundColor: isCurrentUser ? "#A3BA91" : "#A7A7A7",
+            }, // Độ mờ thay đổi khi nhấn
           ]}
         >
           <Text style={{ fontSize: 13, textAlign: "left" }}>
             {message.content}
           </Text>
+          <Text
+            style={{
+              textAlign: "right",
+              fontSize: 9,
+              color: "gray",
+              marginTop: 5,
+            }}
+          >
+            {formatDateOrTime(message?.createdAt)}
+          </Text>
+        </Pressable>
+      </View>
+    );
+  }
+
+  if (message.messageType === "file") {
+    return (
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: isCurrentUser ? "flex-end" : "flex-start",
+          marginVertical: 5,
+        }}
+        key={message._id}
+      >
+        {!isCurrentUser && (
+          <Image
+            style={{
+              width: 25,
+              height: 25,
+              borderRadius: 20,
+              marginRight: 10,
+              marginLeft: 10,
+            }}
+            resizeMode="cover"
+            source={{ uri: message.senderId?.avatar }}
+            defaultSource={require("../assets/avt.jpg")}
+          />
+        )}
+
+        <Pressable
+          onLongPress={() => {
+            setSelectMessage(message);
+            setModalVisible(true);
+          }}
+          style={({ pressed }) => [
+            {
+              alignSelf: isCurrentUser ? "flex-end" : "flex-start",
+              backgroundColor: isCurrentUser ? "#DCF8C6" : "white",
+              paddingHorizontal: 8,
+              paddingVertical: 5,
+              maxWidth: "60%",
+              borderWidth: 0.8,
+              borderColor: "#ddd",
+              borderRadius: 7,
+              marginRight: isCurrentUser ? 10 : 0,
+            },
+            pressed && {
+              opacity: 0.5,
+              backgroundColor: isCurrentUser ? "#A3BA91" : "#A7A7A7",
+            }, // Độ mờ thay đổi khi nhấn
+          ]}
+        >
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
+            <Feather name="file" size={24} color="rgb(203,123,197)" style={{marginRight:10}} />
+            <View style={{}}>
+              <Text style={{ fontSize: 13, textAlign: "left" }}>
+                {message?.content.split("/").pop()}
+              </Text>
+              <Text style={{ fontSize: 9, color: "gray" }}>
+                {message?.fileSize / 1000} KB
+              </Text>
+            </View>
+          </View>
           <Text
             style={{
               textAlign: "right",

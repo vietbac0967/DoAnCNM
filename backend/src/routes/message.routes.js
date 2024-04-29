@@ -6,12 +6,14 @@ import {
   getMessages,
   getMessagesGroup,
   recallMessage,
+  sendFile,
   sendImage,
   sendImageGroup,
   sendMessage,
   sendMessageGroup,
 } from "../controllers/message.controller.js";
 import updoad from "../middlewares/uploadImage.js";
+import uploadFile from "../middlewares/uploadFile.js";
 const router = express.Router();
 /**
  * @openapi
@@ -248,4 +250,10 @@ router.post(
  *        description: Server error
  */
 router.post("/message/forwardMessage", verifyAccount, forwardMessage);
+router.post(
+  "/message/sendFile",
+  verifyAccount,
+  uploadFile.single("file"),
+  sendFile
+);
 export default router;

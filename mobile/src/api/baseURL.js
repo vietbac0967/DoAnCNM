@@ -1,6 +1,7 @@
 import axios from "axios";
 import { URL_SERVER } from "@env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert } from "react-native";
 export const baseURL = axios.create({
   // baseURL: `${URL_SERVER}/api`,
   baseURL: `${URL_SERVER}/api`,
@@ -47,18 +48,14 @@ api.interceptors.response.use(
 
     // If the error status is 401 and there is no originalRequest._retry flag,
     // it means the token has expired and we need to refresh it
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      !originalRequest._retry
-    ) {
+    if (error.response.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise(function (resolve, reject) {
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
             originalRequest.headers.Authorization = `Bearer ${token}`;
-            return api(originalRequest);
+            return axios(originalRequest);
           })
           .catch((err) => {
             return Promise.reject(err);
@@ -66,7 +63,6 @@ api.interceptors.response.use(
       }
       originalRequest._retry = true;
       isRefreshing = true;
-
       try {
         const token = await AsyncStorage.getItem("refreshToken");
         console.log("token refresh:::", token);
@@ -77,16 +73,20 @@ api.interceptors.response.use(
           }
         );
         const { DT, EC, EM } = response.data;
-        if (EC === 0 && EM === "Success") {
+        if (EC === 0) {
           const { accessToken, refreshToken } = DT;
           await AsyncStorage.setItem("accessToken", accessToken);
           await AsyncStorage.setItem("refreshToken", refreshToken);
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           processQueue(null, accessToken);
-          return api(originalRequest);
+          return axios(originalRequest);
         } else {
           await AsyncStorage.removeItem("accessToken");
           await AsyncStorage.removeItem("refreshToken");
+          Alert.alert(
+            "Thông báo",
+            "Phiên của bạn đã hết hạn, vui lòng đăng nhập lại"
+          );
           throw new Error(EM);
         }
         // Retry the original request with the new token
@@ -98,6 +98,10 @@ api.interceptors.response.use(
         await AsyncStorage.removeItem("accessToken");
         await AsyncStorage.removeItem("refreshToken");
         console.log("Refresh token error", error);
+        Alert.alert(
+          "Thông báo",
+          "Phiên của bạn đã hết hạn, vui lòng đăng nhập lại"
+        );
         // Redirect to login
         throw new Error("Refresh token error");
       } finally {
