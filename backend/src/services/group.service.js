@@ -89,7 +89,6 @@ export const deteleGroupService = async (groupId) => {
         DT: "",
       };
     }
-
     const authorId = group.author;
     const deputyLeaderId = group.deputyLeader;
     const memberIds = group.members;
@@ -108,6 +107,7 @@ export const deteleGroupService = async (groupId) => {
       // Delete the group
       Group.deleteOne({ _id: groupId }),
     ]);
+    await Conversation.deleteOne({ participantsGroup: [groupId] });
     return {
       EC: 0,
       EM: "Success",

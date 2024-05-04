@@ -59,7 +59,7 @@ export const getMessagesService = async (senderId, receiverId, page = 1) => {
         { senderDelete: { $ne: senderId } },
       ],
     })
-      .populate("senderId", "_id name avatar")
+      .populate("senderId", "_id name avatar fileSize")
       .sort({ createdAt: -1 })
       .skip((page - 1) * 20)
       .limit(20);

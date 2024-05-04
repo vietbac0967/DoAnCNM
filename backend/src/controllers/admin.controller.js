@@ -5,6 +5,7 @@ import {
   getNewRegisterUsersService,
   getNumberOfSendImageService,
   getNumberOfSendMessaagesService,
+  getTotalDataSizeOfUserService,
 } from "../services/admin.service.js";
 
 export const getAllUser = async (req, res) => {
@@ -60,7 +61,7 @@ export const getFriendsFollowMonthAndYear = async (req, res) => {
     );
     return res.status(200).json({ EC, EM, DT });
   } catch (error) {
-    logger.error(`500 ${error.message}`)
+    logger.error(`500 ${error.message}`);
     return res.status(500).json({
       EC: 1,
       EM: error.message,
@@ -73,6 +74,20 @@ export const getNewRegisterUsers = async (req, res) => {
   try {
     const { month, year } = req.query;
     const { EC, EM, DT } = await getNewRegisterUsersService(month, year);
+    return res.status(200).json({ EC, EM, DT });
+  } catch (error) {
+    return res.status(500).json({
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    });
+  }
+};
+
+export const getTotalDataSizeOfUser = async (req, res) => {
+  try {
+    const userId = req.query?.userId;
+    const { EC, EM, DT } = await getTotalDataSizeOfUserService(userId);
     return res.status(200).json({ EC, EM, DT });
   } catch (error) {
     return res.status(500).json({

@@ -6,11 +6,13 @@ import {
   Pressable,
   FlatList,
   Image,
+  Modal,
+  Alert,
 } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
+  deleteFriendService,
   getFriendRequests,
   getFriends,
   getSendFriendRequests,
@@ -22,6 +24,24 @@ export default function ContactScreen({ navigation }) {
   const [sendFriendRequests, setSendFriendRequests] = useState([]);
   const [sortedFriends, setSortedFriends] = useState([]);
   const [friends, setFriends] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [seclectFriend, setSelectFriend] = useState(null);
+
+  const handleDeleteFriend = async () => {
+    try {
+      const { EM, EC, DT } = await deleteFriendService(seclectFriend._id);
+
+      if (EC === 0 && EM === "Success") {
+        Alert.alert("Success", "Delete friend successfully");
+        setModalVisible(false);
+        fetchData();
+      } else {
+        Alert.alert("Error", "Something went wrong. Please try again later.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Something went wrong. Please try again later.");
+    }
+  };
   useEffect(() => {
     fetchData();
   }, []);
@@ -58,27 +78,35 @@ export default function ContactScreen({ navigation }) {
   }, [friends]);
 
   const renderFriendItem = ({ item }) => (
-    <View style={styles.friendItem}>
-      <Image source={{ uri: item.avatar }} style={styles.avatar} />
-      <View style={styles.friendInfo}>
-        <Text>{item.name}</Text>
-        <View style={styles.contactButtons}>
-          <Pressable style={styles.contactButton}>
-            <Feather name="phone" size={20} color="grey" />
-          </Pressable>
-          <Pressable
-            style={styles.contactButton}
-            onPress={() =>
-              navigation.navigate("ChatScreen", {
-                recevierId: item._id,
-              })
-            }
-          >
-            <Feather name="message-square" size={20} color="grey" />
-          </Pressable>
+    <>
+      <Pressable
+        style={styles.friendItem}
+        onPress={() => {
+          setModalVisible(true);
+          setSelectFriend(item);
+        }}
+      >
+        <Image source={{ uri: item.avatar }} style={styles.avatar} />
+        <View style={styles.friendInfo}>
+          <Text>{item.name}</Text>
+          <View style={styles.contactButtons}>
+            <Pressable style={styles.contactButton}>
+              <Feather name="phone" size={20} color="grey" />
+            </Pressable>
+            <Pressable
+              style={styles.contactButton}
+              onPress={() =>
+                navigation.navigate("ChatScreen", {
+                  recevierId: item._id,
+                })
+              }
+            >
+              <Feather name="message-square" size={20} color="grey" />
+            </Pressable>
+          </View>
         </View>
-      </View>
-    </View>
+      </Pressable>
+    </>
   );
 
   const renderFriendGroupItem = ({ item }) => (
@@ -181,6 +209,56 @@ export default function ContactScreen({ navigation }) {
         </Pressable>
       </View>
 
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <Pressable
+          style={styles.modalBackGround}
+          activeOpacity={1}
+          onPressOut={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={{ flexDirection: "row" }}>
+              <Image
+                style={{ width: 50, height: 50, borderRadius: 25 }}
+                resizeMode="cover"
+                source={{ uri: seclectFriend?.avatar }}
+              ></Image>
+              <Text
+                style={{ fontWeight: "bold", paddingLeft: 15, paddingTop: 15 }}
+              >
+                {seclectFriend?.name}
+              </Text>
+            </View>
+            <Pressable
+              style={{
+                marginTop: 20,
+              }}
+            >
+              <Text style={{}}>Xem thông tin cá nhân</Text>
+            </Pressable>
+            {/* delete friend */}
+            <Pressable
+              onPress={handleDeleteFriend}
+              style={{
+                marginTop: 20,
+              }}
+            >
+              <Text
+                style={{
+                  color: "red",
+                }}
+              >
+                Xóa bạn
+              </Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
+
       <FlatList
         data={Object.keys(sortedFriends).map((key) => ({
           title: key,
@@ -264,5 +342,20 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 5,
     marginLeft: 10,
+  },
+  modalBackGround: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "80%",
+    height: 300,
+    backgroundColor: "white",
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+    borderRadius: 20,
+    elevation: 20,
   },
 });
