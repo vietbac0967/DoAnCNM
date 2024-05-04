@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const socket = io("http://192.160.0.6:5000");
+const socket = io("http://172.20.10.4:5000");
 
 const handleCusttomClient = (data) => {
   socket.emit("storeClientInfo", data);

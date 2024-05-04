@@ -50,25 +50,30 @@ export default function ConversationCard({ item, navigation }) {
               right: -2,
             }}
           ></View>
-        ) : (<View
-          style={{
-            padding: 1,
-            height: 23,
-            width: 23,
-            borderRadius: 20,
-            borderColor: "#F1F1F1",
-            borderWidth: 2.5,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "#8FB6FF",
-            position: "absolute",
-            bottom: -3,
-            right: -3,
-          }}
-        >
-          <Text style={{ fontSize: 8, fontWeight: 'bold'}}>{item.members && item.members.length > 0 ? item.members.length+1 : ''}</Text>
-          
-          </View>)}
+        ) : (
+          <View
+            style={{
+              padding: 1,
+              height: 23,
+              width: 23,
+              borderRadius: 20,
+              borderColor: "#F1F1F1",
+              borderWidth: 2.5,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#8FB6FF",
+              position: "absolute",
+              bottom: -3,
+              right: -3,
+            }}
+          >
+            <Text style={{ fontSize: 8, fontWeight: "bold" }}>
+              {item.members && item.members.length > 0
+                ? item.members.length + 1
+                : ""}
+            </Text>
+          </View>
+        )}
       </View>
 
       <View style={{ flex: 1 }}>
@@ -82,24 +87,28 @@ export default function ConversationCard({ item, navigation }) {
         >
           <View>
             {item?.messageType === "text" ? (
-              item?.message.content.slice(0,6)==="##TB##" ? (
+              item?.message.content.slice(0, 6) === "##TB##" ? (
                 <Text style={{ color: "gray" }}>
-                   {item.message.content.length > 37
-    ? item.message.content.slice(0, 37).slice(7) + "..."
-    : item.message.content}
+                  {item.message.content.length > 37
+                    ? item.message.content.slice(0, 37).slice(7) + "..."
+                    : item.message.content}
                 </Text>
-               ) : (
+              ) : (
                 <Text style={{ color: "gray" }}>
                   {item.message.senderId !== item?._id ? "Bạn: " : ""}
                   {item.message.content}
                 </Text>
-               )
-            ) :  item?.messageType === "image" ? (
+              )
+            ) : item?.messageType === "image" ? (
               <Text style={{ color: "gray" }}>
                 {item.message.senderId !== item?._id ? "Bạn: " : ""}
                 [Hình ảnh]
               </Text>
-            ): <Text style={{ color: "gray" }}>Hãy trò chuyện cùng nhau nào!</Text>}
+            ) : (
+              <Text style={{ color: "gray" }}>
+                Hãy trò chuyện cùng nhau nào!
+              </Text>
+            )}
           </View>
           <View>
             <Text style={{ color: "gray" }}>

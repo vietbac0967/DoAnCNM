@@ -15,12 +15,12 @@ import {
   addMemberToGroup,
   getFriendsInNotGroupService,
 } from "../services/group.service";
+import { sendMessageGroupService } from "../services/message.service";
 import { Button, RadioButton } from "react-native-paper";
 export default function AddMemberScreen({ navigation, route }) {
   const groupId = route.params?.groupId;
   console.log("groupId:::", groupId);
   const token = useSelector((state) => state.token.token);
-
   const [phone, setPhone] = useState("");
   const [friends, setFriends] = useState([]);
   const [members, setMembers] = useState([]);
@@ -35,13 +35,27 @@ export default function AddMemberScreen({ navigation, route }) {
       Alert.alert("Lỗi", "Không thể kết nối đến server");
     }
   };
+  const handleSendMessage = async (message) => {
+    try {
+      const response = await sendMessageGroupService(token, groupId, message);
+      const { EM, EC } = response;
+      if (EC === 0 && EM === "Success") {
+        console.log("send noti success");
+      }
+    }
+    catch (error) {
+      console.log("Error sending message:", error);
+    }
+  };
   const handleAddMember = async () => {
     try {
       const membersCast = members.map((member) => member._id);
       const response = await addMemberToGroup(token,groupId, membersCast);
       const { EC, EM } = response;
       if (EC === 0) {
-        navigation.goBack();
+        const announceMessage = `##TB##: Một thành viên vừa tham gia vào nhóm trò chuyện`;
+      handleSendMessage(announceMessage);
+        navigation.goBack();        
       } else {
         Alert.alert("Lỗi", EM);
       }

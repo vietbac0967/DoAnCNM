@@ -22,6 +22,7 @@ import {
   leaveGroupService,
   updateNameGroupService,
 } from "../services/group.service";
+import { sendMessageGroupService } from "../services/message.service";
 import { io } from "socket.io-client";
 import { URL_SERVER } from "@env";
 export default function GroupInfoScreen({ navigation, route }) {
@@ -49,6 +50,9 @@ export default function GroupInfoScreen({ navigation, route }) {
       console.log("Error getting user:", error);
     }
   };
+  useEffect(() => {
+    getUser();
+  }, []);
   useEffect(() => {
     getUser();
     socket.current = io(URL_SERVER);
@@ -88,6 +92,19 @@ export default function GroupInfoScreen({ navigation, route }) {
       Alert.alert("Error", err.message);
     }
   };
+  const handleSendMessage = async (message) => {
+    try {
+      const groupId = group._id;
+      const response = await sendMessageGroupService(token, groupId, message);
+      const { EM, EC } = response;
+      if (EC === 0 && EM === "Success") {
+        console.log("send noti success");
+      }
+    }
+    catch (error) {
+      console.log("Error sending message:", error);
+    }
+  };
   const handleLeaveGroup = async () => {
     try {
       Alert.alert("Cảnh báo", "Bạn có rời khỏi nhóm này không", [
@@ -106,6 +123,9 @@ export default function GroupInfoScreen({ navigation, route }) {
               console.log("response:::", response);
               const { EM, EC } = response;
               if (EC === 0 && EM === "Success") {
+                const announceMessage = `##TB##: ${user.name} vừa rời khỏi nhóm`;
+                console.log("announceMessage:::", announceMessage);
+                handleSendMessage(announceMessage);
                 Alert.alert("Thông báo", "Rời nhóm thành công");
                 navigation.navigate("Main");
               } else {

@@ -218,7 +218,7 @@ export default function ChatGroupScreen({ route, navigation }) {
   }, []);
   // add socket id to room
   useEffect(() => {
-    socket.current = io(URL_SERVER);
+    socket.current = io("http://172.20.10.4:5000");
     socket.current.emit("join-group", group._id);
     return () => {
       socket.current.disconnect();

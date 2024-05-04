@@ -20,7 +20,6 @@ export default function MessageGroupCard({
   const first5Chars = message.content.slice(0, 6);
   let isAnnounce = false;
   if (first5Chars === "##TB##") { isAnnounce = true; }
-  console.log("isAnnounce", isAnnounce);
   if (message.messageType === "text" && isAnnounce) {
     return (
       <View
@@ -31,7 +30,7 @@ export default function MessageGroupCard({
         }}
        
       >
-        <Text style={{ fontSize: 13, padding:3, textAlign: 'center', }}>{message.content.slice(7)}</Text>
+        <Text style={{ fontSize: 13, padding:3, textAlign: 'center', color: "gray" }}>{message.content.slice(7)}</Text>
       </View>
     );
   }
