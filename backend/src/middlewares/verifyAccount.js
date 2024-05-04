@@ -19,7 +19,7 @@ const getinfoGroupbyId = async (arr) => {
   let list = [];
   if (arr && arr.length > 0) {
     for (let i = 0; i < arr.length; i++) {
-      let user = await Group.findById(arr[i], "_id name members author avatar")
+      let user = await Group.findById(arr[i], "_id name members author avatar deputyLeader")
         .populate("members", "_id name email avatar")
         .populate("author", "_id name email avatar")
         .exec();
@@ -65,20 +65,6 @@ export const verifyAccount = async (req, res, next) => {
         DT: ''
       })
     }
-    // const token = req.headers.authorization.split(" ")[1];
-    // const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-    // if (!decoded) {
-    //   return res.status(400).json({ message: "Invalid token" });
-    // }
-    // if (decoded.exp < Date.now().valueOf() / 1000) {
-    //   return res.status(400).json({ message: "Token expired" });
-    // }
-    // const user = await User.findById(decoded.id)
-    // if (!user) {
-    //   return res.status(400).json({ message: "User not found" });
-    // }
-    // req.user = user;
-    // next();
   } catch (error) {
     console.log(error.message);
     return res.status(403).json({

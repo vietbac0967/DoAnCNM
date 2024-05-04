@@ -75,6 +75,7 @@ export const SocketSetup = (server) => {
             let sender = data.sender;
             let receiver = data.receiver;
 
+
             if (clients && clients.length > 0) {
                 let index = clients.findIndex((item) => item.customId.localeCompare(receiver.phone) === 0)
                 let indexsender = clients.findIndex((item) => item.customId.localeCompare(sender.phone) === 0)
@@ -114,7 +115,9 @@ export const SocketSetup = (server) => {
         })
 
         socket.on("typing", (data) => {
-            socket.broadcast.emit("typing", { groupId: data.groupId })
+            socket.broadcast.emit("typing", {
+                arrmember: data.arrmember
+            })
         })
 
         socket.on("allinfo", (data) => {

@@ -1,0 +1,33 @@
+.info-action-group-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
+
+    .info-action-group-body {
+        background-color: #f7f8f8;
+        padding: 5px;
+        border-radius: 15px;
+
+        .text-name-action-info-in-group {
+            color: #7589a3;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+        .text-action-info-in-group {
+            color: #7589a3;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .div-action-2 {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    }
+
+}

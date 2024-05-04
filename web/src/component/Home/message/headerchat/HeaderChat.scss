@@ -8,14 +8,18 @@
 
 
     .info-and-action {
-
+        width: 100%;
         display: flex;
         justify-content: space-between;
-        width: 100%;
 
         .info-user {
             display: flex;
             margin-left: 10px;
+            overflow: auto;
+
+            &:hover {
+                cursor: pointer;
+            }
 
             .info-name-user {
                 margin-left: 10px;
@@ -23,6 +27,10 @@
                 flex-direction: column;
                 justify-content: space-evenly;
             }
+        }
+
+        .action-info {
+            display: flex;
         }
 
     }

@@ -10,7 +10,11 @@ import {
     sendMessage,
     getMessagesGroup,
     sendMessageGroup,
+    sendImage,
+    sendImageGroup,
 } from "../controllers/message.controller.js";
+import upload from "../middlewares/uploadImage.js";
+
 // import path from "path";
 // import AWS from "aws-sdk";
 // import Message from "../models/message.model.js";
@@ -45,5 +49,18 @@ router.post("/message/deleteMessage", verifyAccount, deleteMessage);
 router.post("/message/recallMessage", verifyAccount, recallMessage);
 router.get("/message/messagesGroup", verifyAccount, getMessagesGroup);
 router.post("/message/sendMessageGroup", verifyAccount, sendMessageGroup);
+router.post(
+    "/message/sendImage",
+    verifyAccount,
+    upload.single("image"),
+    sendImage
+);
+
+router.post(
+    "/message/sendImageGroup",
+    verifyAccount,
+    upload.single("image"),
+    sendImageGroup
+);
 
 export default router;

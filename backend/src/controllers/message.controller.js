@@ -7,6 +7,7 @@ import {
     sendMessageService,
 } from "../services/message.service.js";
 import Conversation from "../models/converstation.model.js";
+import cloud from "../utils/cloudinary.js";
 
 //   import AWS from "aws-sdk";
 //   AWS.config.update({
@@ -26,39 +27,44 @@ export const sendMessage = async (req, res) => {
         res.status(500).json({ EC: 1, EM: error.message, DT: "" });
     }
 };
-// export const sendImage = async (req, res) => {
-//     try {
-//         const senderId = req.user._id;
-//         const image = req.file?.originalname;
-//         console.log("image::::", image);
-//         const fileType = image.split(".").pop();
-//         console.log("fileType::::", fileType);
-//         const filePath = `${senderId}_${Date.now()}.${fileType}`;
-//         s3.upload(
-//             {
-//                 Bucket: bucketName,
-//                 Key: filePath,
-//                 Body: req.file.buffer,
-//                 ContentType: req.file.mimetype,
-//             },
-//             async (err, data) => {
-//                 if (err) {
-//                     res.status(500).json({ EC: 1, EM: "Error", DT: "" });
-//                 } else {
-//                     const sendMessage = await sendMessageService(
-//                         req.body.receiverId,
-//                         senderId,
-//                         data.Location,
-//                         "image"
-//                     );
-//                     res.status(200).json(sendMessage);
-//                 }
-//             }
-//         );
-//     } catch (error) {
-//         res.status(500).json({ EC: 1, EM: error.message, DT: "" });
-//     }
-// };
+export const sendImage = async (req, res) => {
+    if (!req.file || !req.file.buffer) {
+        return res.status(400).json({ EC: 1, EM: "No file provided", DT: "" });
+    }
+    try {
+        const senderId = req.user._id;
+        cloud.uploader
+            .upload_stream({ resource_type: "auto" }, async (error, result) => {
+                if (error) {
+                    return res.status(500).json({ EC: 1, EM: "Error", DT: "" });
+                } else {
+                    const sendMessage = await sendMessageService(
+                        req.body.receiverId,
+                        senderId,
+                        result.secure_url,
+                        "image"
+                    );
+                    // push message to conversation
+                    const converstation = await Conversation.findOne({
+                        participants: { $all: [req.body.receiverId, senderId] },
+                    });
+                    if (!converstation) {
+                        res.status(500).json({
+                            EC: 1,
+                            EM: "Error",
+                            DT: "Conversation not found",
+                        });
+                    }
+                    converstation.messages.push(sendMessage.DT._id);
+                    await converstation.save();
+                    return res.status(200).json(sendMessage);
+                }
+            })
+            .end(req.file.buffer);
+    } catch (error) {
+        return res.status(500).json({ EC: 1, EM: error.message, DT: "" });
+    }
+};
 export const getMessages = async (req, res) => {
     try {
         const senderId = req.user._id;
@@ -113,6 +119,32 @@ export const sendMessageGroup = async (req, res) => {
             "text"
         );
         res.status(200).json(sendMessage);
+    } catch (error) {
+        res.status(500).json({ EC: 1, EM: error.message, DT: "" });
+    }
+};
+
+export const sendImageGroup = async (req, res) => {
+    if (!req.file || !req.file.buffer) {
+        return res.status(400).json({ EC: 1, EM: "No file provided", DT: "" });
+    }
+    try {
+        const senderId = req.user._id;
+        cloud.uploader
+            .upload_stream({ resource_type: "auto" }, async (error, result) => {
+                if (error) {
+                    res.status(500).json({ EC: 1, EM: "Error", DT: "" });
+                } else {
+                    const sendMessage = await sendMessageGroupService(
+                        senderId,
+                        req.body.groupId,
+                        result.secure_url,
+                        "image"
+                    );
+                    res.status(200).json(sendMessage);
+                }
+            })
+            .end(req.file.buffer);
     } catch (error) {
         res.status(500).json({ EC: 1, EM: error.message, DT: "" });
     }

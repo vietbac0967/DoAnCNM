@@ -11,6 +11,7 @@ import {
     updateDeputyLeaderService,
     updateNameGroupService,
 } from "../services/group.service.js";
+import cloud from "../utils/cloudinary.js";
 // import cloud from "../utils/cloudinary.js";
 
 export const createGroup = async (req, res) => {
@@ -167,7 +168,6 @@ export const updateDeputyLeader = async (req, res) => {
 export const updateImageGroup = async (req, res) => {
     try {
         const groupId = req.body.groupId;
-        console.log("groupId:::", groupId);
         if (!req.file) {
             return res.status(400).json({ EC: 1, EM: "No file provided", DT: "" });
         }

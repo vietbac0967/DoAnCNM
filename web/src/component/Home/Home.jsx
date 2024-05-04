@@ -10,7 +10,9 @@ import _ from 'lodash';
 import { getAllMessage, getMessagesGroup } from '../../service/MessageService';
 import { getConverstations } from '../../service/ConverstationService';
 
-const Home = () => {
+const Home = (props) => {
+
+    const { user, setuser } = props;
 
     const theme = useTheme();
     const mdup = useMediaQuery(theme.breakpoints.up('md'))
@@ -19,7 +21,7 @@ const Home = () => {
     const dataredux = useSelector((state) => state.userisaccess.account)
 
     const [showchat, setshowchat] = useState(false)
-    const [user, setuser] = useState({})
+    // const [user, setuser] = useState({})
 
 
     useEffect(() => {
@@ -40,6 +42,29 @@ const Home = () => {
         }
     }, [dataredux])
 
+    useEffect(() => {
+        if (dataredux) {
+            handleCusttomClient({ customId: dataredux.phoneNumber })
+
+            handlerefreshAccount(() => {
+                dispatch(fechUserToken())
+            })
+
+            if (user) {
+                if (user.type === "group") {
+                    let data = { groupId: user._id._id, user: dataredux.phoneNumber, namegroup: user.name };
+                    handleuserleavegroup(data)
+                } else {
+                    if (!user.phoneNumber) {
+                        let data = { groupId: user._id, user: dataredux.phoneNumber, namegroup: user.name };
+                        handleuserleavegroup(data)
+                    }
+                }
+            }
+            setuser({})
+        }
+    }, [])
+
     return (
         <Grid className='home-container' container spacing={0} columns={12}>
             <Grid className='home-frient' item xs={12} sm={12} md={3}
@@ -51,6 +76,8 @@ const Home = () => {
                     setshowchat={setshowchat}
                     setuser={setuser}
                     mdup={mdup}
+                    users={user}
+
                 />
             </Grid>
             <Grid className='home-message' item xs={12} sm={12} md={9}
@@ -64,6 +91,8 @@ const Home = () => {
                             setshowchat={setshowchat}
                             mdup={mdup}
                             users={user}
+                            setusers={setuser}
+                            dataredux={dataredux}
                         />
                         :
                         <></>

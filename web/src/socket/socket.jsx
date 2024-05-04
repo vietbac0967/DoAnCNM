@@ -6,27 +6,26 @@ const socket = io(URL_BE);
 
 const handleCusttomClient = (data) => {
     socket.emit("storeClientInfo", data)
-
 }
 
 const handlerefreshAccount = (callback) => {
-    socket.on("refresh", callback)
+    socket.on("refreshNotification", callback)
 }
 
 const handlesendtext = (data) => {
-    socket.emit("sendtest", data)
+    socket.emit("sendNotification", data)
 }
 
 const handlsendmessange = (data) => {
-    socket.emit("sendmessange", data)
+    socket.emit("sendMessage", data)
 }
 
 const handlerefreshMessange = (callback) => {
-    socket.on("refreshmessange", callback)
+    socket.on("refreshMessage", callback)
 }
 
 const handlerefreshMessangesennder = (callback) => {
-    socket.on("refreshmessangesender", callback)
+    socket.on("refreshMessageSender", callback)
 }
 
 const handlesendaddgroup = () => {
@@ -38,19 +37,19 @@ const handleactionaddgroup = (callback) => {
 }
 
 const handlsendmessangeingroup = (data) => {
-    socket.emit("sendmessangeingroup", data)
+    socket.emit("sendMessageInGroup", data)
 }
 
 const handlerefreshMessangeingroup = (callback) => {
-    socket.on("refreshmessangeingroup", callback)
+    socket.on("receiveMessageInGroup", callback)
 }
 
 const handleuserjoingroup = (data) => {
-    socket.emit("joinRoom", data)
+    socket.emit("joinGroup", data)
 }
 
 const handleuserleavegroup = (data) => {
-    socket.emit("leaveRoom", data)
+    socket.emit("leaveGroup", data)
 }
 
 const handlesendinfoAll = (data) => {

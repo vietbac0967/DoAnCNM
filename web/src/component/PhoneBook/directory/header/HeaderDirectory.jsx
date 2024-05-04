@@ -4,13 +4,18 @@ import './HeaderDirectory.scss'
 import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { handleuserleavegroup } from '../../../../socket/socket';
 
 const HeaderDirectory = (props) => {
 
-    const { titleHeader, setshowchat } = props;
+    const { titleHeader, setshowchat, users } = props;
 
     const theme = useTheme();
     const mdup = useMediaQuery(theme.breakpoints.up('md'))
+
+    const handleCancel = () => {
+        setshowchat(false)
+    }
 
     return (
         <Box className="header-directory-container">
@@ -23,7 +28,7 @@ const HeaderDirectory = (props) => {
                     className="header-icon-goback"
                 >
                     <IconButton
-                        onClick={() => setshowchat(false)}
+                        onClick={() => handleCancel()}
                     >
                         <ArrowBackIosIcon />
                     </IconButton>

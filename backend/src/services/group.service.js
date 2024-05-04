@@ -253,7 +253,7 @@ export const getUserForGroupService = async (groupId) => {
     try {
         const populatedGroup = await Group.findById(groupId).populate([
             { path: "author", select: "_id name email avatar" },
-            { path: "members", select: "_id name email avatar" },
+            { path: "members", select: "_id name email avatar gender phoneNumber" },
         ]);
 
         if (!populatedGroup) {
@@ -266,7 +266,7 @@ export const getUserForGroupService = async (groupId) => {
         const author = populatedGroup.author;
         let members = populatedGroup.members;
         // add author to front members list
-        members = [author, ...members];
+        members = [...members];
         return {
             EC: 0,
             EM: "Success",

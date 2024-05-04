@@ -13,6 +13,7 @@ import {
     updateDeputyLeader,
     updateImageGroup,
 } from "../controllers/group.controller.js";
+import upload from "../middlewares/uploadImage.js";
 // import upload from "../middlewares/uploadImage.js";
 const router = express.Router();
 
@@ -21,16 +22,16 @@ router.get("/getGroups", verifyAccount, getGroupsForUser);
 router.post("/deleteGroup", verifyAccount, deleteGroup);
 router.get("/getUserForGroup", verifyAccount, getUserForGroup);
 router.post("/leaveGroup", verifyAccount, leaveGroup);
-router.post("/updateNameGroup", verifyAccount, updatNameGroup);
 router.post("/addMember", verifyAccount, addMemberToGroup);
 router.get("/lead", verifyAccount, getLeadForGroup);
 router.post("/deleteMember", verifyAccount, deleteMemeberFromGroup);
 router.post("/updateDeputyLeader", verifyAccount, updateDeputyLeader);
-// router.post(
-//     "/updateImageGroup",
-//     verifyAccount,
-//     upload.single("image"),
-//     updateImageGroup
-// );
+router.post("/updateNameGroup", verifyAccount, updatNameGroup);
+router.post(
+    "/updateImageGroup",
+    verifyAccount,
+    upload.single("image"),
+    updateImageGroup
+);
 
 export default router;

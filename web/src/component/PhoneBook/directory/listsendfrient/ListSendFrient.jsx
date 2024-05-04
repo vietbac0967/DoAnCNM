@@ -8,7 +8,7 @@ import ListFriend from './listfriends/ListFriend';
 
 const ListSendFrient = (props) => {
 
-    const { setshowchat } = props;
+    const { setshowchat, users, dataredux } = props;
 
 
     return (
@@ -17,6 +17,8 @@ const ListSendFrient = (props) => {
                 className="list-send-frient-header"
                 titleHeader={{ title: "Lời Mời Kết Bạn", icon: <MarkAsUnreadIcon fontSize='large' /> }}
                 setshowchat={setshowchat}
+                users={users}
+                dataredux={dataredux}
             />
             <Box className="list-send-frient-body">
                 <Box

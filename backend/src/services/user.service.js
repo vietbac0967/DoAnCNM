@@ -50,7 +50,7 @@ export const showFriends = async (userId) => {
 export const getUserByIdService = async (userId) => {
     try {
         const user = await User.findById(userId)
-            .select(["name", "phoneNumber", "avatar", "_id"])
+            .select(["name", "phoneNumber", "avatar", "_id", "gender", "email"])
             .lean();
         if (!user) {
             return { EC: 1, EM: "User not found", DT: "" };
@@ -140,6 +140,8 @@ export const rejectFriendRequestToUser = async (senderId, receiverId) => {
     try {
         const sender = await User.findById(senderId);
         const receiver = await User.findById(receiverId);
+        console.log("sender", sender)
+        console.log("sender", receiver)
         if (!sender || !receiver) {
             return { EC: 1, EM: "User not found", DT: "" };
         }
@@ -274,3 +276,4 @@ export const deleteFriendService = async (userId, friendId) => {
         };
     }
 };
+
