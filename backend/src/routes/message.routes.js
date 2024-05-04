@@ -11,6 +11,7 @@ import {
   sendImageGroup,
   sendMessage,
   sendMessageGroup,
+  sendVideo,
 } from "../controllers/message.controller.js";
 import updoad from "../middlewares/uploadImage.js";
 import uploadFile from "../middlewares/uploadFile.js";
@@ -256,4 +257,5 @@ router.post(
   uploadFile.single("file"),
   sendFile
 );
+router.post("/message/sendVideo",verifyAccount,uploadFile.single("video"),sendVideo);
 export default router;

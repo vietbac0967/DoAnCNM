@@ -46,7 +46,6 @@ export default function ConversationCard({ item, navigation }) {
       Alert.alert("Error", error.message);
     }
   };
-  // console.log("notifications:::", notifications);
   useEffect(() => {
     getNotifications();
   }, [receiver]);
@@ -75,6 +74,7 @@ export default function ConversationCard({ item, navigation }) {
       }
     });
   }, []);
+
   return (
     <Pressable
       style={({ pressed }) => [
@@ -190,7 +190,7 @@ export default function ConversationCard({ item, navigation }) {
             </>
           ) : (
             <>
-              <View>
+              {/* <View>
                 {item?.messageType === "text" ? (
                   item?.message.content.slice(0, 6) === "##TB##" ? (
                     <Text style={{ color: "gray" }}>
@@ -216,7 +216,48 @@ export default function ConversationCard({ item, navigation }) {
                     Hãy trò chuyện cùng nhau nào!
                   </Text>
                 )}
+              </View> */}
+              <View>
+                {(() => {
+                  let messageContent = "";
+                  let senderPrefix = "";
+
+                  if (item?.messageType === "text") {
+                    if (item?.message.content.slice(0, 6) === "##TB##") {
+                      messageContent =
+                        item.message.content.length > 37
+                          ? item.message.content.slice(0, 37).slice(7) + "..."
+                          : item.message.content;
+                    } else {
+                      senderPrefix =
+                        item.message.senderId !== item?._id ? "Bạn: " : "";
+                      messageContent =
+                        item.message.content.length > 11
+                          ? item.message.content.slice(0, 11) + "..."
+                          : item.message.content;
+                    }
+                  } else if (item?.messageType === "image") {
+                    senderPrefix =
+                      item.message.senderId !== item?._id ? "Bạn: " : "";
+                    messageContent = "[Hình ảnh]";
+                  } else if (item?.messageType === "video") {
+                    item.message.senderId !== item?._id ? "Bạn: " : "";
+                    messageContent = "[Video]";
+                  } else if (item?.messageType === "file") {
+                    item.message.senderId !== item?._id ? "Bạn: " : "";
+                    messageContent = "[File]";
+                  } else {
+                    messageContent = "Hãy trò chuyện cùng nhau nào!";
+                  }
+                  return (
+                    <Text style={{ color: "gray" }}>
+                      {senderPrefix}
+                      {messageContent}
+                    </Text>
+                  );
+                })()}
               </View>
+
               <View>
                 <Text style={{ color: "gray" }}>
                   {item.message.createdAt

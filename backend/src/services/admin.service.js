@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import logger from "../helpers/winston.log.js";
 import Conversation from "../models/converstation.model.js";
 import Message from "../models/message.model.js";
@@ -117,6 +118,49 @@ export const getNewRegisterUsersService = async (month, year) => {
       EC: 1,
       EM: error.message,
       DT: "",
+    };
+  }
+};
+
+export const getTotalDataSizeOfUserService = async (userId) => {
+  try {
+    // Use aggregate to calculate the total data size of messages sent by the user
+    const totalDataSize = await Message.aggregate([
+      {
+        $match: {
+          senderId: new Types.ObjectId(userId),
+          messageType: { $in: ["image", "file"] },
+          fileSize: { $ne: null },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalSize: {
+            $sum: "$fileSize",
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0, // Exclude _id field from the output
+          totalSize: 1, // Include totalSize field in the output
+        },
+      },
+    ]);
+
+    // Return the result
+    return {
+      EC: 0, // Error code 0 indicates success
+      EM: "Success", // Success message
+      DT: totalDataSize.length > 0 ? totalDataSize[0].totalSize : 0, // Total data size (if available)
+    };
+  } catch (error) {
+    // If there's an error, return error details
+    return {
+      EC: 1, // Error code 1 indicates an error
+      EM: error.message, // Error message
+      DT: "", // No data to return in case of error
     };
   }
 };

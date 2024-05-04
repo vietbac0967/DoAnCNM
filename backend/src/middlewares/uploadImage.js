@@ -1,5 +1,5 @@
 import multer from "multer";
-import path from "path"
+import path from "path";
 const storage = multer.memoryStorage({
   destination(req, res, cb) {
     cb(null, "");

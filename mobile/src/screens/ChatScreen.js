@@ -40,7 +40,7 @@ import { Feather } from "@expo/vector-icons";
 import { EvilIcons, AntDesign } from "@expo/vector-icons";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
-import * as ImagePicker from "expo-image-picker";
+// import * as ImagePicker from "expo-image-picker";
 import { URL_SERVER } from "@env";
 import MessageCard from "../components/MessageCard";
 import {
@@ -57,6 +57,7 @@ import { sendNotificationService } from "../services/notification.service";
 import Loading from "../components/Loading";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import * as DocumentPicker from "expo-document-picker";
+import * as ImagePicker from "expo-image-picker";
 const ChatScreen = ({ navigation, route }) => {
   const [messages, setMessages] = useState([]);
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
@@ -77,6 +78,7 @@ const ChatScreen = ({ navigation, route }) => {
   const [isLoadingUpload, setIsLoadingUpload] = useState(false);
   const bottomSheetModalRef = useRef(null);
   const snapPoints = useMemo(() => ["25%", "50%"], []);
+  const [images, setImages] = useState([]);
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
@@ -120,39 +122,73 @@ const ChatScreen = ({ navigation, route }) => {
       if (!result.canceled) {
         console.log("image camera:::", result);
         setIsLoadingUpload(true);
-        let localUri = result.assets[0].uri;
-        let filename = localUri.split("/").pop();
-        let match = /\.(\w+)$/.exec(filename);
-        let type = match ? `image/${match[1]}` : "image";
-        const formData = new FormData();
-        formData.append("image", {
-          uri: localUri,
-          name: filename,
-          type,
-        });
-        const token = await AsyncStorage.getItem("accessToken");
-        formData.append("receiverId", recevierId);
-        const response = await axios.post(
-          `${URL_SERVER}/api/message/sendImage`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        const { DT, EC, EM } = response.data;
-        if (EC === 0 && EM === "Success") {
-          setMessages([DT, ...messages.slice(0, -1)]);
-          handlSendMessageSocket({
-            sender: { phone: user.phoneNumber, userId: user._id },
-            receiver: { phone: receiver.phoneNumber, userId: receiver._id },
+        if (result.assets[0].type === "image") {
+          let localUri = result.assets[0].uri;
+          let filename = localUri.split("/").pop();
+          let match = /\.(\w+)$/.exec(filename);
+          let type = match ? `image/${match[1]}` : "image";
+          const formData = new FormData();
+          formData.append("image", {
+            uri: localUri,
+            name: filename,
+            type,
           });
-          setIsLoadingUpload(false);
+          const token = await AsyncStorage.getItem("accessToken");
+          formData.append("receiverId", recevierId);
+          const response = await axios.post(
+            `${URL_SERVER}/api/message/sendImage`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          const { DT, EC, EM } = response.data;
+          if (EC === 0 && EM === "Success") {
+            setMessages([DT, ...messages.slice(0, -1)]);
+            handlSendMessageSocket({
+              sender: { phone: user.phoneNumber, userId: user._id },
+              receiver: { phone: receiver.phoneNumber, userId: receiver._id },
+            });
+            setIsLoadingUpload(false);
+          } else {
+            Alert.alert("Cảnh báo", "Tải ảnh không thành công");
+            setIsLoadingUpload(false);
+          }
         } else {
-          Alert.alert("Cảnh báo", "Tải ảnh không thành công");
-          setIsLoadingUpload(false);
+            console.log("video:::", result.assets[0])
+          const formData = new FormData();
+          formData.append("video", {
+            uri: result.assets[0].uri,
+            name: result.assets[0].fileName,
+            type: result.assets[0].mimeType,
+          });
+          const token = await AsyncStorage.getItem("accessToken");
+          formData.append("receiverId", recevierId);
+          const response = await axios.post(
+            `${URL_SERVER}/api/message/sendVideo`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          const {EC, EM } = response.data;
+          if (EC === 0) {
+            refreshMessages();
+            handlSendMessageSocket({
+              sender: { phone: user.phoneNumber, userId: user._id },
+              receiver: { phone: receiver.phoneNumber, userId: receiver._id },
+            });
+            setIsLoadingUpload(false);
+          } else {
+            Alert.alert("Cảnh báo", "Tải video không thành công");
+            setIsLoadingUpload(false);
+          }
         }
       }
     } catch (error) {
@@ -333,6 +369,7 @@ const ChatScreen = ({ navigation, route }) => {
     if (user) {
       handleRefreshMessageSocket(async (data) => {
         console.log("data refresh message:::", data);
+        refreshMessages();
         getMessages();
       });
       // handleRefreshMessageSenderSocket(async (data) => {
@@ -520,6 +557,7 @@ const ChatScreen = ({ navigation, route }) => {
           </View>
         </Pressable>
       </Modal>
+      
       <Modal
         animationType="fade"
         transparent={true}

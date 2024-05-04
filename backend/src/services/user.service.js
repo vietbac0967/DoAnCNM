@@ -266,6 +266,9 @@ export const deleteFriendService = async (userId, friendId) => {
     await User.findByIdAndUpdate(friendId, {
       $pull: { friends: userId },
     });
+    await Conversation.deleteMany({
+      participants: { $all: [userId, friendId] },
+    });
     return {
       EC: 0,
       EM: "Success",

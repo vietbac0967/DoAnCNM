@@ -6,6 +6,7 @@ import {
   getNewRegisterUsers,
   getNumberOfSendImage,
   getNumberOfSendMessaages,
+  getTotalDataSizeOfUser,
 } from "../controllers/admin.controller.js";
 import User from "../models/user.model.js";
 import logger from "../helpers/winston.log.js";
@@ -16,12 +17,5 @@ router.get("/messages", verifyAdmin, getNumberOfSendMessaages);
 router.get("/images", verifyAdmin, getNumberOfSendImage);
 router.get("/newFriends", verifyAdmin, getFriendsFollowMonthAndYear);
 router.get("/newUsers", verifyAdmin, getNewRegisterUsers);
-router.get("/all", async (req, res) => {
-  try {
-    const users = await User.find();
-    res.status(200).json(users);
-  } catch (error) {
-    logger.error(error.message);
-  }
-});
+router.get("/totalDataSize", verifyAdmin, getTotalDataSizeOfUser);
 export default router;

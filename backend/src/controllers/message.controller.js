@@ -61,32 +61,28 @@ export const sendImage = async (req, res) => {
   try {
     const senderId = req.user._id;
     cloud.uploader
-      .upload_stream({ resource_type: "auto" }, async (error, result) => {
-        if (error) {
-          return res.status(500).json({ EC: 1, EM: "Error", DT: "" });
-        } else {
-          const sendMessage = await sendMessageService(
-            req.body.receiverId,
-            senderId,
-            result.secure_url,
-            "image"
-          );
-          // push message to conversation
-          const converstation = await Conversation.findOne({
-            participants: { $all: [req.body.receiverId, senderId] },
-          });
-          if (!converstation) {
-            res.status(500).json({
-              EC: 1,
-              EM: "Error",
-              DT: "Conversation not found",
-            });
+      .upload_stream(
+        {
+          resource_type: "image",
+          transformation: [{ width: 300}],
+        },
+        async (error, result) => {
+          if (error) {
+            return res.status(500).json({ EC: 1, EM: "Error", DT: "" });
+          } else {
+            const sendMessage = await sendMessageService(
+              req.body.receiverId,
+              senderId,
+              result.secure_url,
+              "image"
+            );
+            const message = await Message.findById(sendMessage.DT._id);
+            message.fileSize = result.bytes;
+            await message.save();
+            return res.status(200).json(sendMessage);
           }
-          converstation.messages.push(sendMessage.DT._id);
-          await converstation.save();
-          return res.status(200).json(sendMessage);
         }
-      })
+      )
       .end(req.file.buffer);
   } catch (error) {
     return res.status(500).json({ EC: 1, EM: error.message, DT: "" });
@@ -111,10 +107,10 @@ export const sendFile = async (req, res) => {
       return res.status(400).json({ EC: 1, EM: "No file provided", DT: "" });
     }
     const senderId = req.user._id;
-    const fileName = path.parse(req.file.originalname).name;
+    const fileName = req.file.originalname;
     cloud.uploader
       .upload_stream(
-        { resource_type: "auto", public_id: fileName},
+        { resource_type: "raw", public_id: `files/${fileName}` },
         async (error, result) => {
           if (error) {
             return res.status(500).json({ EC: 1, EM: "Error", DT: "" });
@@ -128,24 +124,54 @@ export const sendFile = async (req, res) => {
             const message = await Message.findById(sendMessage.DT._id);
             message.fileSize = result.bytes;
             await message.save();
-            // push message to conversation
-            const converstation = await Conversation.findOne({
-              participants: { $all: [req.body.receiverId, senderId] },
-            });
-            if (!converstation) {
-              res.status(500).json({
-                EC: 1,
-                EM: "Error",
-                DT: "Conversation not found",
-              });
-            }
-            converstation.messages.push(sendMessage.DT._id);
-            await converstation.save();
             return res.status(200).json({
               EC: 0,
               EM: "Success",
               DT: message,
             });
+          }
+        }
+      )
+      .end(req.file.buffer);
+  } catch (error) {
+    return res.status(500).json({
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    });
+  }
+};
+export const sendVideo = async (req, res) => {
+  try {
+    if (!req.file || !req.file.buffer)
+      return res.status(400).json({ EC: 1, EM: "No file provided", DT: "" });
+    const senderId = req.user._id;
+    const fileName = req.file.originalname;
+    // Respond to the client immediately
+    res.status(200).json({ EC: 0, EM: "Upload started", DT: "" });
+    // Perform the upload operation in the background
+    cloud.uploader
+      .upload_stream(
+        {
+          resource_type: "video",
+          public_id: `videos/${fileName}`,
+          transformation: [{ width: 300, crop: "pad" }, { duration: 30 }],
+        },
+
+        async (error, result) => {
+          if (error) {
+            console.error("Upload error:", error);
+          } else {
+            const sendMessage = await sendMessageService(
+              req.body.receiverId,
+              senderId,
+              result.secure_url,
+              "video"
+            );
+            const message = await Message.findById(sendMessage.DT._id);
+            message.fileSize = result.bytes;
+            await message.save();
+            console.log("Upload successful:", sendMessage);
           }
         }
       )
@@ -176,6 +202,9 @@ export const sendImageGroup = async (req, res) => {
             result.secure_url,
             "image"
           );
+          const message = await Message.findById(sendMessage.DT._id);
+          message.fileSize = result.bytes;
+          await message.save();
           res.status(200).json(sendMessage);
         }
       })

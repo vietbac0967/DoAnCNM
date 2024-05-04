@@ -135,3 +135,14 @@ export const sendFriendRequestService = async (receiverId) => {
     throw new Error(error.message);
   }
 };
+export const deleteFriendService = async (friendId) => {
+  try {
+    const response = await api.post("/user/deleteFriend", {
+      friendId,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("error:::", error);
+    return {};
+  }
+};

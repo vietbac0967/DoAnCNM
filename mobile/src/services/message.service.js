@@ -29,7 +29,18 @@ export const sendMessageService = async (receiverId, message) => {
     return {};
   }
 };
-
+export const sendImageService = async (data) => {
+  try {
+    const response = await api.post("/message/sendImage", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    return {};
+  }
+};
 export const sendMessageGroupService = async (groupId, message) => {
   try {
     const response = await api.post("/message/sendMessageGroup", {
