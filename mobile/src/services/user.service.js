@@ -127,7 +127,7 @@ export const getUserInfo = async () => {
 export const sendFriendRequestService = async (receiverId) => {
   try {
     const res = await api.post("/user/sendFriendRequest", {
-      receiverId,
+      receiver: receiverId,
     });
     return res.data;
   } catch (error) {

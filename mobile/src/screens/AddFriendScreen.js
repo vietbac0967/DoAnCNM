@@ -52,13 +52,11 @@ export default function AddFriendScreen({ navigation }) {
       //   receiver: user._id,
       // });
       const res = await sendFriendRequestService(user._id);
-      const { EC, EM, DT } = res.data;
+      console.log("res", res);
+      const { EC, EM, DT } = res;
       if (EC === 0 && EM === "Success") {
         Alert.alert("Thông báo", "Gửi lời mời thành công", [{ text: "OK" }]);
-        navigation.navigate("Message", {
-          isLoading: true,
-        });
-        return;
+        navigation.navigate("Main");
       }
     } catch (error) {
       Alert.alert("Thông báo", error, [{ text: "OK" }]);

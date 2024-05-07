@@ -120,7 +120,6 @@ const ChatScreen = ({ navigation, route }) => {
         });
       }
       if (!result.canceled) {
-        console.log("image camera:::", result);
         setIsLoadingUpload(true);
         if (result.assets[0].type === "image") {
           let localUri = result.assets[0].uri;
@@ -147,18 +146,19 @@ const ChatScreen = ({ navigation, route }) => {
           );
           const { DT, EC, EM } = response.data;
           if (EC === 0 && EM === "Success") {
+            await refreshMessages();
             setMessages([DT, ...messages.slice(0, -1)]);
+            setIsLoadingUpload(false);
             handlSendMessageSocket({
               sender: { phone: user.phoneNumber, userId: user._id },
               receiver: { phone: receiver.phoneNumber, userId: receiver._id },
             });
-            setIsLoadingUpload(false);
           } else {
             Alert.alert("Cảnh báo", "Tải ảnh không thành công");
+            await refreshMessages();
             setIsLoadingUpload(false);
           }
         } else {
-            console.log("video:::", result.assets[0])
           const formData = new FormData();
           formData.append("video", {
             uri: result.assets[0].uri,
@@ -177,9 +177,8 @@ const ChatScreen = ({ navigation, route }) => {
               },
             }
           );
-          const {EC, EM } = response.data;
+          const { EC, EM } = response.data;
           if (EC === 0) {
-            refreshMessages();
             handlSendMessageSocket({
               sender: { phone: user.phoneNumber, userId: user._id },
               receiver: { phone: receiver.phoneNumber, userId: receiver._id },
@@ -226,8 +225,9 @@ const ChatScreen = ({ navigation, route }) => {
         );
         const { DT, EC, EM } = response.data;
         if (EC === 0 && EM === "Success") {
-          setIsLoadingUpload(false);
+          await refreshMessages();
           setMessages([DT, ...messages.slice(0, -1)]);
+          setIsLoadingUpload(false);
           handlSendMessageSocket({
             sender: { phone: user.phoneNumber, userId: user._id },
             receiver: { phone: receiver.phoneNumber, userId: receiver._id },
@@ -297,13 +297,10 @@ const ChatScreen = ({ navigation, route }) => {
           const response = await recallMessageService(selectMessage._id);
           setModalVisible(false);
           const { EC, EM, DT } = response;
-          refreshMessages();
-          setMessages(
-            messages.filter((message) => message._id !== selectMessage._id)
-          );
-          setIsLoading(false);
-          setIsRefreshing(false);
           if (EC === 0 && EM === "Success") {
+            setMessages(
+              messages.filter((message) => message._id !== selectMessage._id)
+            );
             handlSendMessageSocket({
               sender: { phone: user.phoneNumber, userId: user._id },
               receiver: {
@@ -323,7 +320,6 @@ const ChatScreen = ({ navigation, route }) => {
       const { EC, EM, DT } = response;
       if (EC === 0 && EM === "Success") {
         setModalVisible(false);
-        refreshMessages();
         setMessages(
           messages.filter((message) => message._id !== selectMessage._id)
         );
@@ -479,6 +475,7 @@ const ChatScreen = ({ navigation, route }) => {
       ),
     });
   }, [navigation, receiver]);
+
   if (isLoadingUpload) {
     return <Loading content={""} />;
   }
@@ -557,7 +554,7 @@ const ChatScreen = ({ navigation, route }) => {
           </View>
         </Pressable>
       </Modal>
-      
+
       <Modal
         animationType="fade"
         transparent={true}
