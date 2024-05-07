@@ -1,7 +1,7 @@
 .my-messenge-container {
     display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    align-items: flex-end;
+    flex-direction: column;
 
     .info-messenge {
         padding: 8px;
@@ -9,11 +9,14 @@
 
         .form-text {
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            justify-content: center;
             min-height: 60px;
             min-width: 90px;
             padding: 10px;
             background-color: #e5efff;
+            overflow: auto;
+
 
             .text {
                 font-size: .9375rem;
@@ -24,6 +27,52 @@
                 word-wrap: break-word;
                 color: var(--text-primary);
             }
+
+            .time {
+                color: #476285;
+                font-size: 13px;
+                font-weight: 400;
+                line-height: 1.5;
+                margin-top: auto;
+            }
+        }
+    }
+
+    .info-image {
+        padding: 8px;
+        max-width: 70%;
+
+
+        .form-image {
+            display: flex;
+            align-items: center;
+            min-width: 120px;
+            min-height: 90px;
+            padding: 10px;
+            overflow: auto;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+
+    }
+
+    .div-time-img {
+        margin-top: 5px;
+        height: 10%;
+        background-color: rgb(113 137 172);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+
+        .time-img {
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #fff;
         }
     }
 }

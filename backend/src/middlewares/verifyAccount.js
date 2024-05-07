@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import logger from "../helpers/winston.log.js";
+import Group from "../models/group.model.js";
 const getinfobyId = async (arr) => {
   let list = [];
   if (arr && arr.length > 0) {
@@ -9,6 +10,22 @@ const getinfobyId = async (arr) => {
         arr[i],
         "_id name email gender is_online avatar phoneNumber"
       ).exec();
+      list.push(user);
+    }
+  }
+  return list;
+};
+const getinfoGroupbyId = async (arr) => {
+  let list = [];
+  if (arr && arr.length > 0) {
+    for (let i = 0; i < arr.length; i++) {
+      let user = await Group.findById(
+        arr[i],
+        "_id name members author avatar deputyLeader"
+      )
+        .populate("members", "_id name email avatar")
+        .populate("author", "_id name email avatar")
+        .exec();
       list.push(user);
     }
   }
@@ -56,7 +73,7 @@ export const verifyAccount = async (req, res, next) => {
           let listsentFriendRequests = await getinfobyId(
             user.sentFriendRequests
           );
-
+          let listgroup = await getinfoGroupbyId(user.groups);
           req.user = {
             _id: user._id,
             name: user.name,
@@ -68,6 +85,7 @@ export const verifyAccount = async (req, res, next) => {
             friends: listfriend,
             friendRequests: listfriendRequests,
             sentFriendRequests: listsentFriendRequests,
+            groups: listgroup,
           };
           next();
         }

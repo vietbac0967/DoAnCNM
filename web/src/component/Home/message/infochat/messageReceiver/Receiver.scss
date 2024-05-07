@@ -1,29 +1,81 @@
 .messenge-container {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
 
-    .avatar-messenge {}
-
-    .info-messenge {
+    .body-messenge {
+        flex-direction: column;
+        max-width: 70%;
         padding: 8px;
 
-        .form-text {
-            display: flex;
-            align-items: center;
-            min-height: 60px;
-            min-width: 90px;
-            padding: 10px;
+        .info-messenge {
+            // padding: 8px;
+            // max-width: 70%;
 
-            .text {
-                font-size: .9375rem;
-                font-weight: 400;
-                line-height: 1.5;
-                user-select: text;
-                white-space: pre-wrap;
-                word-wrap: break-word;
-                color: var(--text-primary);
+            .form-text {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                min-height: 60px;
+                min-width: 90px;
+                padding: 10px;
+                overflow: auto;
+
+                .text {
+                    font-size: .9375rem;
+                    font-weight: 400;
+                    line-height: 1.5;
+                    user-select: text;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    color: var(--text-primary);
+                }
+
+                .time {
+                    color: #476285;
+                    font-size: 13px;
+                    font-weight: 400;
+                    line-height: 1.5;
+                    margin-top: auto;
+                }
+            }
+
+        }
+
+        .info-image {
+            // padding: 8px;
+            // max-width: 70%;
+
+            .form-image {
+                display: flex;
+                align-items: center;
+                min-width: 120px;
+                min-height: 90px;
+                padding: 10px;
+                overflow: auto;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: cover;
             }
         }
 
+        .div-time-img {
+            margin-top: 5px;
+            background-color: rgb(113 137 172);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            width: fit-content;
+
+            .time-img {
+                font-size: 13px;
+                font-weight: 400;
+                line-height: 1.5;
+                color: #fff;
+            }
+        }
     }
+
+
 }

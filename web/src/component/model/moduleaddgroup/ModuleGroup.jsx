@@ -16,7 +16,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { toast } from 'react-toastify';
 import { getAllFriend } from '../../../service/UserService';
 import { CreateGroup } from '../../../service/GroupService';
-import { handlesendaddgroup, handlesendtext } from '../../../socket/socket';
+import { handlesendaddgroup, handlesendinfoAll, handlesendtext } from '../../../socket/socket';
 import { fechUserToken } from '../../../redux/UserSlice';
 
 const style = {
@@ -190,6 +190,7 @@ const ModuleGroup = (props) => {
                 handlesendtext({ receiver: phonearr })
                 handleCloseModel()
                 dispatch(fechUserToken())
+                handlesendinfoAll({ arrmember: arr })
             } else {
                 toast.error(res.EM)
             }

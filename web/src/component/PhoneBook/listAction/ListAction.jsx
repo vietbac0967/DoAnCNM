@@ -9,10 +9,13 @@ import SearchModel from '../../model/searchModel/SearchModel';
 import ChooseAction from './action/ChooseAction';
 import _ from 'lodash';
 import { getConverstations } from '../../../service/ConverstationService';
+import { handleuserleavegroup } from '../../../socket/socket';
 
 const ListAction = (props) => {
 
-    const { mdup, dataredux, showchat, setshowchat, setaction, action, setuser } = props;
+    const { mdup, dataredux, showchat, setshowchat, setaction, action, setuser, user } = props;
+    const [search, setsearch] = useState("");
+
 
     const defaultInput = [
         { id: 1, name: "listfrient", action: false },
@@ -42,6 +45,20 @@ const ListAction = (props) => {
         }
 
         setlistaction(cplistaction)
+        if (user) {
+            if (user.type === "group") {
+                let data = { groupId: user._id._id, user: dataredux.phoneNumber, namegroup: user.name };
+                handleuserleavegroup(data)
+            } else {
+                if (!user.phoneNumber) {
+                    let data = { groupId: user._id, user: dataredux.phoneNumber, namegroup: user.name };
+                    handleuserleavegroup(data)
+                }
+
+            }
+            setuser({})
+
+        }
         if (!mdup) {
             setshowchat(true)
         }
@@ -90,6 +107,15 @@ const ListAction = (props) => {
         handleGetAllFriend()
     }, [dataredux])
 
+    useEffect(() => {
+        if (listaction && listaction.length > 0) {
+            let index = listaction.findIndex((item) => item.action === true)
+            if (index !== -1) {
+                setaction(listaction[index])
+            }
+        }
+    }, [])
+
     return (
         <Box className='listfrient-container'>
             <Paper component={Box} sx={{ height: "100%" }}>
@@ -98,6 +124,8 @@ const ListAction = (props) => {
                         model={model}
                         setmodel={setmodel}
                         setuser={setuser}
+                        setsearch={setsearch}
+                        search={search}
                     />
                 </Box>
                 <Divider orientation="horizontal" />
@@ -116,6 +144,8 @@ const ListAction = (props) => {
                             <SearchModel
                                 dataredux={dataredux}
                                 handleClick={handleClick}
+                                search={search}
+
                             />
 
                     }

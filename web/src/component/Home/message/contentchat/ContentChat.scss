@@ -2,31 +2,38 @@
     height: 100%;
     width: 100%;
     display: flex;
+    flex-direction: column;
 
-    .div-input-and-emo {
-        height: 100%;
-        width: 100%;
+    .div-input-action {
         position: relative;
 
-        .chat-infor-bottom-child-text {
-            height: 100%;
-            width: 100%;
-
-
-        }
-
-        .btn-emoij {
-            position: absolute;
-            top: 20%;
-            right: 20px;
-
-        }
+        .btn-emoij {}
 
         .div-emoij {
             width: 352px;
             position: absolute;
-            top: -650%;
-            right: 20px;
+            top: -1000%;
+            // right: 20px;
+        }
+    }
+
+
+    .div-input-and-emo {
+        width: 100%;
+        height: 100%;
+        position: relative;
+
+
+        .chat-infor-bottom-child-text {
+            width: 100%;
+            height: 100%;
+        }
+
+
+        .btn-send {
+            position: absolute;
+            top: 20%;
+            right: 15px;
         }
 
 

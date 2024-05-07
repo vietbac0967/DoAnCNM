@@ -1,0 +1,33 @@
+.drawer-container {
+    padding: 10px;
+
+    .drawer-body {
+        height: 200px;
+    }
+
+    .drawer-child {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 5px;
+        border-radius: 30px;
+        background-color: #e5efff;
+        margin-top: 5px;
+
+        .drawer-child-left {
+            display: flex;
+            align-items: center;
+
+            .child-chat-right {
+                margin-left: 5px;
+
+                .text-drawer {
+                    font-size: 12px;
+                    color: #1264dd;
+                }
+            }
+        }
+
+        .drawer-child-right {}
+    }
+}

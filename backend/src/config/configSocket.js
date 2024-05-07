@@ -148,6 +148,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("joinGroup", (data) => {
+    console.log("check data", data);
     socket.join(data.groupId);
     if (data && data.user.phoneNumber && data.groupId) {
       const existingClientIndex = userInGroup.findIndex(
@@ -172,16 +173,18 @@ io.on("connection", (socket) => {
         userInGroup.filter((item) => item.groupId === data.groupId)
       );
     }
-    if (data && data.user && data.name && data.groupId) {
-      console.log(`User ${data.user.name} joined room: ${data.name}`);
+    if (data && data.user && data.groupId) {
+      console.log(`User ${data.user} joined room: ${data.namegroup}`);
     } else {
-      console.log(`User ${data.user.name} is ready`);
+      console.log(`User ${data.user} is ready`);
     }
   });
 
   socket.on("sendMessageInGroup", (data) => {
     console.log(data);
-    socket.to(data.groupId).emit("receiveMessageInGroup", data);
+    io.to(data.groupId).emit("receiveMessageInGroup", {
+      groupId: data.groupId,
+    });
   });
 
   socket.on("sendNotificationInGroup", (data) => {

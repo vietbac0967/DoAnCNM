@@ -14,7 +14,7 @@ import ModuleGroup from '../../../model/moduleaddgroup/ModuleGroup';
 
 const Search = (props) => {
 
-    const { model, setmodel, setuser } = props;
+    const { model, setmodel, setuser, setsearch, search } = props;
 
     const [open, setOpen] = useState(false);
     const [openAddGroup, setOpenAddGroup] = useState(false);
@@ -44,6 +44,7 @@ const Search = (props) => {
     const handleCloseSearchModel = () => {
         setmodel(false)
         setuser({})
+        setsearch("")
     }
 
     return (
@@ -60,6 +61,8 @@ const Search = (props) => {
                     placeholder="Tìm kiếm"
                     inputProps={{ 'aria-label': 'search google maps' }}
                     onClick={() => setmodel(true)}
+                    value={search}
+                    onChange={(e) => setsearch(e.target.value)}
                 />
 
                 <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
