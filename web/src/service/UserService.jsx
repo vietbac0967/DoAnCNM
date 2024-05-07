@@ -46,8 +46,24 @@ const getAllFriend = () => {
     return axios.get("/api/user/getFriends")
 }
 
+const updateAVTUser = (data) => {
+    return axios.post("/api/user/updateImage", data, {
+        headers: {
+            'content-type': 'multipart/form-data'
+        }
+    })
+}
+
+const updateUserInfo = (data) => {
+    return axios.post("/api/update", data)
+}
+
+const getInfoUser = (data) => {
+    return axios.post("/api/user", data)
+}
+
 export {
     register, accountUser, login, verifyOTP, resendEmail, getuserbyPhone,
     sendRequestFrient, acceptRequestFrient, rejectRequestFriend, deleteFriend,
-    getAllFriend
+    getAllFriend, updateAVTUser, updateUserInfo, getInfoUser
 }

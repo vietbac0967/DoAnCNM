@@ -1,0 +1,20 @@
+.check-box-friend-container {
+
+
+    .check-box-friend-container-body {
+        padding: 5px;
+        display: flex;
+        align-items: center;
+
+        .child-chat-right {
+            margin-left: 5px;
+        }
+
+    }
+
+    &:hover {
+        background-color: #eeeeee;
+        cursor: pointer;
+    }
+
+}

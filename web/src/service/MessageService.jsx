@@ -30,7 +30,23 @@ const sendMessageGroup = (data) => {
     return axios.post("/api/message/sendMessageGroup", data)
 }
 
+const sendMessageImg = (data) => {
+    return axios.post("/api/message/sendImage", data, {
+        headers: {
+            'content-type': 'multipart/form-data'
+        }
+    })
+}
+
+const sendMessageImgGroup = (data) => {
+    return axios.post("/api/message/sendImageGroup", data, {
+        headers: {
+            'content-type': 'multipart/form-data'
+        }
+    })
+}
+
 export {
     getAllMessage, sendMessage, deleteMessage, recallMessage,
-    getMessagesGroup, sendMessageGroup
+    getMessagesGroup, sendMessageGroup, sendMessageImg, sendMessageImgGroup
 }

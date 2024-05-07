@@ -4,16 +4,20 @@ const CreateGroup = (data) => {
     return axios.post("/api/group/create", data)
 }
 
-const GetGroupbyUser = (data) => {
-    return axios.get("/api/group/getGroups", data)
+const GetGroupbyUser = () => {
+    return axios.get("/api/group/getGroups")
 }
 
 const deleteGroup = (data) => {
     return axios.post("/api/group/deleteGroup", data)
 }
 
-const getUserForGroup = (data) => {
-    return axios.get("/api/group/getUserForGroup", data)
+const getUserForGroup = (groupId) => {
+    return axios.get("/api/group/getUserForGroup", {
+        params: {
+            groupId: groupId
+        }
+    })
 }
 
 const leaveGroup = (data) => {
@@ -40,8 +44,17 @@ const updateDeputyLeader = (data) => {
     return axios.post("/api/group/updateDeputyLeader", data)
 }
 
+const updateAVTGroup = (data) => {
+    return axios.post("/api/group/updateImageGroup", data, {
+        headers: {
+            'content-type': 'multipart/form-data'
+        }
+    })
+}
+
+
 export {
     CreateGroup, GetGroupbyUser, deleteGroup, getUserForGroup, leaveGroup,
     updateNameGroup, addMember, getLeadForGroup, deleteMemeberFromGroup,
-    updateDeputyLeader
+    updateDeputyLeader, updateAVTGroup
 }

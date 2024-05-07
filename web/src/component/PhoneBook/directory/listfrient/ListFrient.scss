@@ -1,0 +1,36 @@
+.list-friend-container {
+    height: 100%;
+    width: 100%;
+
+    .list-frient-body {
+        background-color: #eeeeee;
+        height: 90%;
+        width: 100%;
+
+        .quantity-friend {
+            margin: 10px;
+
+            .text-quantity-friend {
+                font-size: 16px;
+                font-weight: 600;
+            }
+        }
+
+
+        .list-show-friend {
+            margin: 20px 10px 0;
+            background-color: #ffffff;
+            border-radius: 5px;
+            min-height: 100%;
+
+            .list-show-friend-search {
+                margin: 20 0;
+                height: 80px;
+            }
+
+            .list-show-friend-get {
+                margin-top: 10px;
+            }
+        }
+    }
+}

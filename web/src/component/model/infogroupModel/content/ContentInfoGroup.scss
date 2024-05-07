@@ -1,0 +1,107 @@
+.info-body {
+    height: 100%;
+
+    background-color: #eeeeee;
+
+    .info-group {
+        background-color: #ffffff;
+        width: 100%;
+
+        .info-group-avt {
+            display: flex;
+            align-items: center;
+            padding: 0 5px;
+
+            .info-group-avt-and-action {
+                position: relative;
+                margin: 10px 0;
+
+                .info-group-action-avt {
+                    z-index: 100;
+                    right: -20%;
+                    top: 65%;
+                    position: absolute;
+                }
+
+            }
+
+
+
+
+            .info-group-name {
+                margin: 5px;
+                font-size: 18px;
+                font-weight: 600;
+            }
+
+        }
+
+        .info-user-action {
+            padding: 10px;
+
+            .btn-send-message {
+                width: 100%;
+
+                .text-action-message {
+                    color: #2770dc;
+                    font-size: 15px;
+                    font-weight: 600;
+                }
+            }
+        }
+
+    }
+
+    .info-group-des {
+        margin: 10px 0;
+        background-color: #ffffff;
+        padding: 5px;
+
+        .info-group-des-title {
+            margin: 10px 0;
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.5
+        }
+
+        .info-group-des-gender {
+            margin: 10px 0;
+            width: 60%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .avt-btn {
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+
+        }
+
+    }
+
+    .info-action {
+        background-color: #ffffff;
+        height: 120px;
+
+        .info-action-btn {
+            display: flex;
+            align-items: center;
+            height: 50px;
+            justify-content: center;
+
+            &:hover {
+                background-color: #f3f5f6;
+                cursor: pointer;
+            }
+
+            .info-action-text {
+                font-size: 17px;
+                font-weight: 400;
+                color: #081c36;
+                line-height: 1.5;
+            }
+        }
+    }
+}

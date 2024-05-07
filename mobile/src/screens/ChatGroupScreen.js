@@ -219,7 +219,7 @@ export default function ChatGroupScreen({ route, navigation }) {
     if (group._id && user) {
       handleJoinGroupSocket({
         groupId: group._id,
-        name: group.name,
+        namegroup: group.name,
         user: user,
       });
     }

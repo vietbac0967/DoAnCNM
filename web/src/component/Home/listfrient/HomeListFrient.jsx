@@ -10,14 +10,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { handlerefreshAllInfo, handlerefreshMessange, handlerefreshinfoAll, handleuserjoingroup, handleuserleavegroup } from '../../../socket/socket';
 import { getConverstations } from '../../../service/ConverstationService';
 import _ from 'lodash';
+import Scrollbars from 'react-custom-scrollbars-2';
 
 const HomeListFrient = (props) => {
 
+    const { setshowchat, setuser, mdup, user } = props;
 
-    const { dataredux, setshowchat, setuser, mdup } = props;
-
+    const dispatch = useDispatch();
+    const dataredux = useSelector((state) => state.userisaccess.account)
+    console.log("dataredux:::", dataredux)
 
     const [model, setmodel] = useState(false)
+    const [search, setsearch] = useState("");
 
     const [listfrient, setlistfrient] = useState([]);
 
@@ -38,33 +42,37 @@ const HomeListFrient = (props) => {
         handleGetAllFriend()
     }, [dataredux])
 
+    useEffect(() => {
+        handleGetAllFriend()
+    }, [])
+
     const handleGeAllFriendUpdate = async () => {
-        if (listfrient && listfrient.length > 0) {
-            let cplistfrient = _.cloneDeep(listfrient);
-            let res = await getConverstations();
-            if (res && res.EC === 0) {
-                let clickedItems = cplistfrient.filter(item => item.click);
+        let cplistfrient = _.cloneDeep(listfrient);
+        let res = await getConverstations();
+        if (res && res.EC === 0) {
+            let clickedItems = cplistfrient.filter(item => item.click);
 
-                let newData = res.DT.map(item => {
-                    let newItem = _.cloneDeep(item);
-                    clickedItems.forEach(clickedItem => {
-                        if (clickedItem.type === "private") {
-                            if (clickedItem._id === item._id) {
-                                newItem.click = true;
-                            }
-                        } else {
-                            if (clickedItem._id._id === item._id._id) {
-                                newItem.click = true;
-                            }
+            let newData = res.DT.map(item => {
+                let newItem = _.cloneDeep(item);
+                clickedItems.forEach(clickedItem => {
+                    if (clickedItem.type === "private") {
+                        if (clickedItem._id === item._id) {
+                            newItem.click = true;
                         }
+                    } else {
+                        if (clickedItem._id._id === item._id._id) {
+                            newItem.click = true;
+                        }
+                    }
 
-                    });
-                    return newItem;
                 });
-                setlistfrient(newData)
-            }
+                return newItem;
+            });
+
+            setlistfrient(newData)
         }
     }
+
 
     useEffect(() => {
         handlerefreshAllInfo(async (data) => {
@@ -76,12 +84,54 @@ const HomeListFrient = (props) => {
                     }
                 }
             } else {
-                if (dataredux && (dataredux._id === data.sender.userId || dataredux._id === data.receiver.userId))
-                    await handleGeAllFriendUpdate();
+                if (dataredux && (dataredux._id === data.sender.userId || dataredux._id === data.receiver.userId)) {
 
+                    await handleGeAllFriendUpdate();
+                }
             }
         })
+
+        handlerefreshinfoAll(async (data) => {
+            if (data && data.arrmember && data.arrmember.length > 0) {
+                if (dataredux) {
+                    let check = data.arrmember.filter(item => item === dataredux._id)
+                    if (check) {
+                        handleGeAllFriendUpdate();
+                    }
+                }
+            }
+        })
+
     }, [dataredux])
+
+    useEffect(() => {
+        handlerefreshAllInfo(async (data) => {
+            if (data && data.type === "group") {
+                if (dataredux && dataredux.groups.length > 0) {
+                    let index = dataredux.groups.findIndex(item => item && item._id === data.groupId)
+                    if (index !== -1) {
+                        await handleGeAllFriendUpdate();
+                    }
+                }
+            } else {
+                if (dataredux && (dataredux._id === data.sender.userId || dataredux._id === data.receiver.userId)) {
+                    await handleGeAllFriendUpdate();
+                }
+            }
+        })
+
+        handlerefreshinfoAll(async (data) => {
+            if (data && data.arrmember && data.arrmember.length > 0) {
+                if (dataredux) {
+                    let check = data.arrmember.filter(item => item === dataredux._id)
+                    if (check) {
+                        handleGeAllFriendUpdate();
+                    }
+                }
+            }
+        })
+
+    }, [])
 
     const handleClick = async (item) => {
         let cplistfrient = _.cloneDeep(listfrient)
@@ -143,36 +193,41 @@ const HomeListFrient = (props) => {
 
     }, [currentgroup])
 
-
     return (
         <Box className='listfrient-container'>
             <Paper component={Box} sx={{ height: "100%" }}>
-                <Box className="search-content">
-                    <Search
-                        model={model}
-                        setmodel={setmodel}
-                        setuser={setuser}
-                    />
-                </Box>
-                <Divider orientation="horizontal" />
-                <Box className="list-frient-chat-info">
-                    {
-                        !model
-                            ?
-                            <ListChatFrient
-                                dataredux={dataredux}
-                                listfrient={listfrient}
-                                handleClick={handleClick}
-                                currentMessange={currentMessange}
-                            />
-                            :
-                            <SearchModel
-                                dataredux={dataredux}
-                                handleClick={handleClick}
-                            />
+                <Scrollbars style={{ width: "100%", height: "100%" }}>
 
-                    }
-                </Box>
+                    <Box className="search-content">
+                        <Search
+                            model={model}
+                            setmodel={setmodel}
+                            setuser={setuser}
+                            setsearch={setsearch}
+                            search={search}
+                        />
+                    </Box>
+                    <Divider orientation="horizontal" />
+                    <Box className="list-frient-chat-info">
+                        {
+                            !model
+                                ?
+                                <ListChatFrient
+                                    dataredux={dataredux}
+                                    listfrient={listfrient}
+                                    handleClick={handleClick}
+                                    currentMessange={currentMessange}
+                                />
+                                :
+                                <SearchModel
+                                    dataredux={dataredux}
+                                    handleClick={handleClick}
+                                    search={search}
+                                />
+
+                        }
+                    </Box>
+                </Scrollbars>
             </Paper>
 
         </Box>

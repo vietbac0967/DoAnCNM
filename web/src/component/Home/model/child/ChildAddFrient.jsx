@@ -78,13 +78,14 @@ const ChildAddFrient = (props) => {
     }
 
     const handleRejectSendrequestfriend = async () => {
-        let res = await rejectRequestFreind({ senderId: user._id })
+        let res = await rejectRequestFriend({ senderId: user._id })
         if (res && res.EC === 0) {
             setaccept(0)
             await dispatch(fechUserToken())
             handlesendtext({ receiver: user.phoneNumber })
         }
     }
+
 
     const handledeleteFriend = async () => {
         let res = await deleteFriend({ friendId: user._id })

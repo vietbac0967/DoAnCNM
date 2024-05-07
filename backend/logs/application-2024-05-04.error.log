@@ -1,0 +1,52 @@
+[2024-05-04 11:59:49.662 AM] error: 		401 - Invalid token
+[2024-05-04 12:59:58.628 PM] error: 		401 - Invalid token
+[2024-05-04 14:14:36.737 PM] error: 		401 - Invalid token
+[2024-05-04 14:15:24.930 PM] error: 		403 - No token, authorization denied
+[2024-05-04 14:15:24.940 PM] error: 		403 - No token, authorization denied
+[2024-05-04 14:15:25.310 PM] error: 		403 - No token, authorization denied
+[2024-05-04 14:15:25.326 PM] error: 		403 - No token, authorization denied
+[2024-05-04 14:15:32.925 PM] error: 		403 - No token, authorization denied
+[2024-05-04 14:15:32.932 PM] error: 		403 - No token, authorization denied
+[2024-05-04 14:15:32.941 PM] error: 		403 - No token, authorization denied
+[2024-05-04 14:18:27.886 PM] error: 		403 - No token, authorization denied
+[2024-05-04 14:18:27.924 PM] error: 		403 - No token, authorization denied
+[2024-05-04 20:13:33.958 PM] error: 		401 - Invalid token
+[2024-05-04 20:13:35.125 PM] error: 		error in middleware verifyAccount jwt expired
+[2024-05-04 20:13:35.135 PM] error: 		error in middleware verifyAccount jwt expired
+[2024-05-04 20:13:37.908 PM] error: 		error in middleware verifyAccount jwt expired
+[2024-05-04 20:19:48.511 PM] error: 		403 - No token, authorization denied
+[2024-05-04 20:19:48.549 PM] error: 		403 - No token, authorization denied
+[2024-05-04 20:19:48.945 PM] error: 		403 - No token, authorization denied
+[2024-05-04 20:19:48.953 PM] error: 		403 - No token, authorization denied
+[2024-05-04 20:42:40.584 PM] error: 		403 - No token, authorization denied
+[2024-05-04 20:42:40.647 PM] error: 		403 - No token, authorization denied
+[2024-05-04 20:42:40.902 PM] error: 		403 - No token, authorization denied
+[2024-05-04 20:42:40.946 PM] error: 		403 - No token, authorization denied
+[2024-05-04 21:03:04.801 PM] error: 		error in middleware verifyAccount decodetoken is not defined
+[2024-05-04 21:03:04.907 PM] error: 		error in middleware verifyAccount decodetoken is not defined
+[2024-05-04 21:03:05.144 PM] error: 		error in middleware verifyAccount decodetoken is not defined
+[2024-05-04 21:03:05.175 PM] error: 		error in middleware verifyAccount decodetoken is not defined
+[2024-05-04 21:03:28.145 PM] error: 		error in middleware verifyAccount decodetoken is not defined
+[2024-05-04 21:03:28.152 PM] error: 		error in middleware verifyAccount decodetoken is not defined
+[2024-05-04 21:03:28.180 PM] error: 		error in middleware verifyAccount decodetoken is not defined
+[2024-05-04 21:03:28.186 PM] error: 		error in middleware verifyAccount decodetoken is not defined
+[2024-05-04 21:04:54.874 PM] error: 		error in middleware verifyAccount getinfoGroupbyId is not defined
+[2024-05-04 21:04:55.229 PM] error: 		error in middleware verifyAccount getinfoGroupbyId is not defined
+[2024-05-04 21:05:32.022 PM] error: 		error in middleware verifyAccount Group is not defined
+[2024-05-04 21:05:32.158 PM] error: 		error in middleware verifyAccount Group is not defined
+[2024-05-04 21:05:46.246 PM] error: 		error in middleware verifyAccount Group is not defined
+[2024-05-04 21:05:46.285 PM] error: 		error in middleware verifyAccount Group is not defined
+[2024-05-04 21:05:46.311 PM] error: 		error in middleware verifyAccount Group is not defined
+[2024-05-04 21:05:46.336 PM] error: 		error in middleware verifyAccount Group is not defined
+[2024-05-04 21:06:15.203 PM] error: 		403 - No token, authorization denied
+[2024-05-04 21:06:15.213 PM] error: 		403 - No token, authorization denied
+[2024-05-04 21:06:33.746 PM] error: 		error in middleware verifyAccount Group is not defined
+[2024-05-04 21:06:33.792 PM] error: 		error in middleware verifyAccount Group is not defined
+[2024-05-04 21:06:33.822 PM] error: 		error in middleware verifyAccount Group is not defined
+[2024-05-04 21:06:33.847 PM] error: 		error in middleware verifyAccount Group is not defined
+[2024-05-04 21:39:54.320 PM] error: 		403 - No token, authorization denied
+[2024-05-04 21:39:54.337 PM] error: 		403 - No token, authorization denied
+[2024-05-04 21:39:54.416 PM] error: 		403 - No token, authorization denied
+[2024-05-04 21:39:54.421 PM] error: 		403 - No token, authorization denied
+[2024-05-04 21:40:13.676 PM] error: 		403 - No token, authorization denied
+[2024-05-04 21:40:13.687 PM] error: 		403 - No token, authorization denied

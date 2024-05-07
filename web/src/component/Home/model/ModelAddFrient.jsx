@@ -9,6 +9,8 @@ import ChildAddFrient from './child/ChildAddFrient';
 import { getuserbyPhone } from '../../../service/UserService';
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
+import { Container, Divider, Input, useMediaQuery, useTheme } from '@mui/material';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 // import exampleAvatar from '../../assets/Ellipse_191.png';
 const style = {
@@ -16,11 +18,9 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
     bgcolor: 'background.paper',
-    border: '2px solid #000',
     boxShadow: 24,
-    p: 2
+    p: 1
 };
 
 function ModelAddFrient(props) {
@@ -29,6 +29,9 @@ function ModelAddFrient(props) {
 
     const dispatch = useDispatch();
     const dataredux = useSelector((state) => state.userisaccess.account)
+    const theme = useTheme();
+
+    const sm = useMediaQuery(theme.breakpoints.down('sm'))
 
     const [user, setuser] = useState({});
 
@@ -57,60 +60,66 @@ function ModelAddFrient(props) {
         <div>
             <Modal
                 open={open}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
                 onClose={handleClose}
-            // aria-labelledby="modal-modal-title"
-            // aria-describedby="modal-modal-description"
             >
-                <Box sx={style}>
-                    <Box sx={{ borderBottom: 1, flexDirection: 'row', justifyContent: 'space-between', width: "100%" }}>
-                        <Typography variant="h6" >
-                            Thêm bạn
-                        </Typography>
-                        <IconButton
-                            sx={{ position: 'absolute', right: 10, top: 10, width: '5' }}
-                            edge="end"
-                            color="inherit"
-                            onClick={handleClose}
+                <Container>
+                    <Box sx={style}
+                        width={sm ? "80%" : 400}
+                        borderRadius={2}
+                        className="modal-group-container"
+                    >
+                        <Box className="info-header-group"
                         >
-                            <CloseIcon />
-                        </IconButton>
-                    </Box>
-                    <Box sx={{ pt: 2 }}>
-                        <TextField
-                            id="phone-number-input"
-                            label="Số điện thoại"
-                            variant="outlined"
-                            value={phoneNumber}
-                            onChange={handleChange}
-                            fullWidth
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            inputProps={{
-                                inputMode: 'numeric',
-                                pattern: '[0-9]*',
-                            }}
-                            sx={{
+                            <span className='header-title-group'>
+                                Thêm bạn
+                            </span>
+                            <IconButton
+                                onClick={() => handleClose()}
+                            >
+                                <CancelIcon />
+                            </IconButton>
+                        </Box>
+                        <Divider />
+                        <Box sx={{ pt: 2, pb: 2 }}>
+                            <TextField
+                                id="phone-number-input"
+                                label="Số điện thoại"
+                                variant="outlined"
+                                value={phoneNumber}
+                                onChange={handleChange}
+                                fullWidth
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                inputProps={{
+                                    inputMode: 'numeric',
+                                    pattern: '[0-9]*',
+                                }}
+                                sx={{
 
-                            }}
-                        />
-                    </Box>
-                    <Box>
-                        <Typography id="modal-modal-description" sx={{ mt: 2, fontSize: 12, }}>
-                            May you know
-                        </Typography>
-                        {
-                            user && !_.isEmpty(user) ?
-                                <ChildAddFrient
-                                    user={user}
-                                    setuser={setuser}
-                                />
-                                :
-                                <></>
-                        }
+                                }}
+                            />
+                        </Box>
+                        <Divider />
+                        <Box>
+                            <Typography id="modal-modal-description" sx={{ mt: 2, fontSize: 15, fontWeight: 600 }}>
+                                Bạn bè bạn có thể biết
+                            </Typography>
+                            {
+                                user && !_.isEmpty(user) ?
+                                    <ChildAddFrient
+                                        user={user}
+                                        setuser={setuser}
+                                    />
+                                    :
+                                    <></>
+                            }
 
+                        </Box>
                     </Box>
-                </Box>
+                </Container>
             </Modal>
         </div >
     );

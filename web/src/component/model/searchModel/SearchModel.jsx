@@ -5,7 +5,7 @@ import ChildFriend from './child/ChildFriend';
 
 const SearchModel = (props) => {
 
-    const { dataredux, handleClick } = props
+    const { dataredux, handleClick, search } = props
 
     const [listuser, setlistuser] = useState([]);
 
@@ -24,6 +24,21 @@ const SearchModel = (props) => {
             }
         }
     }, [dataredux])
+
+    useEffect(() => {
+        if (search) {
+            if (dataredux) {
+                if (dataredux.friends && dataredux.friends.length > 0) {
+                    let arr = [];
+                    let index = dataredux.friends.findIndex((item) => item.phoneNumber === search)
+                    if (index !== -1) {
+                        arr.push(dataredux.friends[index])
+                        setlistuser(arr)
+                    }
+                }
+            }
+        }
+    }, [search])
 
     return (
         <Box className="search-form-container">

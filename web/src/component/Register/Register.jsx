@@ -211,9 +211,9 @@ const Register = () => {
                             />
                             <FormControlLabel
                                 className='radio-custom'
-                                value="Nu"
+                                value="Nữ"
                                 control={<Radio />}
-                                label="Nu"
+                                label="Nữ"
                             />
                         </RadioGroup>
                         <FormControl>

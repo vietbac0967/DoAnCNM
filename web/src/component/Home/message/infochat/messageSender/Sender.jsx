@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Sender.scss'
 import { Box, Paper } from '@mui/material'
 import MenuMessage from '../menuaction/MenuMessage';
+import { formatDate } from '../../../../../utils/formatDateOrTime';
 
 const Sender = (props) => {
 
@@ -22,17 +23,44 @@ const Sender = (props) => {
 
     return (
         <Box className="my-messenge-container">
-            <Box className="info-messenge"
-            >
-                <Paper className='form-text'
-                    onContextMenu={(e) => handleClick(e)}
-                >
-                    <span className='text'>
-                        {item && item.content}
-                    </span>
-                </Paper>
+            {
+                item && item.messageType === "text"
+                    ?
+                    <Box className="info-messenge"
+                    >
+                        <Paper className='form-text'
+                            onContextMenu={(e) => handleClick(e)}
+                        >
+                            <span className='text'>
+                                {item && item.content}
+                            </span>
+                            <span className='time'>
+                                {formatDate(item && item.createdAt)}
+                            </span>
+                        </Paper>
 
-            </Box>
+                    </Box>
+                    : item.messageType === "image"
+                        ?
+                        <>
+                            <Box className="info-image"
+                            >
+                                <Box className="form-image"
+                                    style={{ backgroundImage: `url(${item.content})` }}
+                                >
+                                </Box>
+
+                            </Box>
+                            <Box className="div-time-img">
+                                <span className='time-img'>
+                                    {formatDate(item && item.createdAt)}
+                                </span>
+                            </Box>
+                        </>
+
+                        : <></>
+            }
+
             <MenuMessage
                 open={open}
                 anchorEl={anchorEl}

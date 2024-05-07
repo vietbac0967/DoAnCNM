@@ -22,19 +22,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(helmet());
-app.use(compression({
-  level:6,
-  threshold: 100 * 1000,
-}));
+app.use(
+  compression({
+    level: 6,
+    threshold: 100 * 1000,
+  })
+);
 // app.use(cors());
 // app.options("*", cors());
 app.use(
   cors({
-    origin: [
-      process.env.URL_CLIENT,
-      process.env.URL_WEB,
-      "http://localhost:8081",
-    ],
+    origin: ["*", process.env.URL_WEB],
     methods: ["GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"],
     allowedHeaders: [
       "X-Requested-With",
