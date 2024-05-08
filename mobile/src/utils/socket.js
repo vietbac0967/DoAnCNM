@@ -9,7 +9,9 @@ const handleCusttomClientSocket = (data) => {
 const handleOffConnectSocket = () => {
   socket.disconnect();
 };
-
+const handlesendinfoAll = (data) => {
+  socket.emit("typing", data)
+}
 const handleRefreshAccount = (callback) => {
   socket.on("refresh", callback);
 };
@@ -44,7 +46,7 @@ const handlSendMessageSocket = (data) => {
   socket.emit("sendMessage", data);
 };
 
-const handleSendText = (data) => {
+const handlesendtext = (data) => {
   socket.emit("sendtest", data);
 };
 
@@ -96,6 +98,9 @@ const handleRefreshNotificationToGroup = (callback) => {
 const handleRefreshUserInGroup = (callback) => {
   socket.on("refreshNotificationInGroup", callback);
 };
+
+
+
 export {
   handleCusttomClientSocket,
   handlSendMessageSocket,
@@ -115,7 +120,10 @@ export {
   handleSendNotificationToGroup,
   handleRefreshNotificationToGroup,
   handleRefreshUserInGroup,
-  handleOffConnectSocket
+  handleOffConnectSocket,
+  handlesendinfoAll,
+  handlesendtext
+  
   // handlerefreshAccount,
   // handlerefreshMessange,
   // handleoffrefreshAccount,

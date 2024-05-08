@@ -19,7 +19,7 @@ export default function MessageGroupCard({
   }
   const first5Chars = message.content.slice(0, 6);
   let isAnnounce = false;
-  if (first5Chars === "##TB##") { isAnnounce = true; }
+  if (first5Chars.includes("###-id-")) { isAnnounce = true; }
   console.log("isAnnounce", isAnnounce);
   if (message.messageType === "text" && isAnnounce) {
     return (
@@ -122,7 +122,6 @@ export default function MessageGroupCard({
               borderRadius: 20,
               marginLeft: 10,
             }}
-            resizeMode="cover"
             source={{ uri: message.senderId?.avatar }}
             defaultSource={require("../assets/avt.jpg")}
           />

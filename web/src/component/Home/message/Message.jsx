@@ -21,7 +21,6 @@ const Message = (props) => {
         try {
             if (user && user.current.type === "private") {
                 setpage((prev) => prev + 1);
-                console.log("check check")
             }
         } catch (error) {
             console.error('Error fetching more data:', error);
@@ -124,7 +123,6 @@ const Message = (props) => {
         }
     }
 
-    console.log("check list message", listmessage)
 
 
     const handleGetAllMessageinGroup = async (data) => {

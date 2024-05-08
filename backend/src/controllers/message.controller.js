@@ -148,7 +148,7 @@ export const sendVideo = async (req, res) => {
     const senderId = req.user._id;
     const fileName = req.file.originalname;
     // Respond to the client immediately
-    res.status(200).json({ EC: 0, EM: "Upload started", DT: "" });
+    
     // Perform the upload operation in the background
     cloud.uploader
       .upload_stream(
@@ -172,6 +172,7 @@ export const sendVideo = async (req, res) => {
             message.fileSize = result.bytes;
             await message.save();
             console.log("Upload successful:", sendMessage);
+            res.status(200).json({ EC: 0, EM: "Upload started", DT: "" });
           }
         }
       )

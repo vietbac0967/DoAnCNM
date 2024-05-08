@@ -60,7 +60,6 @@ const ChildGroup = (props) => {
         }
     }
 
-    console.log("check user", user)
 
     const handleLeaveGroup = async () => {
         if (user) {

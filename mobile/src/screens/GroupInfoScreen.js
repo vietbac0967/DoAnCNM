@@ -25,6 +25,7 @@ import {
 } from "../services/group.service";
 import { selectUser } from "../app/userSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { handlesendinfoAll } from "../utils/socket";
 export default function GroupInfoScreen({ navigation, route }) {
   const groupId = route.params?.groupId;
 
@@ -67,6 +68,8 @@ export default function GroupInfoScreen({ navigation, route }) {
       const { EM, EC } = response;
       if (EC === 0 && EM === "Success") {
         Alert.alert("Thông báo", "Giải tán nhóm thành công");
+        // let arr = members.map(item => item._id)
+        handlesendinfoAll({ arrmember: group && group.members })
         navigation.navigate("Group", { isLoading: true });
       } else {
         Alert.alert("Somthing went wrong", EM);

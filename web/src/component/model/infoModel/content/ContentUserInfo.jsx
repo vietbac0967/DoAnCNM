@@ -18,6 +18,7 @@ const ContentUserInfo = (props) => {
     const dispatch = useDispatch();
     const dataredux = useSelector((state) => state.userisaccess.account)
 
+
     useEffect(() => {
         const backgroundImages = [
             background1, background2, background3

@@ -29,9 +29,11 @@ const ContentInfoGroup = (props) => {
     }, [])
 
     const handleGetAllUserInfo = async () => {
+        let arr = [];
         if (user) {
             if (user.members && user.members.length > 0) {
-                let members = await Promise.all(user.members.map(async (item, index) => {
+            arr = [...user.members,dataredux._id]
+                let members = await Promise.all(arr.map(async (item, index) => {
                     let res = await getInfoUser({ userId: item })
                     return res.DT;
                 }))
@@ -39,6 +41,7 @@ const ContentInfoGroup = (props) => {
             }
         }
     }
+
 
     const handleDeleteGroup = async () => {
         if (user) {

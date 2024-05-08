@@ -16,6 +16,7 @@ import {
   sendFriendRequestService,
 } from "../services/user.service";
 import { useSelector } from "react-redux";
+import { handlesendtext } from "../utils/socket";
 export default function AddFriendScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
@@ -56,6 +57,7 @@ export default function AddFriendScreen({ navigation }) {
       const { EC, EM, DT } = res;
       if (EC === 0 && EM === "Success") {
         Alert.alert("Thông báo", "Gửi lời mời thành công", [{ text: "OK" }]);
+        handlesendtext({ receiver: user.phoneNumber })
         navigation.navigate("Main");
       }
     } catch (error) {

@@ -3,13 +3,19 @@ import React, { useState } from 'react';
 import './ChildFriend.scss'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import InfoModel from '../../../../model/infoModel/InfoModel';
+import { deleteFriend } from '../../../../../service/UserService';
+import { fechUserToken } from '../../../../../redux/UserSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { handlesendtext } from '../../../../../socket/socket';
 
 const ChildFriend = (props) => {
 
-    const { user, setuser } = props;
+    const { user, setuser ,handleChangeValue} = props;
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [openmodel, setopenmodel] = useState(false);
+    const dispatch = useDispatch();
+
 
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
@@ -25,6 +31,14 @@ const ChildFriend = (props) => {
 
     const handleCloseModel = () => {
         setopenmodel(false)
+    }
+
+    const handledeleteFriend = async () => {
+        let res = await deleteFriend({ friendId: user._id })
+        if (res && res.EC === 0) {
+            dispatch(fechUserToken())
+            handlesendtext({ receiver: user.phoneNumber })
+        }
     }
 
     return (
@@ -73,7 +87,9 @@ const ChildFriend = (props) => {
                     Xem Thông Tin
                 </MenuItem>
                 <Divider sx={{ my: 0.5 }} />
-                <MenuItem>
+                <MenuItem
+                    onClick={() => handledeleteFriend()}
+                >
                     <span style={{ color: "red" }}>
                         Xóa bạn
                     </span>

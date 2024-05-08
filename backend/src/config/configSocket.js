@@ -227,8 +227,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("typing", (data) => {
-    socket.broadcast.emit("typing", { groupId: data.groupId });
-  });
+    console.log("check data is socketbe..........",data)
+    socket.broadcast.emit("typing", {
+        arrmember: data.arrmember
+    })
+})
 
   socket.on("allinfo", (data) => {
     io.emit("allinfo", data);
