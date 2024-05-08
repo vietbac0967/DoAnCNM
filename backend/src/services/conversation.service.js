@@ -90,7 +90,7 @@ export const getConversationService = async (userId) => {
         },
         {
           path: "participantsGroup",
-          select: "avatar _id name members",
+          select: "avatar _id name members author deputyLeader",
         },
         {
           path: "messages",
@@ -108,6 +108,7 @@ export const getConversationService = async (userId) => {
           _id: conversation.participantsGroup[0],
           name: conversation.participantsGroup[0].name,
           avatar: conversation.participantsGroup[0].avatar,
+          author: conversation.participantsGroup[0].author,
         };
         type = "group";
       } else if (conversation.participants.length > 0) {

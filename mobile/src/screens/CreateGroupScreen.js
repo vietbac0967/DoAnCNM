@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { RadioButton } from "react-native-paper";
 import { createGroupService } from "../services/group.service";
+import { handlesendinfoAll } from "../utils/socket";
 export default function CreateGroupScreen({ navigation }) {
   const [groupName, setGroupName] = useState("");
   const [members, setMembers] = useState([]);
@@ -112,6 +113,8 @@ export default function CreateGroupScreen({ navigation }) {
       const { EC, EM } = res;
       if (EC === 0) {
         Alert.alert("Thông báo", "Tạo nhóm thành công");
+        let arr = members.map(item => item._id)
+        handlesendinfoAll({ arrmember: arr })
         navigation.navigate("Group", { isLoading: true });
       }
     } catch (error) {

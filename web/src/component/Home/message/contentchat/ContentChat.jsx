@@ -245,7 +245,6 @@ const ContentChat = (props) => {
                 const formData = new FormData();
                 formData.append("video", file);
                 formData.append("receiverId", userinfo._id)
-                console.log(formData)
                 let res = await sendVideo(formData)
                 if (res && res.EC === 0) {
                     setSuccess(true);

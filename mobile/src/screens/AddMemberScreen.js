@@ -16,11 +16,10 @@ import {
   getFriendsInNotGroupService,
 } from "../services/group.service";
 import { RadioButton } from "react-native-paper";
+import { handlesendinfoAll } from "../utils/socket";
 export default function AddMemberScreen({ navigation, route }) {
   const groupId = route.params?.groupId;
   console.log("groupId:::", groupId);
-  const token = useSelector((state) => state.token.token);
-
   const [phone, setPhone] = useState("");
   const [friends, setFriends] = useState([]);
   const [members, setMembers] = useState([]);

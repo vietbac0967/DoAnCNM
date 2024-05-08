@@ -42,7 +42,6 @@ const ContentListMembers = (props) => {
         handleGetAllUserInfo()
     }, [dataredux])
 
-    // console.log("check user user", user)
 
     const handleGetAllUserInfo = async () => {
         if (user) {
@@ -69,7 +68,6 @@ const ContentListMembers = (props) => {
         // }
     }
 
-    // console.log("check list member", listmember)
 
     const handleClickShow = (item) => {
         setchooseuser(item)
@@ -82,6 +80,7 @@ const ContentListMembers = (props) => {
     const handleCloseModelGroup = () => {
         setopenmodelgroup(false)
     }
+
 
     return (
         <Box className="list-member-container">

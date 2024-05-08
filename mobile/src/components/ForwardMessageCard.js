@@ -5,7 +5,6 @@ import { forwardMessageService } from "../services/message.service";
 import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 export default function ForwardMessageCard({ item, messageId }) {
-  const token = useSelector((state) => state.token.token);
   const navigation = useNavigation();
   const handleForward = async () => {
     try {

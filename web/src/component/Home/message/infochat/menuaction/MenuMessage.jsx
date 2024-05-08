@@ -15,34 +15,63 @@ const MenuMessage = (props) => {
     const dispatch = useDispatch();
     const dataredux = useSelector((state) => state.userisaccess.account)
 
+    console.log("check user info",userinfo)
+
     const handledelteMessage = async () => {
         let res = await deleteMessage({ messageId: item._id })
         if (res && res.EC === 0) {
-            if (userinfo && userinfo.phoneNumber) {
-                await handleGetAllMessage({ userId: userinfo._id })
+            if (userinfo && userinfo.type) {
+                if(userinfo.type === "group"){
+                await handleGetAllMessageinGroup({ groupId: userinfo._id._id })
+                }else{
+                    await handleGetAllMessage({ userId: userinfo._id })
+                }
             } else {
-                await handleGetAllMessageinGroup({ groupId: userinfo._id })
+                if(user.phoneNumber){
+                    await handleGetAllMessage({ userId: userinfo._id })
+                }else{
+                    await handleGetAllMessageinGroup({ groupId: userinfo._id })
+                }
             }
         }
     }
 
     useEffect(() => {
-        if (user && user.length > 0)
-            setuserinfo(user[0])
+            setuserinfo(user)
     }, [user])
 
     const handlerecallMessage = async () => {
         let res = await recallMessage({ messageId: item._id })
         if (res && res.EC === 0) {
-            // await handleGetAllMessage({ userId: userinfo._id })
-            if (userinfo && userinfo.phoneNumber) {
-                handlsendmessange({
-                    sender: { phone: dataredux.phoneNumber, userId: dataredux._id }
-                    , receiver: { phone: userinfo.phoneNumber, userId: userinfo._id }
-                })
+            if (userinfo && userinfo.type) {
+                if(userinfo.type === "group"){
+                    handlsendmessangeingroup({ groupId: userinfo._id._id })
+                }else{
+                    handlsendmessange({
+                        sender: { phone: dataredux.phoneNumber, userId: dataredux._id }
+                        , receiver: { phone: userinfo.phoneNumber, userId: userinfo._id }
+                    })
+                }
             } else {
-                handlsendmessangeingroup({ groupId: userinfo._id })
+                if(user.phoneNumber){
+                    handlsendmessange({
+                        sender: { phone: dataredux.phoneNumber, userId: dataredux._id }
+                        , receiver: { phone: userinfo.phoneNumber, userId: userinfo._id }
+                    })
+                }else{
+                    handlsendmessangeingroup({ groupId: userinfo._id })
+
+                }
             }
+            // await handleGetAllMessage({ userId: userinfo._id })
+            // if (userinfo && userinfo.phoneNumber) {
+            //     handlsendmessange({
+            //         sender: { phone: dataredux.phoneNumber, userId: dataredux._id }
+            //         , receiver: { phone: userinfo.phoneNumber, userId: userinfo._id }
+            //     })
+            // } else {
+            //     handlsendmessangeingroup({ groupId: userinfo._id })
+            // }
         }
     }
 
