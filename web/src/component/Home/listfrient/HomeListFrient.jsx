@@ -84,7 +84,6 @@ const HomeListFrient = (props) => {
                 }
             } else {
                 if (dataredux && (dataredux._id === data.sender.userId || dataredux._id === data.receiver.userId)) {
-
                     await handleGeAllFriendUpdate();
                 }
             }

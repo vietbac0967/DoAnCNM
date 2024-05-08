@@ -38,40 +38,26 @@ export const SocketSetup = (server) => {
             }
         })
 
-        socket.on("sendtest", (data) => {
+        socket.on("sendNotification", (data) => {
             let sender = data.sender;
             let receiver = data.receiver;
 
 
             if (clients && clients.length > 0) {
-                // if (receiver.length > 0) {
-                //     for (let i = 0; i < receiver.length; i++) {
-                //         let index = clients.findIndex((item) => item.customId.localeCompare(receiver[i]) === 0)
-                //         if (index !== -1) {
-                //             socket.to(clients[index].clientId).emit("refresh", () => {
-                //                 console.log("test success");
-                //             })
-                //         } else {
-                //             console.log("test error");
-                //         }
-                //     }
-                // }
-                // else {
                 let index = clients.findIndex((item) => item.customId.localeCompare(receiver) === 0)
                 if (index !== -1) {
-                    socket.to(clients[index].clientId).emit("refresh", () => {
+                    socket.to(clients[index].clientId).emit("refreshNotification", () => {
                         console.log("test success");
                     })
                 } else {
                     console.log("test error");
                 }
-                // }
 
             }
         })
 
 
-        socket.on("sendmessange", (data) => {
+        socket.on("sendMessage", (data) => {
             let sender = data.sender;
             let receiver = data.receiver;
 
@@ -80,27 +66,65 @@ export const SocketSetup = (server) => {
                 let index = clients.findIndex((item) => item.customId.localeCompare(receiver.phone) === 0)
                 let indexsender = clients.findIndex((item) => item.customId.localeCompare(sender.phone) === 0)
                 if (index !== -1) {
-                    socket.to(clients[index].clientId).emit("refreshmessange", { phone: sender.phone, userId: sender.userId });
+                    socket.to(clients[index].clientId).emit("refreshMessage", { phone: sender.phone, userId: sender.userId });
                 }
                 if (indexsender !== -1) {
-                    socket.emit("refreshmessangesender", { phone: receiver.phone, userId: receiver.userId });
+                    socket.emit("refreshMessageSender", { phone: receiver.phone, userId: receiver.userId });
                 }
 
             }
 
         })
 
-        socket.on('joinRoom', (data) => {
+        // socket.on('joinGroup', (data) => {
+        //     socket.join(data.groupId);
+        //     if (data && data.user && data.namegroup && data.groupId) {
+        //         console.log(`User ${data.user} joined room: ${data.namegroup}`);
+        //     } else {
+        //         console.log(`User ${data.user} is ready`);
+        //     }
+
+        // });
+
+        socket.on("joinGroup", (data) => {
+            console.log("check data", data)
             socket.join(data.groupId);
-            if (data && data.user && data.namegroup && data.groupId) {
+            if (data && data.user.phoneNumber && data.groupId) {
+                const existingClientIndex = userInGroup.findIndex(
+                    (client) => client.customId === data.user.phoneNumber
+                );
+
+                if (existingClientIndex !== -1) {
+                    userInGroup[existingClientIndex] = {
+                        customId: data.user.phoneNumber,
+                        groupId: data.groupId,
+                    };
+                } else {
+                    const clientInfo = {
+                        customId: data.user.phoneNumber,
+                        groupId: data.groupId,
+                    };
+                    userInGroup.push(clientInfo);
+                }
+                console.log("user in group is", userInGroup);
+                socket.emit(
+                    "refreshUserInGroup",
+                    userInGroup.filter((item) => item.groupId === data.groupId)
+                );
+            }
+            if (data && data.user && data.groupId) {
                 console.log(`User ${data.user} joined room: ${data.namegroup}`);
             } else {
                 console.log(`User ${data.user} is ready`);
             }
-
         });
 
-        socket.on('leaveRoom', (data) => {
+        socket.on("sendMessageInGroup", (data) => {
+            console.log(data);
+            io.to(data.groupId).emit("receiveMessageInGroup", { groupId: data.groupId });
+        });
+
+        socket.on('leaveGroup', (data) => {
             socket.leave(data.groupId);
             if (data && data.user && data.namegroup && data.groupId) {
                 console.log(`User ${data.user} left room: ${data.namegroup}`);
@@ -109,10 +133,10 @@ export const SocketSetup = (server) => {
             }
         });
 
-        socket.on("sendmessangeingroup", (data) => {
-            console.log(data)
-            io.to(data.groupId).emit("refreshmessangeingroup", { groupId: data.groupId })
-        })
+        // socket.on("sendMessageInGroup", (data) => {
+        //     console.log(data)
+        //     io.to(data.groupId).emit("receiveMessageInGroup", { groupId: data.groupId })
+        // })
 
         socket.on("typing", (data) => {
             socket.broadcast.emit("typing", {

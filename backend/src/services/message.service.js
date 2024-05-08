@@ -46,7 +46,9 @@ export const sendMessageService = async (
     }
 };
 
-export const getMessagesService = async (senderId, receiverId) => {
+
+
+export const getMessagesService = async (senderId, receiverId, page = 1) => {
     try {
         const messages = await Message.find({
             $and: [
@@ -58,7 +60,11 @@ export const getMessagesService = async (senderId, receiverId) => {
                 },
                 { senderDelete: { $ne: senderId } },
             ],
-        }).populate("senderId", "_id name avatar");
+        })
+            .populate("senderId", "_id name avatar fileSize")
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * 20)
+            .limit(20);
 
         return {
             EC: 0,

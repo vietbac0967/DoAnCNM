@@ -12,8 +12,11 @@ import {
     sendMessageGroup,
     sendImage,
     sendImageGroup,
+    sendFile,
+    sendVideo,
 } from "../controllers/message.controller.js";
 import upload from "../middlewares/uploadImage.js";
+import uploadFile from "../middlewares/uploadFile.js";
 
 // import path from "path";
 // import AWS from "aws-sdk";
@@ -62,5 +65,14 @@ router.post(
     upload.single("image"),
     sendImageGroup
 );
+
+router.post(
+    "/message/sendFile",
+    verifyAccount,
+    uploadFile.single("file"),
+    sendFile
+);
+
+router.post("/message/sendVideo", verifyAccount, uploadFile.single("video"), sendVideo);
 
 export default router;

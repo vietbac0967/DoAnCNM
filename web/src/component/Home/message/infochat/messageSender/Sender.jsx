@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import './Sender.scss'
-import { Box, Paper } from '@mui/material'
+import { Box, IconButton, Paper } from '@mui/material'
 import MenuMessage from '../menuaction/MenuMessage';
 import { formatDate } from '../../../../../utils/formatDateOrTime';
+import DownloadIcon from '@mui/icons-material/Download';
+import { Link } from 'react-router-dom';
+import ReactPlayer from 'react-player';
 
 const Sender = (props) => {
 
@@ -20,6 +23,12 @@ const Sender = (props) => {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    const [openfile, setopenfile] = useState(false);
+
+    const handleCloseFile = () => {
+        setopenfile(false)
+    }
 
     return (
         <Box className="my-messenge-container">
@@ -58,7 +67,58 @@ const Sender = (props) => {
                             </Box>
                         </>
 
-                        : <></>
+                        :
+                        item.messageType === "file"
+                            ?
+                            <Box className="info-messenge"
+                            >
+                                <Paper className='form-file'
+                                    onContextMenu={(e) => handleClick(e)}
+                                >
+                                    <span className='text-file'>
+                                        {
+                                            item && item.content
+                                            && item.content.split('/').slice(-1)[0]
+
+                                        }
+
+                                        <Link to={item && item.content}>
+                                            <DownloadIcon
+                                                className='icon-down'
+                                            />
+                                        </Link>
+
+
+                                    </span>
+                                    <span className='time'>
+                                        {formatDate(item && item.createdAt)}
+                                    </span>
+                                </Paper>
+
+                            </Box>
+                            :
+                            item.messageType === "video"
+                                ?
+                                item && item.content
+                                    && item.content.split('.').slice(-1)[0] === "mp3"
+                                    ?
+                                    < audio
+                                        style={{ margin: "5px 0" }}
+                                        controls src={item && item.content}
+                                    >
+                                    </audio>
+                                    :
+                                    <Box className="body-video">
+                                        <ReactPlayer
+                                            url={item && item.content}
+                                            width='100%'
+                                            height='100%'
+                                            controls={true}
+                                        />
+                                    </Box>
+
+                                :
+                                <></>
             }
 
             <MenuMessage
@@ -74,7 +134,8 @@ const Sender = (props) => {
                 handleGetAllMessageinGroup={handleGetAllMessageinGroup}
 
             />
-        </Box>
+
+        </Box >
     );
 };
 

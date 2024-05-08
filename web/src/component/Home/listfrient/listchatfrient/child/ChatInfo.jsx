@@ -5,6 +5,8 @@ import Avatar from '@mui/material/Avatar';
 import { useDispatch, useSelector } from 'react-redux';
 import ImageIcon from '@mui/icons-material/Image';
 import { getInfoUser } from '../../../../../service/UserService';
+import FilePresentIcon from '@mui/icons-material/FilePresent';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 
 const ChatInfo = (props) => {
 
@@ -175,7 +177,39 @@ const ChatInfo = (props) => {
                                             <ImageIcon /> Hình ảnh
                                         </Box>
                                     :
-                                    <></>
+                                    user.message.messageType === "file"
+                                        ? user.message.senderId === dataredux._id
+                                            ?
+                                            <Box
+                                                className="text-message"
+                                            >
+                                                Bạn:<FilePresentIcon /> {user.message.content && user.message.content.split('/').slice(-1)[0]}
+                                            </Box>
+                                            :
+                                            <Box
+                                                className="text-message"
+
+                                            >
+                                                <FilePresentIcon /> {user.message.content && user.message.content.split('/').slice(-1)[0]}
+                                            </Box>
+                                        :
+                                        user.message.messageType === "video"
+                                            ? user.message.senderId === dataredux._id
+                                                ?
+                                                <Box
+                                                    className="text-message"
+                                                >
+                                                    Bạn:<PlayCircleIcon /> {user.message.content && user.message.content.split('/').slice(-1)[0]}
+                                                </Box>
+                                                :
+                                                <Box
+                                                    className="text-message"
+
+                                                >
+                                                    <PlayCircleIcon /> {user.message.content && user.message.content.split('/').slice(-1)[0]}
+                                                </Box>
+                                            :
+                                            <></>
                             :
                             <Box
                                 className="text-message"
