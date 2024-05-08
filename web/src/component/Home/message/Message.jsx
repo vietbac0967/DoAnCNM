@@ -15,6 +15,19 @@ const Message = (props) => {
 
     const user = useRef({});
 
+    const [page, setpage] = useState(1);
+
+    const fetchMoreData = async () => {
+        try {
+            if (user && user.current.type === "private") {
+                setpage((prev) => prev + 1);
+                console.log("check check")
+            }
+        } catch (error) {
+            console.error('Error fetching more data:', error);
+        }
+    };
+
     useEffect(() => {
         if (user.current) {
             if (user.current.type === "private" || user.current.phoneNumber) {
@@ -59,6 +72,7 @@ const Message = (props) => {
     }, [user.current])
 
 
+
     // useEffect(() => {
     //     if (listfrient && listfrient.length > 0) {
     //         let data = listfrient.filter((item) => item.click === true)
@@ -100,7 +114,7 @@ const Message = (props) => {
 
     const handleGetAllMessage = async (data) => {
         if (users && !_.isEmpty(users)) {
-            let res = await getAllMessage({ receiverId: data.userId })
+            let res = await getAllMessage({ receiverId: data.userId, page: page })
             if (res && res.EC === 0) {
                 setlistmessage(res.DT)
             } else {
@@ -109,6 +123,8 @@ const Message = (props) => {
 
         }
     }
+
+    console.log("check list message", listmessage)
 
 
     const handleGetAllMessageinGroup = async (data) => {
@@ -145,6 +161,7 @@ const Message = (props) => {
                     listmessage={listmessage}
                     user={user.current}
                     handleGetAllMessageinGroup={handleGetAllMessageinGroup}
+                    fetchMoreData={fetchMoreData}
 
                 />
             </Box>

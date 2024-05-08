@@ -18,7 +18,6 @@ const HomeListFrient = (props) => {
 
     const dispatch = useDispatch();
     const dataredux = useSelector((state) => state.userisaccess.account)
-    console.log("dataredux:::", dataredux)
 
     const [model, setmodel] = useState(false)
     const [search, setsearch] = useState("");
@@ -85,7 +84,6 @@ const HomeListFrient = (props) => {
                 }
             } else {
                 if (dataredux && (dataredux._id === data.sender.userId || dataredux._id === data.receiver.userId)) {
-
                     await handleGeAllFriendUpdate();
                 }
             }
