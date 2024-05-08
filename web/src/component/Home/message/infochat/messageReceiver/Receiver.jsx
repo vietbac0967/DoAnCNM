@@ -3,6 +3,9 @@ import './Receiver.scss'
 import { Avatar, Box, Paper } from '@mui/material'
 import MenuMessage from '../menuaction/MenuMessage';
 import { formatDate } from '../../../../../utils/formatDateOrTime';
+import { Link } from 'react-router-dom';
+import DownloadIcon from '@mui/icons-material/Download';
+import ReactPlayer from 'react-player';
 
 const Receiver = (props) => {
 
@@ -63,8 +66,58 @@ const Receiver = (props) => {
                                     </span>
                                 </Box>
                             </>
+                            :
+                            item.messageType === "file"
+                                ?
+                                <Box className="info-messenge"
+                                >
+                                    <Paper className='form-file'
+                                        onContextMenu={(e) => handleClick(e)}
+                                    >
+                                        <span className='text-file'>
+                                            {
+                                                item && item.content
+                                                && item.content.split('/').slice(-1)[0]
 
-                            : <></>
+                                            }
+
+                                            <Link to={item && item.content}>
+                                                <DownloadIcon
+                                                    className='icon-down'
+                                                />
+                                            </Link>
+
+
+                                        </span>
+                                        <span className='time'>
+                                            {formatDate(item && item.createdAt)}
+                                        </span>
+                                    </Paper>
+
+                                </Box>
+                                :
+                                item.messageType === "video"
+                                    ?
+                                    item && item.content
+                                        && item.content.split('.').slice(-1)[0] === "mp3"
+                                        ?
+                                        < audio
+                                            style={{ margin: "5px 0" }}
+                                            controls src={item && item.content}
+                                        >
+                                        </audio>
+                                        :
+                                        <Box className="body-video">
+                                            <ReactPlayer
+                                                url={item && item.content}
+                                                width='100%'
+                                                height='100%'
+                                                controls={true}
+                                            />
+                                        </Box>
+
+                                    :
+                                    <></>
                 }
             </Box>
 

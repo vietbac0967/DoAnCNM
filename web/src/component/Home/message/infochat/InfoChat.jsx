@@ -13,7 +13,7 @@ import InfoActionGroup from './infoActionGroup/InfoActionGroup';
 const InfoChat = (props) => {
 
     const { users, handleGetAllMessage, listmessage,
-        setlistmessage, user, reflistmessage, handleGetAllMessageinGroup
+        setlistmessage, user, reflistmessage, handleGetAllMessageinGroup, fetchMoreData
     } = props;
 
     const dispatch = useDispatch();

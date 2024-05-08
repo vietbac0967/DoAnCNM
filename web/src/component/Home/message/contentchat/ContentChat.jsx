@@ -4,7 +4,7 @@ import IconButton from '@mui/material/IconButton';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import './ContentChat.scss'
 import { useDispatch, useSelector } from 'react-redux';
-import { sendMessage, sendMessageGroup, sendMessageImg, sendMessageImgGroup } from '../../../../service/MessageService';
+import { sendFile, sendMessage, sendMessageGroup, sendMessageImg, sendMessageImgGroup, sendVideo } from '../../../../service/MessageService';
 import { handlesendAllInfo, handlesendinfoAll, handlsendmessange, handlsendmessangeingroup } from '../../../../socket/socket';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import emojidata from '@emoji-mart/data/sets/15/all.json'
@@ -12,6 +12,7 @@ import Picker from '@emoji-mart/react'
 import _ from 'lodash';
 import ImageIcon from '@mui/icons-material/Image';
 import SendIcon from '@mui/icons-material/Send';
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 
 const ContentChat = (props) => {
 
@@ -202,13 +203,85 @@ const ContentChat = (props) => {
         }
     }
 
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (!loading) {
+                setSuccess(false);
+                setLoading(true);
+            }
+            if (userinfo && (userinfo.type === "private" || userinfo.phoneNumber)) {
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("receiverId", userinfo._id)
+                let res = await sendFile(formData)
+                if (res && res.EC === 0) {
+                    setSuccess(true);
+                    setLoading(false);
+                    handlsendmessange({
+                        sender: { phone: dataredux.phoneNumber, userId: dataredux._id }
+                        , receiver: { phone: userinfo.phoneNumber, userId: userinfo._id }
+                    })
+                    handlesendAllInfo({
+                        sender: { phone: dataredux.phoneNumber, userId: dataredux._id }
+                        , receiver: { phone: userinfo.phoneNumber, userId: userinfo._id },
+                        type: "private"
+                    })
+                }
+            }
+        } else {
+            toast.error("Vui lòng chọn ảnh để thực hiện update");
+        }
+    }
+
+    const handleVideoChange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (!loading) {
+                setSuccess(false);
+                setLoading(true);
+            }
+            if (userinfo && (userinfo.type === "private" || userinfo.phoneNumber)) {
+                const formData = new FormData();
+                formData.append("video", file);
+                formData.append("receiverId", userinfo._id)
+                console.log(formData)
+                let res = await sendVideo(formData)
+                if (res && res.EC === 0) {
+                    setSuccess(true);
+                    setLoading(false);
+                    handlsendmessange({
+                        sender: { phone: dataredux.phoneNumber, userId: dataredux._id }
+                        , receiver: { phone: userinfo.phoneNumber, userId: userinfo._id }
+                    })
+                    handlesendAllInfo({
+                        sender: { phone: dataredux.phoneNumber, userId: dataredux._id }
+                        , receiver: { phone: userinfo.phoneNumber, userId: userinfo._id },
+                        type: "private"
+                    })
+                }
+            }
+        } else {
+            toast.error("Vui lòng chọn ảnh để thực hiện update");
+        }
+    }
+
 
     return (
         <Box className="chat-infor-bottom-child-bottom">
             <Box className="div-input-action">
-                <IconButton type="button" sx={{ p: '10px' }} aria-label="search">
-                    <AttachFileIcon />
-                </IconButton>
+                <input id='previewFile-message' type='file' hidden onChange={(e) => handleFileChange(e)} />
+                <label htmlFor="previewFile-message">
+                    <IconButton component="span" sx={{ p: '10px' }} aria-label="search">
+                        <AttachFileIcon />
+                    </IconButton>
+                </label>
+                <input id='previewFile-video' type='file' hidden onChange={(e) => handleVideoChange(e)} />
+                <label htmlFor="previewFile-video">
+                    <IconButton component="span" sx={{ p: '10px' }} aria-label="search">
+                        <VideoLibraryIcon />
+                    </IconButton>
+                </label>
                 <input id='previewImg-message' type='file' hidden onChange={(e) => handleImageChange(e)} />
                 <label htmlFor="previewImg-message">
                     <IconButton component="span" sx={{ p: '10px' }} aria-label="search">

@@ -39,6 +39,45 @@
                 }
             }
 
+            .form-file {
+
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                min-height: 60px;
+                min-width: 120px;
+                padding: 10px;
+                overflow: auto;
+
+                .text-file {
+                    display: flex;
+                    align-items: center;
+                    font-size: 18px;
+                    font-weight: 600;
+                    line-height: 1.5;
+                    user-select: text;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    color: var(--text-primary);
+
+                    .icon-down {
+                        &:hover {
+                            cursor: pointer;
+                        }
+
+                        margin: 0 5px;
+                    }
+
+                }
+            }
+
+        }
+
+        .body-video {
+            margin: 5px 0;
+            min-width: 120px;
+            min-height: 90px;
+            max-width: 70%;
         }
 
         .info-image {
