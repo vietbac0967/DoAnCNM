@@ -5,7 +5,6 @@ import {
   Image,
   Alert,
   FlatList,
-  Modal,
   Pressable,
 } from "react-native";
 import React, { useEffect, useState } from "react";
@@ -15,12 +14,9 @@ import {
   getUserForGroupService,
   updateDeputyLeader,
 } from "../services/group.service";
-import { useSelector } from "react-redux";
 import { Entypo } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
-import { baseURL } from "../api/baseURL";
 import { sendMessageGroupService } from "../services/message.service";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getUserInfo } from "../services/user.service";
 export default function MemberInfoScreen({ navigation, route }) {
   const groupId = route.params?.groupId;
@@ -34,7 +30,6 @@ export default function MemberInfoScreen({ navigation, route }) {
     try {
       const response = await getUserInfo();
       const { DT, EM, EC } = response;
-      console.log("resonse user:::", response.data);
       if (EC === 0 && EM === "Success") {
         setUser(DT);
       } else {
@@ -45,13 +40,15 @@ export default function MemberInfoScreen({ navigation, route }) {
     }
   };
   useEffect(() => {
+    navigation.setOptions({
+      headerTitle: "Thành viên nhóm",
+    })
     getUser();
   }, []);
-  console.log("user:::", user);
+
   const getUserForGroup = async () => {
     try {
       const response = await getUserForGroupService(groupId);
-      console.log("response groups:::", response);
       const { EM, EC, DT } = response;
       if (EC === 0 && EM === "Success") {
         setMembers(DT);
@@ -122,12 +119,17 @@ export default function MemberInfoScreen({ navigation, route }) {
             <Text style={{ fontSize: 13, fontWeight: "bold" }}>
               Trưởng nhóm
             </Text>
-          ) : null}
+          ) : (
+            null
+          )}
+
           {item?._id === deputyLeader?._id ? (
             <Text style={{ fontSize: 13, fontWeight: "bold" }}>
               Phó trưởng nhóm
             </Text>
-          ) : null}
+          ) : (
+            null
+          )}
         </View>
       </View>
 
@@ -150,7 +152,8 @@ export default function MemberInfoScreen({ navigation, route }) {
                 <Text style={{ color: "red" }}>Xóa</Text>
               </Pressable>
             ) : null}
-            {item?._id !== author._id ? (
+
+            {/* {item?._id !== author._id && item?._id !== deputyLeader?._id ? ( */}
               <Pressable
                 style={{ flexDirection: "row" }}
                 onPress={() => {
@@ -160,7 +163,7 @@ export default function MemberInfoScreen({ navigation, route }) {
                 <SimpleLineIcons name="user" size={24} color="#97E7E1" />
                 <Text style={{ fontSize: 13 }}>Phó nhóm</Text>
               </Pressable>
-            ) : null}
+            {/* ) : null} */}
           </View>
         ) : null}
       </View>

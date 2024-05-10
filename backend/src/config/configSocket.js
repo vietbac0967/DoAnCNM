@@ -39,7 +39,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendNotification", (data) => {
-    console.log("data notification:::", data);
     const receiver = data.receiver;
     if (clients && clients.length > 0) {
       const index = clients.findIndex(
@@ -57,8 +56,6 @@ io.on("connection", (socket) => {
     const sender = data.sender;
     const receiver = data.receiver;
 
-    console.log("sender:::", sender);
-    console.log("receiver:::", receiver);
     if (clients && clients.length > 0) {
       const index = clients.findIndex(
         (item) => item.customId.localeCompare(receiver.phone) === 0

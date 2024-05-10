@@ -1,3 +1,4 @@
+import { Alert } from "react-native";
 import api, { baseURL } from "../api/baseURL";
 
 export const getMessagesService = async (friendId, currentPage) => {
@@ -15,6 +16,19 @@ export const getMessagesService = async (friendId, currentPage) => {
   } catch (error) {
     console.log("error:::", error);
     return [];
+  }
+};
+
+export const getAllMessagesService = async (receiverId) => {
+  try {
+    const response = await api.get("/message/getAllMessages", {
+      params: {
+        receiverId,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    Alert.alert("Error", error.message);
   }
 };
 

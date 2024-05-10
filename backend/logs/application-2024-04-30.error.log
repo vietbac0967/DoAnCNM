@@ -1,5 +1,0 @@
-[2024-04-30 10:48:34.915 AM] error: 		401 - Invalid token
-[2024-04-30 10:48:35.995 AM] error: 		error in middleware verifyAccount jwt expired
-[2024-04-30 10:48:36.001 AM] error: 		error in middleware verifyAccount jwt expired
-[2024-04-30 10:48:42.047 AM] error: 		error in middleware verifyAccount jwt expired
-[2024-04-30 13:43:16.726 PM] error: 		401 - Invalid token

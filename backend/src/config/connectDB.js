@@ -1,14 +1,18 @@
 import mongoose from "mongoose";
+import logger from "../helpers/winston.log.js";
 
 const connectToMongoDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI).then(() => {
-      console.log("Connected to MongoDB");
-    }).catch((err) => {
-      console.log("Error connecting to MongoDB", err.message);
-    });
+    await mongoose
+      .connect(process.env.MONGO_URI)
+      .then(() => {
+        logger.info("Connected to MongoDB");
+      })
+      .catch((err) => {
+        logger.error("Error connecting to MongoDB", err.message);
+      });
   } catch (error) {
-    console.log("Error connecting to MongoDB", error.message);
+    logger.error("Error connecting to MongoDB", error.message);
   }
 };
 

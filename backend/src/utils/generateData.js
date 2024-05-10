@@ -1,4 +1,5 @@
-import { registerService } from "./src/services/auth.service.js";
+import logger from "../helpers/winston.log.js";
+import { registerService } from "../services/auth.service.js";
 import { faker } from "@faker-js/faker";
 const generatePhoneNumber = () => {
   // let generate 10 numbers with prefix is 0
@@ -27,7 +28,7 @@ const generateData = async (size) => {
         confirmPassword,
         gender,
       });
-      console.log({ EC, EM, DT });
+      logger.info({ EC, EM, DT });
     })
   );
 };

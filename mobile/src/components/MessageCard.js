@@ -19,7 +19,7 @@ export default function MessageCard({
   if (userId) {
     isCurrentUser = message.senderId?._id === userId;
   }
-  if (message.messageType === "text") {
+  if (message?.messageType === "text") {
     return (
       <View
         style={{
@@ -84,7 +84,7 @@ export default function MessageCard({
     );
   }
 
-  if (message.messageType === "file") {
+  if (message?.messageType === "file") {
     return (
       <View
         style={{
@@ -164,7 +164,7 @@ export default function MessageCard({
       </View>
     );
   }
-  if (message.messageType === "image") {
+  if (message?.messageType === "image") {
     return (
       <View
         style={{
@@ -249,7 +249,7 @@ export default function MessageCard({
       </View>
     );
   }
-  if (message.messageType === "video") {
+  if (message?.messageType === "video") {
     return (
       <View
         style={{
@@ -280,7 +280,6 @@ export default function MessageCard({
           }}
           onPress={() => {
             setSelectMessage(message);
-            // setModalImageVisible(true);
           }}
           style={[
             isCurrentUser
@@ -292,16 +291,33 @@ export default function MessageCard({
                 }
               : {
                   alignSelf: "flex-start",
-                  paddingHorizontal: 8,
-                  borderRadius: 7,
                   maxWidth: "60%",
+                  marginRight: "auto",
                 },
           ]}
         >
           <Video
             ref={video}
             source={{ uri: message.content }}
-            style={styles.video}
+            style={[
+              ,
+              isCurrentUser
+                ? {
+                    alignSelf: "flex-end",
+                    maxWidth: "60%",
+                    borderRadius: 7,
+                    marginRight: 10,
+                    width: 320,
+                    height: 200,
+                  }
+                : {
+                    alignSelf: "flex-start",
+                    maxWidth: "60%",
+                    marginLeft: 20,
+                    width: 320,
+                    height: 200,
+                  },
+            ]}
             useNativeControls
             resizeMode={ResizeMode.CONTAIN}
             isLooping
@@ -312,11 +328,10 @@ export default function MessageCard({
               setModalVisible(true);
             }}
             style={{
-              alignSelf: "flex-end",
+              alignSelf: "flex-start",
               backgroundColor: "gray",
-              borderRadius:20,
-              marginTop:5,
-              alignItems:"center",
+              borderRadius: 20,
+              marginTop: 5,
             }}
           >
             <Text
@@ -326,7 +341,7 @@ export default function MessageCard({
                 color: "white",
                 paddingTop: 5,
                 paddingHorizontal: 5,
-                paddingVertical:2
+                paddingVertical: 2,
               }}
             >
               {formatDateOrTime(message?.createdAt)}
