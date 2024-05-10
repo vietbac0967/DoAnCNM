@@ -69,7 +69,6 @@ const ChatScreen = ({ navigation, route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageVisible, setModalImageVisible] = useState(false);
   const [receiver, setReceiver] = useState({});
-  const scrollViewRef = useRef(null);
   const [activeUsers, setActiveUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const user = useSelector(selectUser);
@@ -78,7 +77,6 @@ const ChatScreen = ({ navigation, route }) => {
   const [isLoadingUpload, setIsLoadingUpload] = useState(false);
   const bottomSheetModalRef = useRef(null);
   const snapPoints = useMemo(() => ["25%", "50%"], []);
-  const [images, setImages] = useState([]);
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
@@ -86,17 +84,7 @@ const ChatScreen = ({ navigation, route }) => {
   const handleSheetChanges = useCallback((index) => {
     console.log("handleSheetChanges", index);
   }, []);
-
-  // const scrollToBottom = () => {
-  //   if (scrollViewRef.current) {
-  //     scrollViewRef.current.scrollToEnd({ animated: false });
-  //   }
-  // };
-
-  // const handleContentSizeChange = () => {
-  //   scrollToBottom();
-  // };
-
+  
   const handleEmojiPress = () => {
     setShowEmojiSelector(!showEmojiSelector);
     inputRef.current.blur();
@@ -146,16 +134,18 @@ const ChatScreen = ({ navigation, route }) => {
           );
           const { DT, EC, EM } = response.data;
           if (EC === 0 && EM === "Success") {
-            await refreshMessages();
-            setMessages([DT, ...messages.slice(0, -1)]);
             setIsLoadingUpload(false);
+            if (messages.length >= 20) {
+              setMessages([DT, ...messages.slice(0, -1)]);
+            } else {
+              setMessages([DT, ...messages]);
+            }
             handlSendMessageSocket({
               sender: { phone: user.phoneNumber, userId: user._id },
               receiver: { phone: receiver.phoneNumber, userId: receiver._id },
             });
           } else {
             Alert.alert("Cảnh báo", "Tải ảnh không thành công");
-            await refreshMessages();
             setIsLoadingUpload(false);
           }
         } else {
@@ -195,7 +185,6 @@ const ChatScreen = ({ navigation, route }) => {
       setIsLoadingUpload(false);
     }
   };
-  // console.log("user current is:::", user);
 
   const handleSendFile = async () => {
     try {
@@ -225,9 +214,8 @@ const ChatScreen = ({ navigation, route }) => {
         );
         const { DT, EC, EM } = response.data;
         if (EC === 0 && EM === "Success") {
-          await refreshMessages();
-          setMessages([DT, ...messages.slice(0, -1)]);
           setIsLoadingUpload(false);
+          setMessages([DT, ...messages.slice(0, -1)]);
           handlSendMessageSocket({
             sender: { phone: user.phoneNumber, userId: user._id },
             receiver: { phone: receiver.phoneNumber, userId: receiver._id },
@@ -247,14 +235,15 @@ const ChatScreen = ({ navigation, route }) => {
     try {
       const { DT, EC, EM } = await sendMessageService(recevierId, message);
       if (EC === 0 && EM === "Success") {
-        await refreshMessages();
-        // set messages is new message is front to before end message
-        setMessages((prevMessages) => [DT, ...prevMessages.slice(0, -1)]);
+        if (messages.length >= 20) {
+          setMessages([DT, ...messages.slice(0, -1)]);
+        } else {
+          setMessages([DT, ...messages]);
+        }
         handlSendMessageSocket({
           sender: { phone: user.phoneNumber, userId: user._id },
           receiver: { phone: receiver.phoneNumber, userId: receiver._id },
         });
-        // check user online or offline to send notification
         if (
           !activeUsers.some((user) => user.customId === receiver.phoneNumber)
         ) {
@@ -273,10 +262,8 @@ const ChatScreen = ({ navigation, route }) => {
             throw new Error(EM);
           }
         }
-        setIsLoading(false);
-        setIsRefreshing(false);
-        setMessage("");
       }
+      setMessage("");
     } catch (error) {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -325,6 +312,7 @@ const ChatScreen = ({ navigation, route }) => {
         );
         setIsLoading(false);
         setIsRefreshing(false);
+        console.log("current page is", currentPage);
       } else {
         Alert("Thông báo", "Xóa không thành công");
       }
@@ -346,7 +334,6 @@ const ChatScreen = ({ navigation, route }) => {
       setIsRefreshing(false);
     } catch (error) {
       console.log("error:::", error.message);
-    } finally {
       setIsLoading(false);
       setIsRefreshing(false);
     }
@@ -362,17 +349,21 @@ const ChatScreen = ({ navigation, route }) => {
   };
   // fetching data
   useEffect(() => {
-    if (user) {
-      handleRefreshMessageSocket(async (data) => {
-        console.log("data refresh message:::", data);
-        refreshMessages();
-        getMessages();
-      });
-      // handleRefreshMessageSenderSocket(async (data) => {
-      //   console.log("data message sender:::", data);
-      //   getMessages();
-      // });
-    }
+    // if (user) {
+    handleRefreshMessageSocket(async (data) => {
+      console.log("data refresh message:::", data);
+      await refreshMessages();
+      getMessages();
+    });
+    // });
+    // handleReceiveInConversation(async (data) => {
+    //   console.log("data user avtive is:::", data);
+    //   setActiveUsers(data);
+    // });
+    // handleRefreshMessageSenderSocket(async (data) => {
+    //   console.log("data message sender:::", data);
+    //   getMessages();
+    // });
   }, []);
   const refreshMessages = async () => {
     setIsRefreshing(true);
@@ -398,22 +389,11 @@ const ChatScreen = ({ navigation, route }) => {
     getReceiver();
   }, []);
 
-  // useEffect(() => {
-  //   scrollToBottom();
-  // }, [messages]);
-
   useEffect(() => {
     handleInConversation({
       customId: user.phoneNumber,
     });
   }, [user]);
-
-  useEffect(() => {
-    handleReceiveInConversation((data) => {
-      console.log("data user avtive is:::", data);
-      setActiveUsers(data);
-    });
-  }, []);
 
   // info receiver
   useLayoutEffect(() => {
@@ -465,12 +445,16 @@ const ChatScreen = ({ navigation, route }) => {
           >
             <Ionicons name="videocam" size={24} color="#fff" />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => console.log("Setting")}
+          <Pressable
+            onPress={() =>
+              navigation.navigate("Setting", {
+                receiverId: receiver._id,
+              })
+            }
             style={styles.settingButton}
           >
             <Ionicons name="list" size={24} color="#fff" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       ),
     });
@@ -486,11 +470,6 @@ const ChatScreen = ({ navigation, route }) => {
       keyboardVerticalOffset={100}
       style={styles.container}
     >
-      {/* <ScrollView
-        ref={scrollViewRef}
-        contentContainerStyle={{ flexGrow: 1 }}
-        onContentSizeChange={handleContentSizeChange}
-      > */}
       {/* Header for user about image, name  */}
       <Modal
         animationType="fade"
@@ -604,7 +583,7 @@ const ChatScreen = ({ navigation, route }) => {
           />
         )}
         keyExtractor={(item) => item._id}
-        ListFooterComponent={renderLoader}
+        // ListFooterComponent={renderLoader}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.1}
         onRefresh={refreshMessages}

@@ -3,10 +3,12 @@ import { verifyAccount } from "../middlewares/verifyAccount.js";
 import {
   deleteMessage,
   forwardMessage,
+  getAllMessage,
   getMessages,
   getMessagesGroup,
   recallMessage,
   sendFile,
+  sendFileGroup,
   sendImage,
   sendImageGroup,
   sendMessage,
@@ -257,5 +259,17 @@ router.post(
   uploadFile.single("file"),
   sendFile
 );
-router.post("/message/sendVideo",verifyAccount,uploadFile.single("video"),sendVideo);
+router.post(
+  "/message/sendVideo",
+  verifyAccount,
+  uploadFile.single("video"),
+  sendVideo
+);
+router.get("/message/getAllMessages", verifyAccount, getAllMessage);
+router.post(
+  "/message/sendFileGroup",
+  verifyAccount,
+  uploadFile.single("file"),
+  sendFileGroup
+);
 export default router;

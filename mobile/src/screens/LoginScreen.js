@@ -31,7 +31,6 @@ export default function LoginScreen({ navigation }) {
       const response = await getUserInfo();
       const { EC, EM, DT } = response;
       if (EC === 0 && EM === "Success") {
-        console.log("data in login is", DT);
         const { _id, name, email, phoneNumber, avatar } = DT;
         dispatch(setUser({ _id, name, email, phoneNumber, avatar }));
       }
@@ -43,8 +42,6 @@ export default function LoginScreen({ navigation }) {
     const checkToken = async () => {
       const token = await AsyncStorage.getItem("accessToken");
       const refreshToken = await AsyncStorage.getItem("refreshToken");
-      console.log("token is", token);
-      console.log("refresh token is", refreshToken);
       if (token && refreshToken) {
         await getUser();
         navigation.navigate("Main");
@@ -64,7 +61,6 @@ export default function LoginScreen({ navigation }) {
         password,
       });
       const { EM, EC, DT } = response.data;
-      console.log("data is", response.data);
       if (EM === "User not verified" && EC === 0) {
         alert("Hãy xác thực email của bạn");
         return;
@@ -83,7 +79,7 @@ export default function LoginScreen({ navigation }) {
         return;
       }
     } catch (error) {
-      console.log("error", error);
+      Alert.alert("Error", error.message);
     }
   };
 
