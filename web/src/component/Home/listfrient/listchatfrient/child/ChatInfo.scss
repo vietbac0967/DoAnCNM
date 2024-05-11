@@ -1,0 +1,40 @@
+.chat-info-container {
+    padding: 5px;
+    display: flex;
+    height: 50px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    .name-chat-info {
+        margin-left: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+
+        .name-info {
+            font-style: inherit;
+            font-weight: 600;
+            font-size: 18px;
+            line-height: 16.94px;
+            color: #000000;
+        }
+
+        .chat-info {
+            font-size: 15px;
+            font-weight: 450;
+            line-height: 1.5;
+            color: gray;
+
+            .text-message {
+                display: flex;
+                align-items: center;
+            }
+        }
+    }
+
+    &.active {
+        background-color: #e5efff;
+    }
+}

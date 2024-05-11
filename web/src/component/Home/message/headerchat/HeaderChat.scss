@@ -1,0 +1,39 @@
+.header-chat-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    // justify-content: space-between;
+    align-items: center;
+    padding: 0;
+
+
+    .info-and-action {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+
+        .info-user {
+            display: flex;
+            margin-left: 10px;
+            overflow: auto;
+
+            &:hover {
+                cursor: pointer;
+            }
+
+            .info-name-user {
+                margin-left: 10px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-evenly;
+            }
+        }
+
+        .action-info {
+            display: flex;
+        }
+
+    }
+
+
+}

@@ -1,0 +1,34 @@
+.header-container {
+    width: 100%;
+    height: 100%;
+    background-color: #00ACED;
+
+    .header-body {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        margin-left: 15px;
+
+        .header-info-user {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .avt-user {
+                margin-right: 10px;
+
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+
+            .name-user {
+                font-style: inherit;
+                font-weight: 600;
+                font-size: 16px;
+                line-height: 19.36px;
+                color: #FFFFFF;
+            }
+        }
+    }
+}

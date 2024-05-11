@@ -1,0 +1,122 @@
+.info-body {
+    height: 100%;
+
+    background-color: #eeeeee;
+
+    .info-bg {
+        height: 200px;
+    }
+
+    .info-user {
+        background-color: #ffffff;
+        width: 100%;
+
+        .info-user-avt {
+            display: flex;
+            align-items: center;
+            padding: 0 5px;
+
+            .info-avt-and-action {
+                position: relative;
+
+                .info-user-avatar {
+                    margin-top: -16px;
+
+                }
+
+                .info-user-action-avt {
+                    z-index: 100;
+                    right: -20%;
+                    top: 40%;
+                    position: absolute;
+                }
+
+            }
+
+
+
+
+            .info-user-name {
+                margin: 5px;
+                font-size: 18px;
+                font-weight: 600;
+            }
+
+            .info-user-custom {}
+        }
+
+        .info-user-action {
+            padding: 10px;
+
+            .btn-send-message {
+                width: 100%;
+
+                .text-action-message {
+                    color: #2770dc;
+                    font-size: 15px;
+                    font-weight: 600;
+                }
+            }
+        }
+
+    }
+
+    .info-user-des {
+        margin: 10px 0;
+        background-color: #ffffff;
+        padding: 5px;
+
+        .info-user-des-title {
+            margin: 10px 0;
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.5
+        }
+
+        .info-user-des-gender {
+            margin: 10px 0;
+            width: 60%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .info-user-text {
+                font-size: 15px;
+                font-weight: 400;
+                color: #7589a3;
+
+            }
+
+            .info-user-if {
+                color: #081c36;
+                font-size: 16px;
+                font-weight: 400;
+            }
+        }
+
+    }
+
+    .info-action {
+        background-color: #ffffff;
+        height: 120px;
+
+        .info-action-btn {
+            display: flex;
+            align-items: center;
+            height: 50px;
+            justify-content: center;
+
+            &:hover {
+                background-color: #f3f5f6;
+                cursor: pointer;
+            }
+
+            .info-action-text {
+                font-size: 17px;
+                font-weight: 400;
+                color: #081c36;
+                line-height: 1.5;
+            }
+        }
+    }
+}

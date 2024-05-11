@@ -1,0 +1,43 @@
+.chat-infor-bottom-child-bottom {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .div-input-action {
+        position: relative;
+
+        .btn-emoij {}
+
+        .div-emoij {
+            width: 352px;
+            position: absolute;
+            top: -1000%;
+            // right: 20px;
+        }
+    }
+
+
+    .div-input-and-emo {
+        width: 100%;
+        height: 100%;
+        position: relative;
+
+
+        .chat-infor-bottom-child-text {
+            width: 100%;
+            height: 100%;
+        }
+
+
+        .btn-send {
+            position: absolute;
+            top: 20%;
+            right: 15px;
+        }
+
+
+    }
+
+
+}
