@@ -1,8 +1,7 @@
-import path from "path";
-import Conversation from "../models/converstation.model.js";
 import {
   deleteMessageService,
   forwardMessageService,
+  getAllMessageService,
   getMessagesGroupService,
   getMessagesService,
   recallMessageService,
@@ -11,6 +10,7 @@ import {
 } from "../services/message.service.js";
 import cloud from "../utils/cloudinary.js";
 import Message from "../models/message.model.js";
+import logger from "../helpers/winston.log.js";
 export const sendMessage = async (req, res) => {
   try {
     const senderId = req.user._id;
@@ -64,7 +64,7 @@ export const sendImage = async (req, res) => {
       .upload_stream(
         {
           resource_type: "image",
-          transformation: [{ width: 300}],
+          transformation: [{ width: 300 }],
         },
         async (error, result) => {
           if (error) {
@@ -141,6 +141,48 @@ export const sendFile = async (req, res) => {
     });
   }
 };
+export const sendFileGroup = async (req, res) => {
+  try {
+    if (!req.file || !req.file.buffer) {
+      return res.status(400).json({ EC: 1, EM: "No file provided", DT: "" });
+    }
+    const senderId = req.user._id;
+    const fileName = req.file.originalname;
+    cloud.uploader
+      .upload_stream(
+        { resource_type: "raw", public_id: `files/${fileName}` },
+        async (error, result) => {
+          if (error) {
+            return res.status(500).json({ EC: 1, EM: "Error", DT: "" });
+          } else {
+            const sendMessage = await sendMessageGroupService(
+              senderId,
+              req.body.groupId,
+              result.secure_url,
+              "file"
+            );
+            const message = await Message.findById(sendMessage.DT._id);
+            message.fileSize = result.bytes;
+            await message.save();
+            return res.status(200).json({
+              EC: 0,
+              EM: "Success",
+              DT: message,
+            });
+          }
+        }
+      )
+      .end(req.file.buffer);
+  } catch (error) {
+    logger.error(error.message);
+    return res.status(500).json({
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    });
+  }
+};
+
 export const sendVideo = async (req, res) => {
   try {
     if (!req.file || !req.file.buffer)
@@ -148,7 +190,7 @@ export const sendVideo = async (req, res) => {
     const senderId = req.user._id;
     const fileName = req.file.originalname;
     // Respond to the client immediately
-    res.status(200).json({ EC: 0, EM: "Upload started", DT: "" });
+
     // Perform the upload operation in the background
     cloud.uploader
       .upload_stream(
@@ -172,6 +214,7 @@ export const sendVideo = async (req, res) => {
             message.fileSize = result.bytes;
             await message.save();
             console.log("Upload successful:", sendMessage);
+            res.status(200).json({ EC: 0, EM: "Upload started", DT: "" });
           }
         }
       )
@@ -292,5 +335,16 @@ export const forwardMessage = async (req, res) => {
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ EC: 1, EM: error.message, DT: "" });
+  }
+};
+// Get all message for user
+export const getAllMessage = async (req, res) => {
+  try {
+    const senderId = req.user._id;
+    const receiverId = req.query.receiverId;
+    const reponse = await getAllMessageService(senderId, receiverId);
+    return res.status(200).json(reponse);
+  } catch (error) {
+    return res.status(500).json({ EC: 1, EM: error.message, DT: "" });
   }
 };

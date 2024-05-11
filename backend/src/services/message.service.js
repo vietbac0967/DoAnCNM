@@ -1,3 +1,4 @@
+import logger from "../helpers/winston.log.js";
 import Conversation from "../models/converstation.model.js";
 import Message from "../models/message.model.js";
 
@@ -70,6 +71,34 @@ export const getMessagesService = async (senderId, receiverId, page = 1) => {
       DT: messages,
     };
   } catch (error) {
+    return {
+      EC: 1,
+      EM: "Error",
+      DT: error,
+    };
+  }
+};
+
+export const getAllMessageService = async (senderId, receiverId) => {
+  try {
+    const messages = await Message.find({
+      $and: [
+        {
+          $or: [
+            { senderId: senderId, receiverId: receiverId },
+            { senderId: receiverId, receiverId: senderId },
+          ],
+        },
+        { senderDelete: { $ne: senderId } },
+      ],
+    }).populate("senderId", "_id name avatar fileSize");
+    return {
+      EC: 0,
+      EM: "Success",
+      DT: messages,
+    };
+  } catch (error) {
+    logger.error(`error in getAllMessageService ${error.message}`);
     return {
       EC: 1,
       EM: "Error",

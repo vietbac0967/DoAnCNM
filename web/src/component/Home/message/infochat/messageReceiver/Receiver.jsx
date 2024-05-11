@@ -41,6 +41,9 @@ const Receiver = (props) => {
                             <Paper className='form-text'
                                 onContextMenu={(e) => handleClick(e)}
                             >
+                                <span className='text-name'>
+                                    {item && item.senderId?.name}
+                                </span>
                                 <span className='text'>
                                     {item && item.content}
                                 </span>
@@ -74,6 +77,9 @@ const Receiver = (props) => {
                                     <Paper className='form-file'
                                         onContextMenu={(e) => handleClick(e)}
                                     >
+                                        <span className='text-name'>
+                                            {item && item.senderId?.name}
+                                        </span>
                                         <span className='text-file'>
                                             {
                                                 item && item.content

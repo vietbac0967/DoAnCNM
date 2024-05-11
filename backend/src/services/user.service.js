@@ -52,7 +52,7 @@ export const showFriends = async (userId) => {
 export const getUserByIdService = async (userId) => {
   try {
     const user = await User.findById(userId)
-      .select(["name", "phoneNumber", "avatar", "_id"])
+      .select(["name", "phoneNumber", "avatar", "_id", "gender", "email"])
       .lean();
     if (!user) {
       return { EC: 1, EM: "User not found", DT: "" };

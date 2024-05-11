@@ -102,6 +102,7 @@ const ModuleGroup = (props) => {
         }
     }
 
+
     const handleCancelAdd = (user) => {
         if (arrUser && arrUser.length > 0) {
             let cparruser = _.cloneDeep(arrUser)
@@ -177,7 +178,7 @@ const ModuleGroup = (props) => {
         if (namegroup) {
             let arr = [...choosegroup.map((item, index) => {
                 return item._id
-            }), dataredux._id]
+            })]
             let data = {
                 groupName: namegroup,
                 members: arr

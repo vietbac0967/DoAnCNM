@@ -25,12 +25,10 @@ import {
 } from "../services/group.service";
 import { selectUser } from "../app/userSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { handlesendinfoAll } from "../utils/socket";
 export default function GroupInfoScreen({ navigation, route }) {
   const groupId = route.params?.groupId;
-
   const [modalVisible, setModalVisible] = useState(false);
-  // const socket = useRef(null);
-  // const [name, setName] = useState(groupId?.name);
   const user = useSelector(selectUser);
   const [group, setGroup] = useState(null);
   const [name, setName] = useState("");
@@ -67,6 +65,8 @@ export default function GroupInfoScreen({ navigation, route }) {
       const { EM, EC } = response;
       if (EC === 0 && EM === "Success") {
         Alert.alert("Thông báo", "Giải tán nhóm thành công");
+        // let arr = members.map(item => item._id)
+        handlesendinfoAll({ arrmember: group && group.members });
         navigation.navigate("Group", { isLoading: true });
       } else {
         Alert.alert("Somthing went wrong", EM);
@@ -165,7 +165,6 @@ export default function GroupInfoScreen({ navigation, route }) {
       if (EC === 0 && EM === "Success") {
         Alert.alert("Thông báo", "Đổi tên nhóm thành công");
         setModalVisible(false);
-        // socket.current.emit("rename-group", { groupId, name });
         navigation.navigate("Group");
       } else {
         Alert.alert("Something went wrong", EM);
@@ -225,7 +224,12 @@ export default function GroupInfoScreen({ navigation, route }) {
       >
         <View style={{ alignContent: "center", alignItems: "center" }}>
           <View style={styles.iconHeader}>
-            <AntDesign name="search1" size={20} color="black" />
+            <AntDesign
+              name="search1"
+              size={20}
+              color="black"
+              onPress={() => navigation.navigate("SearchMessage", { groupId })}
+            />
           </View>
           <Text style={{ textAlign: "center" }}>Tìm {"\n"} tin nhắn</Text>
         </View>

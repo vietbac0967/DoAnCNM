@@ -13,10 +13,10 @@ export const getFriendRequests = async () => {
   }
 };
 
-export const getReceiverService = async (receiverId) => {
+export const getReceiverService = async (recevierId) => {
   try {
     const response = await api.post(`/user/`, {
-      userId: receiverId,
+      userId: recevierId,
     });
     const { EC, EM, DT } = response.data;
     if (EC === 0 && EM === "Success") {

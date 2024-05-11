@@ -18,6 +18,8 @@ import {
   getSendFriendRequests,
 } from "../services/user.service";
 import Loading from "../components/Loading";
+import { handlesendtext } from "../utils/socket";
+import { useIsFocused } from "@react-navigation/native";
 export default function ContactScreen({ navigation }) {
   const [activeTab, setActiveTab] = useState("friends");
   const [friendRequests, setFriendRequests] = useState([]);
@@ -26,6 +28,7 @@ export default function ContactScreen({ navigation }) {
   const [friends, setFriends] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [seclectFriend, setSelectFriend] = useState(null);
+  const isFocused = useIsFocused();
 
   const handleDeleteFriend = async () => {
     try {
@@ -33,6 +36,7 @@ export default function ContactScreen({ navigation }) {
 
       if (EC === 0 && EM === "Success") {
         Alert.alert("Success", "Delete friend successfully");
+        handlesendtext({ receiver: seclectFriend.phoneNumber })
         setModalVisible(false);
         fetchData();
       } else {
@@ -43,8 +47,10 @@ export default function ContactScreen({ navigation }) {
     }
   };
   useEffect(() => {
-    fetchData();
-  }, []);
+    if(isFocused){
+      fetchData();
+    }
+  }, [isFocused]);
 
   const getFirstLetter = (name) => {
     return name.charAt(0).toUpperCase();
@@ -351,7 +357,6 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     width: "80%",
-    height: 300,
     backgroundColor: "white",
     paddingHorizontal: 20,
     paddingVertical: 30,

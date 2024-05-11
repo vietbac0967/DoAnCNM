@@ -1,67 +1,70 @@
 import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
-import winstonMongodb from "winston-mongodb";
-const { combine, timestamp, printf, align, json } = winston.format;
+// import LokiTransport from "winston-loki";
+const { combine, timestamp, printf, colorize } = winston.format;
+const levels = {
+  error: 0,
+  warn: 1,
+  info: 2,
+  http: 3,
+  debug: 4,
+};
+const level = () => {
+  const env = process.env.NODE_ENV || "development";
+  const isDevelopment = env === "development";
+  return isDevelopment ? "debug" : "warn";
+};
+const colors = {
+  error: "red",
+  warn: "yellow",
+  info: "green",
+  http: "magenta",
+  debug: "white",
+};
+winston.addColors(colors);
+
+const transports = [
+  // Allow the use the console to print the messages
+  new winston.transports.Console({
+    format: combine(
+      timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+      // Tell Winston that the logs must be colored
+      colorize({ all: true }),
+      // Define the format of the message showing the timestamp, the level and the message
+      printf((info) => `[${info.timestamp}] ${info.level}: ${info.message}`)
+    ),
+  }),
+  new DailyRotateFile({
+    dirname: "logs",
+    filename: "application-%DATE%.all.log",
+    datePattern: "YYYY-MM-DD",
+    zippedArchive: true,
+    maxSize: "10m",
+    maxFiles: "14d",
+  }),
+  new DailyRotateFile({
+    dirname: "logs",
+    filename: "application-%DATE%.error.log",
+    datePattern: "YYYY-MM-DD",
+    zippedArchive: true,
+    maxSize: "20m",
+    maxFiles: "14d",
+    level: "error",
+  }),
+  // new LokiTransport({
+  //   labels: {
+  //     app: "application",
+  //   },
+  //   host: "http://localhost:3100",
+  // }),
+];
 const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || "debug",
+  level: level(),
+  levels,
   format: combine(
-    timestamp({
-      format: "YYYY-MM-DD HH:mm:ss.SSS A",
-    }),
-    align(),
+    timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
     printf((info) => `[${info.timestamp}] ${info.level}: ${info.message}`)
   ),
-  transports: [
-    new winston.transports.Console(),
-    // new winston.transports.File({
-    //   dirname: "logs",
-    //   filename: "data.log", // level 1
-    // }),
-    // logging in mongodb
-    new winston.transports.MongoDB({
-      db: process.env.MONGO_URI,
-      options: { useUnifiedTopology: true },
-      collection: "logs",
-      level: "error",
-      format: combine(timestamp(), json()),
-    }),
-    // logging in file for current day
-    new DailyRotateFile({
-      dirname: "logs",
-      filename: "application-%DATE%.info.log",
-      datePattern: "YYYY-MM-DD",
-      zippedArchive: true,
-      maxSize: "1m",
-      maxFiles: "14d",
-      format: combine(
-        timestamp({
-          format: "YYYY-MM-DD HH:mm:ss.SSS A",
-        }),
-        align(), //
-        printf((info) => `[${info.timestamp}] ${info.level}: ${info.message}`)
-      ),
-      level: "info",
-    }),
-    new DailyRotateFile({
-      dirname: "logs",
-      filename: "application-%DATE%.error.log",
-      datePattern: "YYYY-MM-DD",
-      zippedArchive: true,
-      maxSize: "20m",
-      maxFiles: "14d",
-      format: combine(
-        timestamp({
-          format: "YYYY-MM-DD HH:mm:ss.SSS A",
-        }),
-        align(),
-        printf((info) => `[${info.timestamp}] ${info.level}: ${info.message}`),
-      ),
-      level: "error",
-    }),
-  ],
+  transports,
 });
 export default logger;
-//
-// If we're not in production then log to the `console` with the format:
-// `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
-//

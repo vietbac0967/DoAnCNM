@@ -251,8 +251,8 @@ export const leaveGroupService = async (userId, groupId) => {
 export const getUserForGroupService = async (groupId) => {
   try {
     const populatedGroup = await Group.findById(groupId).populate([
-      { path: "author", select: "_id name email avatar" },
-      { path: "members", select: "_id name email avatar" },
+      { path: "author", select: "_id name email avatar gender phoneNumber" },
+      { path: "members", select: "_id name email avatar gender phoneNumber" },
     ]);
 
     if (!populatedGroup) {

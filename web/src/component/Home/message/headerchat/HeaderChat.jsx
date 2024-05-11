@@ -28,6 +28,7 @@ const HeaderChat = (props) => {
     }
   }, []);
 
+
   useEffect(() => {
     if (users && !_.isEmpty(users)) {
       setuser(users);

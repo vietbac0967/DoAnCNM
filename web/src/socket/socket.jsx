@@ -9,11 +9,11 @@ const handleCusttomClient = (data) => {
 }
 
 const handlerefreshAccount = (callback) => {
-    socket.on("refreshNotification", callback)
+    socket.on("refresh", callback)
 }
 
 const handlesendtext = (data) => {
-    socket.emit("sendNotification", data)
+    socket.emit("sendtest", data)
 }
 
 const handlsendmessange = (data) => {

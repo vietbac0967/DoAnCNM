@@ -16,7 +16,7 @@ import { baseURL } from "../api/baseURL";
 import { useSelector } from "react-redux";
 import { Ionicons, AntDesign, EvilIcons } from "@expo/vector-icons";
 import EmojiSelector from "react-native-emoji-selector";
-import { Entypo, Feather, FontAwesome } from "@expo/vector-icons";
+import { Entypo, Feather, FontAwesome, Octicons } from "@expo/vector-icons";
 import { URL_SERVER } from "@env";
 import {
   deleteMessageService,
@@ -40,6 +40,7 @@ import {
 import { selectUser } from "../app/userSlice";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as DocumentPicker from "expo-document-picker";
 import { sendNotificationService } from "../services/notification.service";
 export default function ChatGroupScreen({ route, navigation }) {
   const [messages, setMessages] = useState([]);
@@ -47,11 +48,10 @@ export default function ChatGroupScreen({ route, navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageVisible, setModalImageVisible] = useState(false);
   const [selectMessage, setSelectMessage] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef(null);
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
   const group = route.params?.group;
-  const scrollViewRef = useRef(null);
   const user = useSelector(selectUser);
   const [activeUsers, setActiveUsers] = useState([]);
 
@@ -62,8 +62,8 @@ export default function ChatGroupScreen({ route, navigation }) {
       if (EC === 0 && EM === "Success") {
         setMessages(DT);
       }
+      console.log("messages:", messages);
     } catch (error) {
-      console.log(error);
       Alert.alert("Error", "Something went wrong");
     }
   };
@@ -81,6 +81,7 @@ export default function ChatGroupScreen({ route, navigation }) {
         quality: 1,
       });
       if (!result.canceled) {
+        setIsLoading(true);
         let localUri = result.assets[0].uri;
         let filename = localUri.split("/").pop();
         let match = /\.(\w+)$/.exec(filename);
@@ -105,6 +106,7 @@ export default function ChatGroupScreen({ route, navigation }) {
         );
         const { DT, EC, EM } = response.data;
         if (EC === 0 && EM === "Success") {
+          setIsLoading(false);
           handleSendMessageInGroupSocket({
             groupId: group._id,
             message: DT,
@@ -120,11 +122,55 @@ export default function ChatGroupScreen({ route, navigation }) {
     }
   };
 
+  const handleSendFile = async () => {
+    try {
+      setIsLoading(true);
+      const document = await DocumentPicker.getDocumentAsync({
+        type: "*/*",
+        copyToCacheDirectory: true,
+      });
+      if (!document.canceled) {
+        const formData = new FormData();
+        formData.append("file", {
+          uri: document.assets[0].uri,
+          name: document.assets[0].name,
+          type: document.assets[0].mimeType,
+        });
+        const token = await AsyncStorage.getItem("accessToken");
+        formData.append("groupId", group._id);
+        const response = await axios.post(
+          `${URL_SERVER}/api/message/sendFileGroup`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        const { DT, EC, EM } = response.data;
+        if (EC === 0 && EM === "Success") {
+          setIsLoading(false);
+          setMessages((prevMessages) => [...prevMessages, DT]);
+          handleSendMessageInGroupSocket({
+            groupId: group._id,
+            message: DT,
+          });
+        } else {
+          setIsLoading(false);
+          Alert.alert("Cảnh báo", "Tải file không thành công");
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      Alert.alert("Cảnh báo", "Tải file không thành công");
+    }
+  };
+
   const handleSendMessage = async () => {
     try {
       const response = await sendMessageGroupService(group._id, message);
       const { EM, EC, DT } = response;
-      console.log("DT:::", DT);
       if (EC === 0 && EM === "Success") {
         handleSendMessageInGroupSocket({
           groupId: group._id,
@@ -155,21 +201,10 @@ export default function ChatGroupScreen({ route, navigation }) {
     }
   };
 
-  const scrollToBottom = () => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToEnd({ animated: false });
-    }
-  };
-
-  const handleContentSizeChange = () => {
-    scrollToBottom();
-  };
-
   const handleDeleteMessage = async () => {
     try {
       const response = await deleteMessageService(selectMessage?._id);
       const { EC, EM, DT } = response;
-      console.log("response:::", response);
       if (EC === 0 && EM === "Success") {
         getMessagesGroup();
         setModalVisible(false);
@@ -177,7 +212,7 @@ export default function ChatGroupScreen({ route, navigation }) {
         Alert("Thông báo", "Xóa không thành công");
       }
     } catch (error) {
-      console.log(error);
+      Alert.alert("Error", error.message)
     }
   };
 
@@ -194,7 +229,6 @@ export default function ChatGroupScreen({ route, navigation }) {
           onPress: async () => {
             try {
               const response = await recallMessageService(selectMessage?._id);
-              console.log("response:::", response);
               const { EC, EM, DT } = response;
               if (EC === 0 && EM === "Success") {
                 setModalVisible(false);
@@ -288,6 +322,9 @@ export default function ChatGroupScreen({ route, navigation }) {
       ),
     });
   }, [navigation, group]);
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <KeyboardAvoidingView
@@ -409,9 +446,6 @@ export default function ChatGroupScreen({ route, navigation }) {
           />
         )}
         keyExtractor={(item) => item._id}
-        ref={scrollViewRef}
-        contentContainerStyle={{ flexGrow: 1 }}
-        onContentSizeChange={handleContentSizeChange}
       />
       <View
         style={{
@@ -458,8 +492,12 @@ export default function ChatGroupScreen({ route, navigation }) {
           }}
         >
           <Ionicons name="image" size={24} color="gray" onPress={pickImage} />
-
-          <Ionicons name="mic" size={24} color="gray" />
+          <Octicons
+            name="file-zip"
+            size={22}
+            color="gray"
+            onPress={handleSendFile}
+          />
         </View>
 
         <Pressable

@@ -44,16 +44,14 @@ export const verifyAccount = async (req, res, next) => {
     if (req.headers.authorization) {
       token = req.headers.authorization.split(" ")[1];
       if (!token) {
+        logger.error("Invalid token");
         return res.status(401).json({ message: "Invalid token" });
       }
       try {
         decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
       } catch (error) {
-        logger.error("401 - Invalid token");
+        logger.error("Invalid token");
         return res.status(401).json({ message: "Invalid token" });
-      }
-      if (decoded.exp < Date.now().valueOf() / 1000) {
-        return res.status(401).json({ message: "Token expired" });
       }
       const user = await User.findById(decoded.id);
       if (!user) {
@@ -65,7 +63,6 @@ export const verifyAccount = async (req, res, next) => {
       token = req.cookies?.accessToken;
       if (token) {
         const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-        console.log(decoded);
         let user = await User.findById({ _id: decoded.id });
         if (user) {
           let listfriend = await getinfobyId(user.friends);

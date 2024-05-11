@@ -19,6 +19,7 @@ const InfoChat = (props) => {
     const dispatch = useDispatch();
     const dataredux = useSelector((state) => state.userisaccess.account)
 
+
     return (
         <Box className="info-chat-container">
             <Box
@@ -34,10 +35,25 @@ const InfoChat = (props) => {
             >
                 <InfiniteScroll
                     dataLength={listmessage.length}
-                    // next={fetchMoreData}
+                    next={fetchMoreData}
                     // hasMore={true}
                     inverse={true}
-                    style={{ display: 'flex', flexDirection: 'column' }}
+                    style={
+                        users && users.type
+                            ? users.type === "group"
+                                ?
+                                { display: 'flex', flexDirection: "column" }
+                                :
+                                { display: 'flex', flexDirection: "column-reverse" }
+                            : users.phoneNumber
+                                ?
+                                { display: 'flex', flexDirection: "column-reverse" }
+                                :
+                                { display: 'flex', flexDirection: "column" }
+                           
+
+
+                    }
                     loader={<h4>Loading...</h4>}
                     scrollableTarget="scrollableDiv"
                 >

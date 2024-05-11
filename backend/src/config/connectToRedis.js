@@ -1,5 +1,6 @@
 import redis from "redis";
 import dotenv from "dotenv";
+import logger from "../helpers/winston.log.js";
 
 dotenv.config();
 
@@ -62,9 +63,9 @@ const connectToRedis = async () => {
   try {
     await client.connect();
     handleEventConnect({ connectionRedis: client });
-    console.log("Connected to Redis!");
+    logger.info("Connected to Redis");
   } catch (err) {
-    console.error("Error connecting to Redis:", err);
+    logger.error("Error connecting to Redis", err.message);
   }
 };
 

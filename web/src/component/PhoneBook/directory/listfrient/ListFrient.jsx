@@ -29,6 +29,14 @@ const ListFrient = (props) => {
     }, [])
 
     useEffect(() => {
+            if (value === +0) {
+                setlistuser([...dataredux.friends].sort((a, b) => a.name.localeCompare(b.name)))
+            } else {
+                setlistuser([...dataredux.friends].sort((a, b) => b.name.localeCompare(a.name)))
+            }
+    }, [dataredux])
+
+    useEffect(() => {
         handleChangeValue()
     }, [value])
 
@@ -104,6 +112,7 @@ const ListFrient = (props) => {
                                                 <ChildFriend
                                                     user={item}
                                                     setuser={setuser}
+                                                    handleChangeValue={handleChangeValue}
                                                 />
                                             </Box>
 
