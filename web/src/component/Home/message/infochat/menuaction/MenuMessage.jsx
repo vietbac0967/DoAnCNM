@@ -15,7 +15,6 @@ const MenuMessage = (props) => {
     const dispatch = useDispatch();
     const dataredux = useSelector((state) => state.userisaccess.account)
 
-    console.log("check user info",userinfo)
 
     const handledelteMessage = async () => {
         let res = await deleteMessage({ messageId: item._id })

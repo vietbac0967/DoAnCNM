@@ -41,6 +41,7 @@ export default function AddMemberScreen({ navigation, route }) {
       const { EC, EM } = response;
       if (EC === 0) {
         navigation.goBack();
+        handlesendinfoAll({ arrmember: membersCast })
       } else {
         Alert.alert("Lỗi", EM);
       }

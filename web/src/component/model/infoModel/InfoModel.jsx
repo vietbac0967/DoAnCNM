@@ -40,6 +40,7 @@ const InfoModel = (props) => {
         handleShowChatUser()
     }
 
+
     return (
         <>
             <Modal

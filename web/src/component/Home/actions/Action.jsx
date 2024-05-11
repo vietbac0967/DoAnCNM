@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import PersonIcon from '@mui/icons-material/Person';
 import { useDispatch, useSelector } from 'react-redux';
 import InfoModel from '../../model/infoModel/InfoModel';
+import { logOutUser } from '../../../service/UserService';
 
 const Action = (props) => {
 
@@ -66,6 +67,13 @@ const Action = (props) => {
         setopenprivate(false)
     }
 
+    const handleLogout = async () =>{
+        let res = await logOutUser()
+        if(res && res.EC === 0){
+            navigate("/login")
+        }
+    }
+
     return (
         <Box className='action-container'>
             <Paper component={Box} sx={{ height: "100%" }}>
@@ -81,11 +89,6 @@ const Action = (props) => {
                     >
                         <PermContactCalendarIcon fontSize='inherit' color='#ffffff' />
                     </IconButton>
-                    {/* <IconButton color={listaction[2].action ? "primary" : "#ffffff"} size='large'
-                        onClick={() => handleClick(3)}
-                    >
-                        <GroupIcon fontSize='inherit' color='#ffffff' />
-                    </IconButton> */}
                     <IconButton color="#ffffff" size='large'
                         onClick={(e) => handleClickSetting(e)}
                     >
@@ -116,9 +119,11 @@ const Action = (props) => {
                     </span>
                 </MenuItem>
                 <Divider />
-                <MenuItem>
+                <MenuItem
+                    onClick={() => handleLogout()}
+                >
                     <span style={{ color: "#e53935" }}>
-                        Đăng suất
+                        Đăng xuất
                     </span>
                 </MenuItem>
             </Menu>
