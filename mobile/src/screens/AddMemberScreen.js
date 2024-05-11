@@ -19,8 +19,6 @@ import { RadioButton } from "react-native-paper";
 export default function AddMemberScreen({ navigation, route }) {
   const groupId = route.params?.groupId;
   console.log("groupId:::", groupId);
-  const token = useSelector((state) => state.token.token);
-
   const [phone, setPhone] = useState("");
   const [friends, setFriends] = useState([]);
   const [members, setMembers] = useState([]);
