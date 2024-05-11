@@ -119,7 +119,7 @@ const ChildGroup = (props) => {
 
                     </span>
                     <span className='child-group-member-text'>
-                        {user && user.members && user.members.length} thành viên
+                        {user && user.members && user.members.length+1} thành viên
                     </span>
                 </Box>
             </Box>

@@ -12,20 +12,9 @@ import _ from 'lodash';
 const Message = (props) => {
 
     const { users, setshowchat, showchat, mdup, dataredux, setusers } = props;
-
-    const user = useRef({});
-
     const [page, setpage] = useState(1);
 
-    const fetchMoreData = async () => {
-        try {
-            if (user && user.current.type === "private") {
-                setpage((prev) => prev + 1);
-            }
-        } catch (error) {
-            console.error('Error fetching more data:', error);
-        }
-    };
+    const user = useRef({});
 
     useEffect(() => {
         if (user.current) {
@@ -70,25 +59,6 @@ const Message = (props) => {
         }
     }, [user.current])
 
-
-
-    // useEffect(() => {
-    //     if (listfrient && listfrient.length > 0) {
-    //         let data = listfrient.filter((item) => item.click === true)
-    //         user.current = data
-    //         let index = listfrient.findIndex(item => item.click === true);
-    //         if (index !== -1) {
-    //             if (listfrient[index] && listfrient[index].type === "private") {
-    //                 handleGetAllMessage({ userId: listfrient[index]._id })
-    //             }
-    //             else {
-    //                 handleGetAllMessageinGroup({ groupId: listfrient[index]._id._id })
-    //             }
-    //         }
-
-    //     }
-    // }, [listfrient])
-
     useEffect(() => {
         if (users && !_.isEmpty(users)) {
             let data = users
@@ -116,20 +86,17 @@ const Message = (props) => {
             let res = await getAllMessage({ receiverId: data.userId, page: page })
             if (res && res.EC === 0) {
                 setlistmessage(res.DT)
+                // setpage(1)
             } else {
                 setlistmessage([])
             }
-
         }
     }
 
-
-
+    
     const handleGetAllMessageinGroup = async (data) => {
         if (users && !_.isEmpty(users)) {
-
             let res = await getMessagesGroup(data.groupId);
-
             if (res && res.EC === 0) {
                 setlistmessage(res.DT)
             } else {
@@ -159,8 +126,8 @@ const Message = (props) => {
                     listmessage={listmessage}
                     user={user.current}
                     handleGetAllMessageinGroup={handleGetAllMessageinGroup}
-                    fetchMoreData={fetchMoreData}
-
+                    page={page}
+                    setpage={setpage}
                 />
             </Box>
             <Divider orientation="horizontal" />

@@ -13,8 +13,39 @@ import InfoActionGroup from './infoActionGroup/InfoActionGroup';
 const InfoChat = (props) => {
 
     const { users, handleGetAllMessage, listmessage,
-        setlistmessage, user, reflistmessage, handleGetAllMessageinGroup, fetchMoreData
+        setlistmessage, user, reflistmessage, handleGetAllMessageinGroup,
+        page,setpage
     } = props;
+
+
+    const fetchMoreData = async () => {
+        try {
+            if (users && users.type === "private") {
+                setpage((prev) => prev + 1);
+            }
+        } catch (error) {
+            console.error('Error fetching more data:', error);
+        }
+    };
+
+    const handleLoad = async (page) => {
+        if (users && !_.isEmpty(users)) {
+            let res = await getAllMessage({ receiverId: users._id, page: page })
+            if (res && res.EC === 0) {
+                if(res.DT !== null){
+                    setlistmessage(listmessage.concat(res.DT))
+                }
+            } else {
+                setlistmessage([])
+            }
+        }
+    }
+
+    useEffect(() =>{
+        handleLoad(page)
+    },[page])
+
+   
 
     const dispatch = useDispatch();
     const dataredux = useSelector((state) => state.userisaccess.account)
@@ -35,8 +66,8 @@ const InfoChat = (props) => {
             >
                 <InfiniteScroll
                     dataLength={listmessage.length}
-                    next={fetchMoreData}
-                    // hasMore={true}
+                    next={users && users.phoneNumber ? fetchMoreData : null}
+                    hasMore={true}
                     inverse={true}
                     style={
                         users && users.type
@@ -54,7 +85,7 @@ const InfoChat = (props) => {
 
 
                     }
-                    loader={<h4>Loading...</h4>}
+                    // loader={<h4>Loading...</h4>}
                     scrollableTarget="scrollableDiv"
                 >
                     {
@@ -64,7 +95,7 @@ const InfoChat = (props) => {
                                 return (
                                     <Box key={`chat-private-${index}`}>
                                         {
-                                            item.content.startsWith("###")
+                                            item?.content?.startsWith("###")
                                                 ?
                                                 <InfoActionGroup
                                                     item={item.content}
@@ -103,7 +134,7 @@ const InfoChat = (props) => {
                                 return (
                                     <Box key={`chat-private-${index}`}>
                                         {
-                                            item.content.startsWith("###")
+                                            item?.content?.startsWith("###")
                                                 ?
                                                 <InfoActionGroup
                                                     item={item.content}

@@ -60,7 +60,6 @@ const MenuAction = (props) => {
                                 groupId: user._id,
                                 type: "group"
                             })
-
                         }
                     }
                 } else {
