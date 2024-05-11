@@ -491,10 +491,11 @@ export default function ChatGroupScreen({ route, navigation }) {
             marginHorizontal: 8,
           }}
         >
-          <Ionicons name="image" size={24} color="gray" onPress={pickImage} />
-          <Octicons
-            name="file-zip"
-            size={22}
+          <Ionicons name="image-outline" size={24} color="gray" onPress={pickImage} />
+          
+          <Ionicons
+            name="document-text-outline"
+            size={24}
             color="gray"
             onPress={handleSendFile}
           />

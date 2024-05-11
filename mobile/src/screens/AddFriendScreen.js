@@ -19,6 +19,7 @@ import { useSelector } from "react-redux";
 import { handlesendtext } from "../utils/socket";
 export default function AddFriendScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(true);
+  const userCurrent = useSelector((state) => state.user);
   useEffect(() => {
     navigation.setOptions({
       headerTitle: "Thêm bạn bè",
@@ -44,6 +45,7 @@ export default function AddFriendScreen({ navigation }) {
     if (res.EC === 1 && res.EM === "User is already your friend") {
       setStatus(true);
     }
+    if(DT._id=== userCurrent._id){return} 
     setPhone("");
     setUser(res.DT);
   };

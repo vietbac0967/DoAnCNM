@@ -52,7 +52,7 @@ export default function SettingScreen({ navigation, route }) {
         </Pressable>
         <Pressable
           onPress={() =>
-            navigation.navigate("SearchMessage", {
+            navigation.navigate("FriendInfo", {
               recevierId,
             })
           }

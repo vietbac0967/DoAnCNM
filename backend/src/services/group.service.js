@@ -65,6 +65,7 @@ export const getGroupsForUserService = async (userId) => {
     })
       .populate("author", "_id name email avatar")
       .populate("members", "_id name email");
+      
     return {
       EC: 0,
       EM: "Success",

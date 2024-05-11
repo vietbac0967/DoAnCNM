@@ -22,7 +22,7 @@ import MemberInfoScreen from "../screens/MemberInfoScreen";
 import ForwardMessageScreen from "../screens/ForwardMessageScreen";
 import FunctionUnavailableScreen from "../screens/FunctionUnavailableScreen";
 import SearchMessageScreen from "../screens/SearchMessageScreen";
-import FriendInfoScreen from "../screens/SettingScreen";
+import FriendInfoScreen from "../screens/FriendInfoScreen";
 import SettingScreen from "../screens/SettingScreen";
 const Stack = createNativeStackNavigator();
 const StackNavigation = () => {
@@ -120,6 +120,7 @@ const StackNavigation = () => {
           component={FunctionUnavailableScreen}
         />
         <Stack.Screen name="SearchMessage" component={SearchMessageScreen} />
+        <Stack.Screen name="FriendInfo" component={FriendInfoScreen} options={{headerShown: false}}/>
         <Stack.Screen name="Setting" component={SettingScreen} />
       </Stack.Navigator>
     </NavigationContainer>

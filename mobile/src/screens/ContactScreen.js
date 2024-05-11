@@ -46,6 +46,7 @@ export default function ContactScreen({ navigation }) {
       Alert.alert("Error", "Something went wrong. Please try again later.");
     }
   };
+
   useEffect(() => {
     if(isFocused){
       fetchData();
@@ -240,6 +241,13 @@ export default function ContactScreen({ navigation }) {
               </Text>
             </View>
             <Pressable
+            onPress={() => {
+              navigation.navigate("FriendInfo", {
+                recevierId: seclectFriend._id,
+              });
+              setModalVisible(false);
+
+            }}
               style={{
                 marginTop: 20,
               }}
