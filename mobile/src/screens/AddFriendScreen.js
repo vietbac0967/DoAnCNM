@@ -45,7 +45,7 @@ export default function AddFriendScreen({ navigation }) {
     if (res.EC === 1 && res.EM === "User is already your friend") {
       setStatus(true);
     }
-    if(DT._id=== userCurrent._id){return} 
+    // if(DT._id=== userCurrent._id){return} 
     setPhone("");
     setUser(res.DT);
   };

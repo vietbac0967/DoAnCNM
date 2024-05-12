@@ -7,14 +7,14 @@ import {
   FlatList,
   Pressable,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import {
   deleteMemeberFromGroup,
   getLeadForGroupService,
   getUserForGroupService,
   updateDeputyLeader,
 } from "../services/group.service";
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { sendMessageGroupService } from "../services/message.service";
 import { getUserInfo } from "../services/user.service";
@@ -39,10 +39,31 @@ export default function MemberInfoScreen({ navigation, route }) {
       console.log("Error getting user:", error);
     }
   };
-  useEffect(() => {
+  // useEffect(() => {
+  //   navigation.setOptions({
+  //     headerTitle: "Thành viên nhóm",
+  //   })
+  //   getUser();
+  // }, []);
+
+  useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: "Thành viên nhóm",
-    })
+      headerTintColor: "#fff",
+      headerStyle: {
+        backgroundColor: "#00ACED",
+      },
+      headerLeft: () => (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+          <Ionicons
+            onPress={() => navigation.goBack()}
+            name="chevron-back-outline"
+            size={24}
+            color="#fff"
+          />
+        </View>
+      ),
+    });
     getUser();
   }, []);
 
@@ -98,13 +119,20 @@ export default function MemberInfoScreen({ navigation, route }) {
     }
   };
   const renderMembers = ({ item, index }) => (
-    <View
+    <Pressable
       style={{
         flexDirection: "row",
-        marginBottom: 5,
         flex: 1,
         justifyContent: "space-between",
         marginHorizontal: 8,
+        padding: 5,
+        borderBottomWidth: 0.5,
+        borderBottomColor: "#ddd",
+      }}
+      onPress={() => {
+        navigation.navigate("FriendInfo", {
+          receiverId: item._id,
+        });
       }}
     >
       {/* left */}
@@ -112,6 +140,7 @@ export default function MemberInfoScreen({ navigation, route }) {
         <Image
           style={{ width: 50, height: 50, borderRadius: 25 }}
           source={{ uri: item?.avatar }}
+          defaultSource={require("../assets/avt.jpg")}
         />
         <View style={{ marginLeft: 10 }}>
           <Text style={{ paddingTop: 10 }}>{item?.name}</Text>
@@ -119,17 +148,13 @@ export default function MemberInfoScreen({ navigation, route }) {
             <Text style={{ fontSize: 13, fontWeight: "bold" }}>
               Trưởng nhóm
             </Text>
-          ) : (
-            null
-          )}
+          ) : null}
 
           {item?._id === deputyLeader?._id ? (
             <Text style={{ fontSize: 13, fontWeight: "bold" }}>
               Phó trưởng nhóm
             </Text>
-          ) : (
-            null
-          )}
+          ) : null}
         </View>
       </View>
 
@@ -154,20 +179,20 @@ export default function MemberInfoScreen({ navigation, route }) {
             ) : null}
 
             {/* {item?._id !== author._id && item?._id !== deputyLeader?._id ? ( */}
-              <Pressable
-                style={{ flexDirection: "row" }}
-                onPress={() => {
-                  handleUpdateDeputyLeader(item._id);
-                }}
-              >
-                <SimpleLineIcons name="user" size={24} color="#97E7E1" />
-                <Text style={{ fontSize: 13 }}>Phó nhóm</Text>
-              </Pressable>
+            <Pressable
+              style={{ flexDirection: "row" }}
+              onPress={() => {
+                handleUpdateDeputyLeader(item._id);
+              }}
+            >
+              <SimpleLineIcons name="user" size={24} color="#97E7E1" />
+              <Text style={{ fontSize: 13 }}>Phó nhóm</Text>
+            </Pressable>
             {/* ) : null} */}
           </View>
         ) : null}
       </View>
-    </View>
+    </Pressable>
   );
 
   const handleUpdateDeputyLeader = async (userId) => {

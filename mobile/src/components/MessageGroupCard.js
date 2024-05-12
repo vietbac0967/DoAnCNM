@@ -9,6 +9,7 @@ export default function MessageGroupCard({
   setModalImageVisible,
   setSelectMessage,
   userId,
+  navigation
 }) {
   let isCurrentUser = null;
   if (receiverId) {
@@ -19,7 +20,7 @@ export default function MessageGroupCard({
   }
   const first5Chars = message.content.slice(0, 6);
   let isAnnounce = false;
-  if (first5Chars.includes("###-id-")) {
+  if (first5Chars.includes("##TB##")) {
     isAnnounce = true;
   }
   if (message.messageType === "text" && isAnnounce) {
@@ -29,15 +30,20 @@ export default function MessageGroupCard({
           justifyContent: "center",
           alignItems: "center",
           borderRadius: 7,
-          margin: 5,
+          margin: 3,
         }}
       >
-        <Text style={{ fontSize: 13, padding: 3, textAlign: "center" }}>
+        <Text style={{ fontSize: 12, padding: 3, textAlign: "center", color: "gray" }}>
           {message.content.slice(7)}
         </Text>
       </View>
     );
   }
+  const directToFriendInfo = () => {
+    navigation.navigate("FriendInfo", {
+      receiverId: message.senderId?._id,
+    });
+  };
 
   if (message.messageType === "text" && !isAnnounce) {
     return (
@@ -50,7 +56,8 @@ export default function MessageGroupCard({
         key={message._id}
       >
         {!isCurrentUser && (
-          <Image
+          <Pressable onPress={directToFriendInfo}>
+            <Image
             style={{
               width: 25,
               height: 25,
@@ -62,6 +69,7 @@ export default function MessageGroupCard({
             source={{ uri: message.senderId?.avatar }}
             defaultSource={require("../assets/avt.jpg")}
           />
+          </Pressable>
         )}
         <Pressable
           onLongPress={() => {

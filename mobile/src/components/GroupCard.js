@@ -39,7 +39,7 @@ export default function GroupCard({ item }) {
     >
       <View style={{ marginLeft: 5 }}>
         <Image
-          style={{ width: 50, height: 50 }}
+          style={{ width: 50, height: 50, borderRadius: 25}}
           source={{ uri: item?.avatar || item?.author.avatar }}
         ></Image>
       </View>
