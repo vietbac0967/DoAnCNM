@@ -185,20 +185,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendNotificationInGroup", (data) => {
-    const groupId = data.groupId;
-    if (userInGroup.length > 0) {
-      const users = userInGroup.filter((item) => item.groupId === groupId);
-      users.forEach((user) => {
-        const index = clients.findIndex(
-          (item) => item.customId.localeCompare(user.customId) === 0
-        );
-        if (index !== -1) {
-          socket
-            .to(clients[index].clientId)
-            .emit("refreshNotificationInGroup", data);
-        }
-      });
-    }
+    console.log("data sendNotificationInGroup", data);
+    socket.to(data.groupId).emit("receiveNotificationInGroup", {
+      groupId: data.groupId,
+      message: data.message,
+    });
   });
 
   socket.on("leaveGroup", (data) => {
@@ -224,11 +215,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("typing", (data) => {
-    console.log("check data is socketbe..........",data)
+    console.log("check data is socketbe..........", data);
     socket.broadcast.emit("typing", {
-        arrmember: data.arrmember
-    })
-})
+      arrmember: data.arrmember,
+    });
+  });
 
   socket.on("allinfo", (data) => {
     io.emit("allinfo", data);

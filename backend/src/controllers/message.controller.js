@@ -64,7 +64,6 @@ export const sendImage = async (req, res) => {
       .upload_stream(
         {
           resource_type: "image",
-          transformation: [{ width: 300 }],
         },
         async (error, result) => {
           if (error) {
@@ -197,7 +196,7 @@ export const sendVideo = async (req, res) => {
         {
           resource_type: "video",
           public_id: `videos/${fileName}`,
-          transformation: [{ width: 300, crop: "pad" }, { duration: 30 }],
+          transformation: [{ width: 300, crop: "pad" }, { duration: 120 }],
         },
 
         async (error, result) => {

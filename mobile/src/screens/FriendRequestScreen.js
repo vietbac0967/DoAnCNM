@@ -17,7 +17,7 @@ import {
   getSendFriendRequests,
 } from "../services/user.service";
 import { Ionicons } from "@expo/vector-icons";
-export default function FriendRequestScreen( {navigation} ) {
+export default function FriendRequestScreen({ navigation }) {
   const [activeTab, setActiveTab] = useState("friendsRequest");
   const [friendRequests, setFriendRequests] = useState([]);
   const [sendFriendRequests, setSendFriendRequests] = useState([]);
@@ -32,6 +32,7 @@ export default function FriendRequestScreen( {navigation} ) {
     setFriendRequests(friendRequests);
     setSendFriendRequests(sendFriendRequests);
   };
+  console.log(friendRequests);
   const renderFriendItem = ({ item }) => (
     <View style={styles.friendItem}>
       <Image source={{ uri: item.avatar }} style={styles.avatar} />
@@ -56,7 +57,7 @@ export default function FriendRequestScreen( {navigation} ) {
         <View style={{ flexDirection: "row" }}>
           <Pressable onPress={() => navigation.goBack()}>
             <Ionicons
-              style={{ padding: 5, marginRight: 10}}
+              style={{ padding: 5, marginRight: 10 }}
               name="chevron-back"
               size={24}
               color="#fff"
@@ -70,13 +71,19 @@ export default function FriendRequestScreen( {navigation} ) {
   return (
     <View style={styles.container}>
       <View style={styles.tabContainer}>
-        
         <Pressable
-          style={[styles.tab, activeTab === "friendsRequest" && styles.activeTab]}
+          style={[
+            styles.tab,
+            activeTab === "friendsRequest" && styles.activeTab,
+          ]}
           onPress={() => setActiveTab("friendsRequest")}
         >
           <View style={{ flexDirection: "row" }}>
-          <MaterialCommunityIcons name="account-arrow-left" size={25} color="#444444" />
+            <MaterialCommunityIcons
+              name="account-arrow-left"
+              size={25}
+              color="#444444"
+            />
             <Text style={styles.tabText}>Đã nhận</Text>
           </View>
         </Pressable>
@@ -89,28 +96,43 @@ export default function FriendRequestScreen( {navigation} ) {
           onPress={() => setActiveTab("sendFriendsRequest")}
         >
           <View style={{ flexDirection: "row" }}>
-            <MaterialCommunityIcons name="account-arrow-right" size={25} color="#444444" />
+            <MaterialCommunityIcons
+              name="account-arrow-right"
+              size={25}
+              color="#444444"
+            />
             <Text style={styles.tabText}>Đã gửi</Text>
           </View>
         </Pressable>
       </View>
 
       {activeTab === "friendsRequest" ? (
-        friendRequests.map((item) => (
-          <FriendRequestCard
-            key={item._id}
-            item={item}
-            friendRequests={friendRequests}
-            setFriendRequests={setFriendRequests}
-          />
-        ))
+        // friendRequests.map((item) => (
+        //   <FriendRequestCard
+        //     key={item._id}
+        //     item={item}
+        //     friendRequests={friendRequests}
+        //     setFriendRequests={setFriendRequests}
+        //   />
+        // ))
+        <FlatList
+          data={friendRequests}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <FriendRequestCard
+              item={item}
+              friendRequests={friendRequests}
+              setFriendRequests={setFriendRequests}
+            />
+          )}
+        ></FlatList>
       ) : activeTab === "sendFriendsRequest" ? (
         <FlatList
           data={sendFriendRequests}
           renderItem={renderFriendItem}
           keyExtractor={(item) => item._id}
         />
-      ): null}
+      ) : null}
     </View>
   );
 }
@@ -123,7 +145,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     marginVertical: 5,
-    paddingHorizontal: 5
+    paddingHorizontal: 5,
   },
   tab: {
     paddingHorizontal: 30,
