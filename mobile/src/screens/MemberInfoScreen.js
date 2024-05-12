@@ -18,6 +18,7 @@ import { Entypo, Ionicons } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { sendMessageGroupService } from "../services/message.service";
 import { getUserInfo } from "../services/user.service";
+import { handlesendinfoAll } from "../utils/socket";
 export default function MemberInfoScreen({ navigation, route }) {
   const groupId = route.params?.groupId;
   const [members, setMembers] = useState([]);
@@ -109,6 +110,9 @@ export default function MemberInfoScreen({ navigation, route }) {
       const { EM, EC } = response;
       if (EC === 0 && EM === "Success") {
         Alert.alert("Success", "Xóa thành công");
+        let arr = [];
+        arr.push(userId)
+        handlesendinfoAll({ arrmember: arr })
         const announceMessage = `##TB##: Trưởng nhóm đã xóa một thành viên ra khỏi nhóm`;
         getUserForGroup();
         setAnnounce(announceMessage);

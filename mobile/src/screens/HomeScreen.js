@@ -25,11 +25,9 @@ import {
 } from "../utils/socket";
 import { selectUser } from "../app/userSlice";
 import Loading from "../components/Loading";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function HomeScreen({ navigation, route }) {
   const [conversations, setConversations] = useState([]);
   const user = useSelector(selectUser);
-  console.log("user home screen is", user);
   const isFocused = useIsFocused();
   const [isLoading, setIsLoading] = useState(true);
   const getConversations = async () => {

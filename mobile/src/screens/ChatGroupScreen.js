@@ -62,7 +62,6 @@ export default function ChatGroupScreen({ route, navigation }) {
       if (EC === 0 && EM === "Success") {
         setMessages(DT);
       }
-      console.log("messages:", messages);
     } catch (error) {
       Alert.alert("Error", "Something went wrong");
     }
@@ -184,7 +183,8 @@ export default function ChatGroupScreen({ route, navigation }) {
             message
           );
           const { EM, EC, DT } = response;
-          if (EM === 0 && EC === "Success") {
+
+          if (EM === "Success" && EC === 0) {
             handleSendNotificationToGroup({
               groupId: group._id,
               message: DT,
@@ -212,7 +212,7 @@ export default function ChatGroupScreen({ route, navigation }) {
         Alert("Thông báo", "Xóa không thành công");
       }
     } catch (error) {
-      Alert.alert("Error", error.message)
+      Alert.alert("Error", error.message);
     }
   };
 
@@ -232,11 +232,15 @@ export default function ChatGroupScreen({ route, navigation }) {
               const { EC, EM, DT } = response;
               if (EC === 0 && EM === "Success") {
                 setModalVisible(false);
+                setMessages(
+                  messages.filter(
+                    (message) => message._id !== selectMessage._id
+                  )
+                );
                 handleSendMessageInGroupSocket({
                   groupId: group._id,
                   message: DT,
                 });
-                getMessagesGroup();
               }
             } catch (error) {
               Alert.alert("Error", error.message);
@@ -262,7 +266,7 @@ export default function ChatGroupScreen({ route, navigation }) {
 
   useEffect(() => {
     handleRefreshUserInGroup((data) => {
-      console.log("user in group:::", data);
+      // console.log("user in group:::", data);
     });
   }, []);
 
@@ -286,7 +290,11 @@ export default function ChatGroupScreen({ route, navigation }) {
             color="#fff"
           />
           <Image
+<<<<<<< HEAD
             style={{ width: 40, height: 40, borderRadius: 20}}
+=======
+            style={{ width: 40, height: 40, borderRadius: 20 }}
+>>>>>>> master
             resizeMode="cover"
             source={{ uri: group?.avatar }}
           ></Image>

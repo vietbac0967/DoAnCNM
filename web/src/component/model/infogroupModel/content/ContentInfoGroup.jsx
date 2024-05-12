@@ -22,6 +22,7 @@ const ContentInfoGroup = (props) => {
     const dispatch = useDispatch();
     const dataredux = useSelector((state) => state.userisaccess.account)
 
+
     const [listmember, setlistmember] = useState([]);
 
     useEffect(() => {
@@ -31,14 +32,26 @@ const ContentInfoGroup = (props) => {
     const handleGetAllUserInfo = async () => {
         let arr = [];
         if (user) {
-            if (user.members && user.members.length > 0) {
-            arr = [...user.members,dataredux._id]
-                let members = await Promise.all(arr.map(async (item, index) => {
-                    let res = await getInfoUser({ userId: item })
-                    return res.DT;
-                }))
-                setlistmember(members)
+            if(typeof user._id === "object"){
+                if (user._id.members && user._id.members.length > 0) {
+                    arr = [...user._id.members,user._id.author]
+                        let members = await Promise.all(arr.map(async (item, index) => {
+                            let res = await getInfoUser({ userId: item })
+                            return res.DT;
+                        }))
+                        setlistmember(members)
+                    }
+            }else{
+                if (user.members && user.members.length > 0) {
+                    arr = [...user.members,user.author._id]
+                        let members = await Promise.all(arr.map(async (item, index) => {
+                            let res = await getInfoUser({ userId: item })
+                            return res.DT;
+                        }))
+                        setlistmember(members)
+                    }
             }
+            
         }
     }
 
@@ -225,8 +238,8 @@ const ContentInfoGroup = (props) => {
                     {
                         dataredux && user
                             ?
-                            typeof user.author === "object"
-                                ? dataredux._id === user.author._id
+                            typeof user._id === "object"
+                                ? dataredux._id === user._id.author
                                     ?
                                     <Box className="info-action-btn"
                                         sx={{

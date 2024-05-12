@@ -83,36 +83,49 @@ export const login = async (req, res) => {
 // endpoint to logout user
 export const logout = async (req, res) => {
   try {
-    const token = req.body.token;
-    const verify = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-    if (!verify) {
-      return res.status(403).json({
-        EC: 1,
-        EM: "Invalid token",
+    let cookie = req.cookies
+    if (cookie) {
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken");
+      res.status(200).json({
+        EC: 0,
+        EM: "Success",
+        DT: "",
+      });
+    }else{
+      const token = req.body.token;
+      const verify = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+      
+      if (!verify) {
+        return res.status(403).json({
+          EC: 1,
+          EM: "Invalid token",
+          DT: "",
+        });
+      }
+      const existToken = await client.get(verify.id);
+      if (!existToken) {
+        return res.status(404).json({
+          EC: 1,
+          EM: "Token not found",
+          DT: "",
+        });
+      }
+      if (existToken !== token) {
+        return res.status(404).json({
+          EC: 1,
+          EM: "Token not match",
+          DT: "",
+        });
+      }
+      await client.del(verify.id);
+      res.status(200).json({
+        EC: 0,
+        EM: "Success",
         DT: "",
       });
     }
-    const existToken = await client.get(verify.id);
-    if (!existToken) {
-      return res.status(404).json({
-        EC: 1,
-        EM: "Token not found",
-        DT: "",
-      });
-    }
-    if (existToken !== token) {
-      return res.status(404).json({
-        EC: 1,
-        EM: "Token not match",
-        DT: "",
-      });
-    }
-    await client.del(verify.id);
-    res.status(200).json({
-      EC: 0,
-      EM: "Success",
-      DT: "",
-    });
+    
   } catch (error) {
     console.log(error.message);
     res.status(500).json({

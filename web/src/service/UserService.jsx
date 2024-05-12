@@ -62,8 +62,12 @@ const getInfoUser = (data) => {
     return axios.post("/api/user", data)
 }
 
+const logOutUser = () => {
+    return axios.post("/api/auth/logout")
+}
+
 export {
     register, accountUser, login, verifyOTP, resendEmail, getuserbyPhone,
     sendRequestFrient, acceptRequestFrient, rejectRequestFriend, deleteFriend,
-    getAllFriend, updateAVTUser, updateUserInfo, getInfoUser
+    getAllFriend, updateAVTUser, updateUserInfo, getInfoUser,logOutUser
 }

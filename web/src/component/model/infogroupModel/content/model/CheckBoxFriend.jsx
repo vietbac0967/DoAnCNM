@@ -27,7 +27,6 @@ const CheckBoxFriend = (props) => {
                             sx={{ width: 45, height: 45 }}
                             src={item && item.avatar}
                         >
-
                         </Avatar>
                     </Box>
                     <Box className="child-chat-right">

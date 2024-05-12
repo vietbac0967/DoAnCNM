@@ -14,7 +14,6 @@ const ListSendInvitation = () => {
 
     useEffect(() => {
         handlerefreshAccount(() => {
-            console.log("check check data")
             dispatch(fechUserToken())
         })
     }, [])
