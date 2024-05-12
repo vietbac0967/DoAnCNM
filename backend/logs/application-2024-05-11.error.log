@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [2024-05-11 14:19:32] error: 403 - No token, authorization denied
 [2024-05-11 14:19:32] error: 403 - No token, authorization denied
 [2024-05-11 14:51:01] error: 403 - No token, authorization denied
@@ -103,3 +104,5 @@
 [2024-05-11 17:01:27] error: error in middleware verifyAccount jwt expired
 [2024-05-11 22:31:48] error: Invalid token
 [2024-05-11 23:33:23] error: Invalid token
+=======
+>>>>>>> f242522fb6c8359c7d21c73614afcd996f941d05

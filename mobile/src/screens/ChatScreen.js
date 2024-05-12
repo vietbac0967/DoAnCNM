@@ -636,18 +636,17 @@ const ChatScreen = ({ navigation, route }) => {
           }}
         >
           <Ionicons
-            name="image"
+            name="image-outline"
             size={24}
             color="gray"
             onPress={handlePresentModalPress}
           />
-          <AntDesign
-            name="filetext1"
-            size={20}
+          <Ionicons
+            name="document-text-outline"
+            size={24}
             color="gray"
             onPress={handleSendFile}
           />
-          <Ionicons name="mic" size={24} color="gray" />
         </View>
 
         <Pressable
