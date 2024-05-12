@@ -10,7 +10,7 @@ export default function MessageGroupCard({
   setModalImageVisible,
   setSelectMessage,
   userId,
-  navigation
+  navigation,
 }) {
   const [user, setuser] = useState({});
 
@@ -24,11 +24,7 @@ export default function MessageGroupCard({
 
   const first5Chars = message.content.slice(0, 6);
   let isAnnounce = false;
-<<<<<<< HEAD
-  if (first5Chars.includes("##TB##")) {
-=======
   if (first5Chars.includes("##")) {
->>>>>>> master
     isAnnounce = true;
   }
 
@@ -56,20 +52,6 @@ export default function MessageGroupCard({
       }, []);
     }
     return (
-<<<<<<< HEAD
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          borderRadius: 7,
-          margin: 3,
-        }}
-      >
-        <Text style={{ fontSize: 12, padding: 3, textAlign: "center", color: "gray" }}>
-          {message.content.slice(7)}
-        </Text>
-      </View>
-=======
       <>
         <View
           style={{
@@ -126,7 +108,6 @@ export default function MessageGroupCard({
           )}
         </View>
       </>
->>>>>>> master
     );
   }
   const directToFriendInfo = () => {
@@ -148,17 +129,17 @@ export default function MessageGroupCard({
         {!isCurrentUser && (
           <Pressable onPress={directToFriendInfo}>
             <Image
-            style={{
-              width: 25,
-              height: 25,
-              borderRadius: 20,
-              marginRight: 10,
-              marginLeft: 10,
-            }}
-            resizeMode="cover"
-            source={{ uri: message.senderId?.avatar }}
-            defaultSource={require("../assets/avt.jpg")}
-          />
+              style={{
+                width: 25,
+                height: 25,
+                borderRadius: 20,
+                marginRight: 10,
+                marginLeft: 10,
+              }}
+              resizeMode="cover"
+              source={{ uri: message.senderId?.avatar }}
+              defaultSource={require("../assets/avt.jpg")}
+            />
           </Pressable>
         )}
         <Pressable
@@ -286,7 +267,7 @@ export default function MessageGroupCard({
               </Text>
             </View>
           )}
-          
+
           <Image
             source={{ uri: message.content }}
             resizeMode="cover"
