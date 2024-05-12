@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, Text, View, Image } from "react-native";
-import React, { useEffect } from "react";
+import { Pressable, StyleSheet, Text, View, Image, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
 import formatDateOrTime from "../utils/formatDateOrTime";
 import { Feather } from "@expo/vector-icons";
+import { getUserByIdService } from "../services/user.service";
 export default function MessageGroupCard({
   message,
   receiverId,
@@ -10,6 +11,8 @@ export default function MessageGroupCard({
   setSelectMessage,
   userId,
 }) {
+  const [user, setuser] = useState({});
+
   let isCurrentUser = null;
   if (receiverId) {
     isCurrentUser = message.senderId?._id !== receiverId;
@@ -17,25 +20,93 @@ export default function MessageGroupCard({
   if (userId) {
     isCurrentUser = message.senderId?._id === userId;
   }
+
   const first5Chars = message.content.slice(0, 6);
   let isAnnounce = false;
-  if (first5Chars.includes("###-id-")) {
+  if (first5Chars.includes("##")) {
     isAnnounce = true;
   }
+
   if (message.messageType === "text" && isAnnounce) {
+    if (
+      message.content.includes("-id-1-") ||
+      message.content.includes("-id-2-") ||
+      message.content.includes("-id-3-") ||
+      message.content.includes("##TB##")
+    ) {
+      const id = message.content.slice(9);
+      const getUser = async () => {
+        try {
+          const response = await getUserByIdService(id);
+          const { DT, EC, EM } = response;
+          if (EC === 0 && EM === "Success") {
+            setuser(DT);
+          }
+        } catch (error) {
+          Alert.alert("Error", error.message);
+        }
+      };
+      useEffect(() => {
+        getUser();
+      }, []);
+    }
     return (
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          borderRadius: 7,
-          margin: 5,
-        }}
-      >
-        <Text style={{ fontSize: 13, padding: 3, textAlign: "center" }}>
-          {message.content.slice(7)}
-        </Text>
-      </View>
+      <>
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: 25,
+            backgroundColor: "white",
+            marginVertical: 4,
+            marginHorizontal: 20,
+            borderWidth: 0.8,
+            borderColor: "#ddd",
+            paddingVertical: 5,
+          }}
+        >
+          {message?.content.includes("-id-1-") && (
+            <View>
+              <Image
+                source={{ uri: user?.avatar }}
+                width={30}
+                height={30}
+                borderRadius={15}
+                resizeMode="contain"
+              ></Image>
+              <Text>{user?.name} đã được bổ nhiệm thành phó nhóm</Text>
+            </View>
+          )}
+          {message?.content.includes("-id-2-") && (
+            <Text>{user?.name} đã rời khỏi nhóm</Text>
+          )}
+          {message?.content.includes("-id-3-") && (
+            <View style={{ flexDirection: "row" }}>
+              <Image
+                source={{ uri: user?.avatar }}
+                width={30}
+                height={30}
+                borderRadius={15}
+                resizeMode="contain"
+              ></Image>
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontWeight: "bold",
+                  paddingVertical: 5,
+                  paddingHorizontal: 4,
+                }}
+              >
+                {user?.name + " "}
+              </Text>
+              <Text style={{ paddingVertical: 4 }}>tham gia nhóm</Text>
+            </View>
+          )}
+          {message?.content.includes("##TB##") && (
+            <Text>{message?.content.slice(7)}</Text>
+          )}
+        </View>
+      </>
     );
   }
 
@@ -188,6 +259,7 @@ export default function MessageGroupCard({
               </Text>
             </View>
           )}
+          
           <Image
             source={{ uri: message.content }}
             resizeMode="cover"

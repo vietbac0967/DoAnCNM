@@ -93,7 +93,7 @@ const handleSendNotificationToGroup = (data) => {
   socket.emit("sendNotificationInGroup", data);
 };
 const handleRefreshNotificationToGroup = (callback) => {
-  socket.on("refreshNotificationInGroup", callback);
+  socket.on("receiveNotificationInGroup", callback);
 };
 const handleRefreshUserInGroup = (callback) => {
   socket.on("refreshNotificationInGroup", callback);

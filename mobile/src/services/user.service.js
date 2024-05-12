@@ -146,3 +146,14 @@ export const deleteFriendService = async (friendId) => {
     return {};
   }
 };
+export const getUserByIdService = async (id) => {
+  try {
+    const response = await api.post("/user", {
+      userId: id,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("error:::", error);
+    return {};
+  }
+};

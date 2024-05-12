@@ -188,12 +188,12 @@ const ChatScreen = ({ navigation, route }) => {
 
   const handleSendFile = async () => {
     try {
-      setIsLoadingUpload(true);
       const document = await DocumentPicker.getDocumentAsync({
         type: "*/*",
         copyToCacheDirectory: true,
       });
       if (!document.canceled) {
+        setIsLoadingUpload(true);
         const formData = new FormData();
         formData.append("file", {
           uri: document.assets[0].uri,

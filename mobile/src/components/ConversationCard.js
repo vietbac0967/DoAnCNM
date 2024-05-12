@@ -16,6 +16,13 @@ export default function ConversationCard({ item, navigation }) {
   const [receiver, setReceiver] = useState(null);
   const user = useSelector(selectUser);
 
+  useEffect(() => {
+    if (item?.type === "private") {
+      setReceiver(item?._id);
+    } else {
+      setReceiver(item?._id._id);
+    }
+  }, []);
   const handleReadNotification = async () => {
     try {
       if (receiver) {
@@ -52,27 +59,23 @@ export default function ConversationCard({ item, navigation }) {
 
   useEffect(() => {
     if (item?.type === "private") {
-      setReceiver(item?._id);
-    } else {
-      setReceiver(item?._id._id);
+      handleReceiveNotification((data) => {
+        console.log("data notification is:::", data);
+        if (data?.message.senderId._id === item?._id) {
+          // setReceiver(data?.message.senderId._id);
+          // setNotification(data?.message.content);
+          setNotifications((prev) => [...prev, data.message]);
+        }
+      });
     }
-  }, []);
-
-  useEffect(() => {
-    handleReceiveNotification((data) => {
-      console.log("data notification is:::", data);
-      if (data?.message.senderId._id === item?._id) {
-        // setReceiver(data?.message.senderId._id);
-        // setNotification(data?.message.content);
-        setNotifications((prev) => [...prev, data.message]);
-      }
-    });
-    handleRefreshNotificationToGroup((data) => {
-      console.log("notification to group:::", data);
-      if (data?.groupId === item?._id._id) {
-        setNotifications((prev) => [...prev, data.message]);
-      }
-    });
+    if (item?.type === "group") {
+      handleRefreshNotificationToGroup((data) => {
+          console.log("data notification is:::", data);
+        if (data?.groupId === item?._id._id) {
+          setNotifications((prev) => [...prev, data.message]);
+        }
+      });
+    }
   }, []);
 
   return (
