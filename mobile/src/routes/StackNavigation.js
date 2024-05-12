@@ -121,7 +121,11 @@ const StackNavigation = () => {
         />
         <Stack.Screen name="SearchMessage" component={SearchMessageScreen} />
         <Stack.Screen name="FriendInfo" component={FriendInfoScreen} options={{headerShown: false}}/>
-        <Stack.Screen name="Setting" component={SettingScreen} />
+        <Stack.Screen name="Setting" component={SettingScreen} options={{
+            headerStyle: {
+              backgroundColor: "#00ACED",              
+            },
+          }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

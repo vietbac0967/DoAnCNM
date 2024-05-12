@@ -1,131 +1,130 @@
-import { Pressable, StyleSheet, Text, View, Image } from "react-native";
+import { Pressable, StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import React, { useEffect, useLayoutEffect, useState } from "react";
-import { AntDesign, FontAwesome, Feather } from "@expo/vector-icons";
+import { AntDesign, FontAwesome, Feather, Ionicons } from "@expo/vector-icons";
 import { getReceiverService } from "../services/user.service";
+
 export default function SettingScreen({ navigation, route }) {
-  const recevierId = route.params?.receiverId;
-  const [recevier, setReceiver] = useState({});
-  console.log("receiverId:::", recevierId);
+  const receiverId = route.params?.receiverId;
+  const [receiver, setReceiver] = useState({});
+  
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: "Tùy chọn",
-    });
-  }, [navigation]);
+      headerTitle: "Tùy chọn",
+      headerTintColor: "#fff",
+      headerLeft: () => (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+          <Ionicons
+            onPress={() => navigation.goBack()}
+            name="chevron-back-outline"
+            size={24}
+            color="#fff"
+          />
+         
+        </View>
+      ),});
+      
+  }, []);
+
   const getReceiver = async () => {
     try {
-      const response = await getReceiverService(recevierId);
+      const response = await getReceiverService(receiverId);
       setReceiver(response);
     } catch (error) {
       console.log("error:::", error);
     }
   };
+
   useEffect(() => {
     getReceiver();
   }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Image
-          width={50 * 2}
-          height={50 * 2}
-          borderRadius={25 * 2}
-          resizeMode="contain"
-          source={{ uri: recevier?.avatar }}
-        ></Image>
-        <Text style={styles.name}>{recevier?.name}</Text>
+          style={styles.avatar}
+          source={{ uri: receiver?.avatar }}
+          defaultSource={require("../assets/avt.jpg")}
+        />
+        <Text style={styles.name}>{receiver?.name}</Text>
       </View>
       <View style={styles.navbar}>
-        <Pressable
+        <OptionButton
+          icon={<Ionicons name="search-outline" size={24} color="black" />}
+          text="Tìm tin nhắn"
           onPress={() =>
             navigation.navigate("SearchMessage", {
-              recevierId,
+              receiverId,
             })
           }
-        >
-          <AntDesign
-            name="search1"
-            size={24}
-            color="black"
-            style={{ marginLeft: 10 }}
-          />
-          <Text style={styles.text}>Tìm {"\n"} tin nhắn</Text>
-        </Pressable>
-        <Pressable
+        />
+        <OptionButton
+          icon={<Ionicons name="person-outline" size={24} color="black" />}
+          text="Trang cá nhân"
           onPress={() =>
             navigation.navigate("FriendInfo", {
-              recevierId,
+              receiverId,
             })
           }
-        >
-          <FontAwesome
-            name="user-o"
-            size={24}
-            color="black"
-            style={{ marginLeft: 13 }}
-          />
-          <Text style={styles.text}>Trang {"\n"} cá nhân</Text>
-        </Pressable>
-        <Pressable
-          onPress={() =>
-            navigation.navigate("SearchMessage", {
-              recevierId,
-            })
-          }
-        >
-          <Feather
-            name="edit"
-            size={24}
-            color="black"
-            style={{ marginLeft: 13 }}
-          />
-          <Text style={styles.text}>Đổi {"\n"} hình nền</Text>
-        </Pressable>
-        <Pressable
-          onPress={() =>
-            navigation.navigate("SearchMessage", {
-              recevierId,
-            })
-          }
-        >
-          <FontAwesome
-            name="bell-o"
-            size={24}
-            color="black"
-            style={{ marginLeft: 13 }}
-          />
-          <Text style={styles.text}>Tắt thông {"\n"}báo</Text>
-        </Pressable>
+        />
+        <OptionButton
+          icon={<Ionicons name="color-palette-outline" size={24} color="black" />}
+          text="Đổi hình nền"
+          
+        />
+        <OptionButton
+          icon={<Ionicons name="notifications-outline" size={24} color="black" />}
+          text="Tắt thông báo"
+          
+        />
       </View>
     </View>
+  );
+}
+
+function OptionButton({ icon, text, onPress }) {
+  return (
+    <Pressable onPress={onPress} style={styles.option}>
+      <View style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: "#ddd", justifyContent: "center", alignItems: "center" }}>
+        {icon}
+      </View>
+      <Text style={styles.optionText}>{text}</Text>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  btn: {
-    flexDirection: "row",
-    marginTop: 20,
+    backgroundColor: "#fff",
+    paddingHorizontal: 20,
   },
   header: {
     alignItems: "center",
-    justifyContent: "center",
-    marginTop: 20,
+    marginTop: 30,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 20,
   },
   name: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "bold",
-    paddingTop: 10,
   },
   navbar: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    marginTop:10,
+    justifyContent: "space-between",
+    marginTop: 25,
   },
-  text: {
+  option: {
+    alignItems: "center",
+  },
+  optionText: {
+    width: 80,
+    marginTop: 8,
+    fontSize: 12,
     textAlign: "center",
-    fontSize: 13,
   },
 });

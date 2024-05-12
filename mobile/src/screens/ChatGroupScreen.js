@@ -290,7 +290,11 @@ export default function ChatGroupScreen({ route, navigation }) {
             color="#fff"
           />
           <Image
+<<<<<<< HEAD
+            style={{ width: 40, height: 40, borderRadius: 20}}
+=======
             style={{ width: 40, height: 40, borderRadius: 20 }}
+>>>>>>> master
             resizeMode="cover"
             source={{ uri: group?.avatar }}
           ></Image>
@@ -444,6 +448,7 @@ export default function ChatGroupScreen({ route, navigation }) {
           <MessageGroupCard
             message={item}
             userId={user?._id}
+            navigation={navigation}
             setModalVisible={setModalVisible}
             setModalImageVisible={setModalImageVisible}
             setSelectMessage={setSelectMessage}

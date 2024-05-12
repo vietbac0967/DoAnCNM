@@ -233,6 +233,7 @@ export default function ContactScreen({ navigation }) {
                 style={{ width: 50, height: 50, borderRadius: 25 }}
                 resizeMode="cover"
                 source={{ uri: seclectFriend?.avatar }}
+                defaultSource={require("../assets/avt.jpg")}
               ></Image>
               <Text
                 style={{ fontWeight: "bold", paddingLeft: 15, paddingTop: 15 }}
@@ -243,7 +244,7 @@ export default function ContactScreen({ navigation }) {
             <Pressable
             onPress={() => {
               navigation.navigate("FriendInfo", {
-                recevierId: seclectFriend._id,
+                receiverId: seclectFriend._id,
               });
               setModalVisible(false);
 

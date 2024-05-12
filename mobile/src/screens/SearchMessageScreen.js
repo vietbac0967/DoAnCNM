@@ -10,15 +10,15 @@ import MessageGroupCard from "../components/MessageGroupCard";
 import { useSelector } from "react-redux";
 import { selectUser } from "../app/userSlice";
 export default function SearchMessageScreen({ navigation, route }) {
-  const recevierId = route.params?.recevierId;
+  const receiverId = route.params?.receiverId;
   const groupId = route.params?.groupId;
   const [messages, setMessages] = useState([]);
   const [textSearch, setTextSearch] = useState("");
   const user = useSelector(selectUser);
   const getMessages = async () => {
     try {
-      if (recevierId) {
-        const response = await getAllMessagesService(recevierId);
+      if (receiverId) {
+        const response = await getAllMessagesService(receiverId);
         const { EM, EC, DT } = response;
         if (EC !== 0) {
           Alert.alert(EM);
@@ -74,7 +74,7 @@ export default function SearchMessageScreen({ navigation, route }) {
           if (groupId) {
             return <MessageGroupCard userId={user._id} message={item} />;
           } else {
-            return <MessageCard message={item} receiverId={recevierId} />;
+            return <MessageCard message={item} receiverId={receiverId} />;
           }
         }}
         keyExtractor={(item) => item._id}

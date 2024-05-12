@@ -8,9 +8,9 @@ import {
   Modal,
   TextInput,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
 import { AntDesign, Feather } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
@@ -50,11 +50,7 @@ export default function GroupInfoScreen({ navigation, route }) {
     getGroup();
   }, []);
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerTitle: "Thông tin nhóm",
-    });
-  }, []);
+  
   console.log("groupId in group info screen:::", groupId);
   console.log("group in group info screen:::", group);
 
@@ -75,6 +71,27 @@ export default function GroupInfoScreen({ navigation, route }) {
       Alert.alert("Error", err.message);
     }
   };
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: "Tùy chọn nhóm",
+      headerTintColor: "#fff",
+      headerStyle: {
+        backgroundColor: "#00ACED",              
+      },
+      headerLeft: () => (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+          <Ionicons
+            onPress={() => navigation.goBack()}
+            name="chevron-back-outline"
+            size={24}
+            color="#fff"
+          />
+         
+        </View>
+      ),});
+      
+  }, []);
 
   const handleLeaveGroup = async () => {
     try {
@@ -185,14 +202,17 @@ export default function GroupInfoScreen({ navigation, route }) {
       >
         <View style={{ flexDirection: "row" }}>
           <Image
-            style={{ width: 60, height: 60, borderRadius: 30 }}
+            style={{ width: 100,
+              height: 100,
+              borderRadius: 50,
+              marginBottom: 20,
+            marginTop: 15 }}
             source={{ uri: group?.avatar || group?.author.avatar }}
           ></Image>
-          <Pressable onPress={handleUpdateImage}>
+          <Pressable onPress={handleUpdateImage} style={{ position: "absolute", bottom: 20, right: 5, backgroundColor: "#F5F5F5", padding: 4, borderRadius: 20, borderWidth: 0.5}}>
             <EvilIcons
-              style={{ alignSelf: "flex-end" }}
               name="camera"
-              size={24}
+              size={18}
               color="black"
             />
           </Pressable>
@@ -205,13 +225,14 @@ export default function GroupInfoScreen({ navigation, route }) {
           gap: 10,
           marginLeft: "auto",
           marginRight: "auto",
+          alignItems: "center",
         }}
       >
-        <Text style={{ textAlign: "center", fontSize: 22, fontWeight: "bold" }}>
+        <Text style={{ textAlign: "center", fontSize: 20, fontWeight: "bold" }}>
           {group?.name}
         </Text>
-        <Pressable onPress={() => setModalVisible(true)}>
-          <AntDesign name="edit" size={22} color="black" />
+        <Pressable onPress={() => setModalVisible(true)} style={{ justifyContent: "center", }}>
+          <AntDesign name="edit" size={20} color="gray" />
         </Pressable>
       </View>
 
@@ -231,7 +252,7 @@ export default function GroupInfoScreen({ navigation, route }) {
               onPress={() => navigation.navigate("SearchMessage", { groupId })}
             />
           </View>
-          <Text style={{ textAlign: "center" }}>Tìm {"\n"} tin nhắn</Text>
+          <Text style={{ textAlign: "center", width: 80, marginTop: 8, fontSize: 12 }}>Tìm {"\n"} tin nhắn</Text>
         </View>
 
         <Modal
@@ -318,59 +339,59 @@ export default function GroupInfoScreen({ navigation, route }) {
           <View style={styles.iconHeader}>
             <MaterialIcons name="group-add" size={22} color="black" />
           </View>
-          <Text style={{ textAlign: "center" }}>Thêm {"\n"} thành viên</Text>
+          <Text style={{ textAlign: "center", width: 80, marginTop: 8, fontSize: 12 }}>Thêm thành viên</Text>
         </Pressable>
 
         <View style={{ alignItems: "center" }}>
           <View style={styles.iconHeader}>
             <AntDesign name="picture" size={20} color="black" />
           </View>
-          <Text style={{ textAlign: "center" }}>Đổi{"\n"} hình nền</Text>
+          <Text style={{ textAlign: "center", width: 80, marginTop: 8, fontSize: 12 }}>Đổi hình nền</Text>
         </View>
 
         <View style={{ alignItems: "center" }}>
           <View style={styles.iconHeader}>
             <Feather name="bell" size={20} color="black" />
           </View>
-          <Text style={{ textAlign: "center" }}>Tắt{"\n"} thông báo</Text>
+          <Text style={{ textAlign: "center", width: 80, marginTop: 8, fontSize: 12 }}>Tắt thông báo</Text>
         </View>
       </View>
 
-      <View style={{ marginTop: 15 }}>
+      <View style={{ marginTop: 20 }}>
         <Pressable
           onPress={() => {
             navigation.navigate("MemberInfo", {
               groupId: group._id,
             });
           }}
-          style={{ flexDirection: "row", marginBottom: 5, paddingLeft: 10 }}
+          style={{ flexDirection: "row", alignItems: "center", paddingLeft: 10, paddingVertical: 10, borderBottomWidth: 0.5, borderBottomColor: "#ddd"}}
         >
           <FontAwesome name="group" size={24} color="black" />
-          <Text style={{ paddingLeft: 5 }}>Thành viên nhóm</Text>
+          <Text style={{ marginLeft: 10 }}>Thành viên nhóm</Text>
         </Pressable>
 
         <Pressable
-          style={{ flexDirection: "row", marginBottom: 5, paddingLeft: 10 }}
+          style={{ flexDirection: "row", alignItems: "center", paddingLeft: 10, paddingVertical: 10, borderBottomWidth: 0.5, borderBottomColor: "#ddd"}}
         >
           <AntDesign name="setting" size={24} color="black" />
-          <Text style={{ paddingLeft: 5 }}>Cài đặt nhóm</Text>
+          <Text style={{ marginLeft: 10 }}>Cài đặt nhóm</Text>
         </Pressable>
 
         {user?._id === group?.author._id ? (
           <Pressable
             onPress={handleDeleteGroup}
-            style={{ flexDirection: "row", marginBottom: 5, paddingLeft: 10 }}
+            style={{ flexDirection: "row", alignItems: "center", paddingLeft: 10, paddingVertical: 10 }}
           >
             <EvilIcons name="trash" size={26} color="red" />
-            <Text style={{ paddingLeft: 5, color: "red" }}>Giải tán nhóm</Text>
+            <Text style={{ marginLeft: 10, color: "red" }}>Giải tán nhóm</Text>
           </Pressable>
         ) : (
           <Pressable
             onPress={handleLeaveGroup}
-            style={{ flexDirection: "row", marginBottom: 5, paddingLeft: 10 }}
+            style={{ flexDirection: "row", alignItems: "center", paddingLeft: 10, paddingVertical: 10 }}
           >
             <Entypo name="log-out" size={24} color="red" />
-            <Text style={{ paddingLeft: 5 }}>Rời nhóm</Text>
+            <Text style={{ marginLeft: 10 }}>Rời nhóm</Text>
           </Pressable>
         )}
       </View>
@@ -382,12 +403,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    paddingHorizontal: 20,
   },
   iconHeader: {
     backgroundColor: "#ddd",
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     alignItems: "center",
     justifyContent: "center",
   },
