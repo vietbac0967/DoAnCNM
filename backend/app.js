@@ -31,11 +31,7 @@ app.use(
 // app.options("*", cors());
 app.use(
   cors({
-<<<<<<< HEAD
     origin: [process.env.URL_WEB,process.env.URL_CLIENT,"*",process.env.URL_MOBILE],
-=======
-    origin: ["*", process.env.URL_WEB,"http://localhost:8081"],
->>>>>>> f242522fb6c8359c7d21c73614afcd996f941d05
     methods: ["GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"],
     allowedHeaders: [
       "X-Requested-With",
