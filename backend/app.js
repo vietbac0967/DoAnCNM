@@ -19,7 +19,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(morganMiddleware)
+app.use(morganMiddleware);
 app.use(helmet());
 app.use(
   compression({
@@ -27,11 +27,11 @@ app.use(
     threshold: 100 * 1000,
   })
 );
-// app.use(cors());
-// app.options("*", cors());
 app.use(
   cors({
-    origin: [process.env.URL_WEB,process.env.URL_CLIENT,"*",process.env.URL_MOBILE],
+    origin: (origin, callback) => {
+      callback(null, true);
+    },
     methods: ["GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"],
     allowedHeaders: [
       "X-Requested-With",
@@ -43,6 +43,7 @@ app.use(
     credentials: true,
   })
 );
+
 app.use("/api/auth", authRoutes);
 app.use("/api/", userRoutes);
 app.use("/api/", messageRoutes);
