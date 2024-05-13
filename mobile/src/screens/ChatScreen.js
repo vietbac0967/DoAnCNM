@@ -181,8 +181,8 @@ const ChatScreen = ({ navigation, route }) => {
         }
       }
     } catch (error) {
-      Alert.alert("Cảnh báo", "Hình ảnh quá lớn, vui lòng chọn hình ảnh khác");
       setIsLoadingUpload(false);
+      Alert.alert("Cảnh báo", "Hình ảnh quá lớn, vui lòng chọn hình ảnh khác");
     }
   };
 
