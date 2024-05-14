@@ -61,6 +61,7 @@ export const verifyAccount = async (req, res, next) => {
       next();
     } else if (req.cookies?.accessToken) {
       token = req.cookies?.accessToken;
+      console.log(token); 
       if (token) {
         const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
         let user = await User.findById({ _id: decoded.id });
