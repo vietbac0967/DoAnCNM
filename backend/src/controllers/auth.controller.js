@@ -61,14 +61,16 @@ export const reSendEmail = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { EC, EM, DT } = await loginService(req.body);
-    if (DT) {
+    if (EC === 0) {
       res.cookie("accessToken", DT.accessToken, {
         maxAge: 86400000,
         httpOnly: true,
+        sameSite: "none",
       });
       res.cookie("refreshToken", DT.refreshToken, {
         maxAge: 86400000,
         httpOnly: true,
+        sameSite: "none",
       });
     }
     res.status(200).json({ EC, EM, DT });
@@ -83,7 +85,7 @@ export const login = async (req, res) => {
 // endpoint to logout user
 export const logout = async (req, res) => {
   try {
-    let cookie = req.cookies
+    let cookie = req.cookies;
     if (cookie) {
       res.clearCookie("accessToken");
       res.clearCookie("refreshToken");
@@ -92,10 +94,10 @@ export const logout = async (req, res) => {
         EM: "Success",
         DT: "",
       });
-    }else{
+    } else {
       const token = req.body.token;
       const verify = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-      
+
       if (!verify) {
         return res.status(403).json({
           EC: 1,
@@ -125,7 +127,6 @@ export const logout = async (req, res) => {
         DT: "",
       });
     }
-    
   } catch (error) {
     console.log(error.message);
     res.status(500).json({

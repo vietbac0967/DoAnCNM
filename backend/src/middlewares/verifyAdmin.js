@@ -33,6 +33,7 @@ export const verifyAdmin = async (req, res, next) => {
       req.user = user;
       next();
     } else if (req.cookies?.accessToken) {
+      console.log(req);
       token = req.cookies?.accessToken;
       if (token) {
         const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
