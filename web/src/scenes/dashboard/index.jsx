@@ -1,283 +1,134 @@
 import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
-// import { mockTransactions } from "../../data/mockData";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import EmailIcon from "@mui/icons-material/Email";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import TrafficIcon from "@mui/icons-material/Traffic";
-import Header from "../../components/Header";
-import LineChart from "../../components/LineChart";
-import GeographyChart from "../../components/GeographyChart";
-import BarChart from "../../components/BarChart";
-import StatBox from "../../components/StatBox";
-import ProgressCircle from "../../components/ProgressCircle";
-
+import { Link } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import SideBar from "./SideBar";
+import './index.scss'
+import User from "./User";
+import axios from "axios";
+import { getAllUser, getAllDetailAboutChatApp } from "../../service/UserService";
+import AllDetail from "./AllDetail/AllDetail";
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const navigate = useNavigate();
+  const [data, setData] = useState([]);
+  const [allDetail, setAllDetail] = useState({});
+  const [choose, setChoose] = useState('all-detail');
+  const [error, setError] = useState('');
+  // console.log(choose);
+  useEffect(() => {
 
+    const fetchData = async () => {
+      try {
+
+        const userList = await getAllUser();
+        const allDetail = await getAllDetailAboutChatApp();
+        setAllDetail(allDetail.DT)
+        setData(userList.DT);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+      } catch (error) {
+        setError(error);
+      } finally {
+      }
+    };
+
+    fetchData();
+  }, []);
+  console.log(allDetail);
   return (
-    <Box m="20px">
-      {/* HEADER */}
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
+    <div className="body-dashboard">
+      <div className="app-dashboard">
+        <header className="app-header">
+          <div className="app-header-logo">
+            <div className="logo">
+              <h1 className="logo-title">
+                <span>SurpriseMessage</span>
+                <span>Dashboard</span>
+              </h1>
+            </div>
+          </div>
+          <div className="app-header-navigation">
+          </div>
+          <div className="app-header-actions">
+            <button className="user-profile">
+              <span>Admin</span>
+              <span>
+                <img src="https://avatar.iran.liara.run/public/boy?username=admin" />
+              </span>
+            </button>
+          </div>
+          <div className="app-header-mobile">
+            <button className="icon-button large">
+              <i className="ph-list"></i>
+            </button>
+          </div>
 
-        <Box>
-          <Button
-            sx={{
-              backgroundColor: colors.blueAccent[700],
-              color: colors.grey[100],
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
-            }}
-          >
-            <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-            Download Reports
-          </Button>
-        </Box>
-      </Box>
+        </header>
+        <div className="app-body">
+          <div className="app-body-navigation">
+            <nav className="navigation">
+              <a href="#" onClick={() => setChoose('all-detail')}>
+                <i className="ph-browsers"></i>
+                <span>Dashboard</span>
+              </a>
+              <a href="#" onClick={() => setChoose('all')}>
+                <i className="ph-check-square"></i>
+                <span>Danh sách người dùng</span>
+              </a>
+              <a href="#">
+                <i className="ph-file-text"></i>
+                <span>Templates</span>
+              </a>
+            </nav>
+            <footer className="footer">
+              <div>HUY ©<br />
+                All Rights Reserved 2024
+              </div>
+            </footer>
+          </div>
+          <div className="app-body-main-content">
+            <section className="transfer-section">
+              {choose == 'all-detail' && <AllDetail allDetail={allDetail} />}
+              {choose == 'all' && <div className="transfers">
+                <div className="transfer">
+                  Ảnh đại diện
+                  <dl className="transfer-details">
+                    <div>
+                      <dt>Tên</dt>
+                    </div>
+                    <div>
+                      <dt>Số điện thoại</dt>
+                    </div>
+                    <div>
+                      <dt>Tổng số tin nhắn đã gửi</dt>
+                    </div>
+                    <div>
+                      <dt>Tổng số hình ảnh đã gửi</dt>
+                    </div>
+                    <div>
+                      <dt>Dung lượng đã sử dụng</dt>
+                    </div>
+                  </dl>
+                </div>
+                {data.map((item) => {
+                  return (
+                    <User data={item} />
+                  )
+                })
+                }
+              </div>}
 
-      {/* GRID & CHARTS */}
-      <Box
-        display="grid"
-        gridTemplateColumns="repeat(12, 1fr)"
-        gridAutoRows="140px"
-        gap="20px"
-      >
-        {/* ROW 1 */}
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="12,361"
-            subtitle="Tổng số tin nhắn được gửi"
-            progress="0.75"
-            increase="+14%"
-            icon={
-              <EmailIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="431,225"
-            subtitle="Người dùng đang hoạt động"
-            progress="0.50"
-            increase="+21%"
-            icon={
-              <PointOfSaleIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="32,441"
-            subtitle="Người dùng mới"
-            progress="0.30"
-            increase="+5%"
-            icon={
-              <PersonAddIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="1,325,134"
-            subtitle="Traffic Received"
-            progress="0.80"
-            increase="+43%"
-            icon={
-              <TrafficIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
+            </section>
+          </div>
 
-        {/* ROW 2 */}
-        <Box
-          gridColumn="span 8"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-        >
-          <Box
-            mt="25px"
-            p="0 30px"
-            display="flex "
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                Revenue Generated
-              </Typography>
-              <Typography
-                variant="h3"
-                fontWeight="bold"
-                color={colors.greenAccent[500]}
-              >
-                $59,342.32
-              </Typography>
-            </Box>
-            <Box>
-              <IconButton>
-                <DownloadOutlinedIcon
-                  sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
-                />
-              </IconButton>
-            </Box>
-          </Box>
-          <Box height="250px" m="-20px 0 0 0">
-            <LineChart isDashboard={true} />
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          overflow="auto"
-        >
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            borderBottom={`4px solid ${colors.primary[500]}`}
-            colors={colors.grey[100]}
-            p="15px"
-          >
-            <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              Recent Transactions
-            </Typography>
-          </Box>
-          {/* {mockTransactions.map((transaction, i) => (
-            <Box
-              key={`${transaction.txId}-${i}`}
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              borderBottom={`4px solid ${colors.primary[500]}`}
-              p="15px"
-            >
-              <Box>
-                <Typography
-                  color={colors.greenAccent[500]}
-                  variant="h5"
-                  fontWeight="600"
-                >
-                  {transaction.txId}
-                </Typography>
-                <Typography color={colors.grey[100]}>
-                  {transaction.user}
-                </Typography>
-              </Box>
-              <Box color={colors.grey[100]}>{transaction.date}</Box>
-              <Box
-                backgroundColor={colors.greenAccent[500]}
-                p="5px 10px"
-                borderRadius="4px"
-              >
-                ${transaction.cost}
-              </Box>
-            </Box>
-          ))} */}
-        </Box>
+        </div>
+      </div>
+    </div>
 
-        {/* ROW 3 */}
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          p="30px"
-        >
-          <Typography variant="h5" fontWeight="600">
-            Campaign
-          </Typography>
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            mt="25px"
-          >
-            <ProgressCircle size="125" />
-            <Typography
-              variant="h5"
-              color={colors.greenAccent[500]}
-              sx={{ mt: "15px" }}
-            >
-              $48,352 revenue generated
-            </Typography>
-            <Typography>Includes extra misc expenditures and costs</Typography>
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-        >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-            sx={{ padding: "30px 30px 0 30px" }}
-          >
-            Sales Quantity
-          </Typography>
-          <Box height="250px" mt="-20px">
-            <BarChart isDashboard={true} />
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          padding="30px"
-        >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-            sx={{ marginBottom: "15px" }}
-          >
-            Geography Based Traffic
-          </Typography>
-          <Box height="200px">
-            <GeographyChart isDashboard={true} />
-          </Box>
-        </Box>
-      </Box>
-    </Box>
   );
 };
 

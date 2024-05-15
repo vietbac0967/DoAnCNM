@@ -9,9 +9,37 @@ const login = (data) => {
 }
 
 const accountUser = () => {
-    return axios.get("/api/v1/account")
+    return axios.get("/api/auth/verifyAccount")
 }
+const getAllUser = () => {
+    return axios.get("/api/admin/users")
 
+}
+const getNumberOfSendMessaages = (userId) => {
+    return axios.get('/api/admin/messages', {
+        params: { userId }
+    })
+}
+const getNumberOfSendImage = (userId) => {
+    return axios.get('/api/admin/images', {
+        params: { userId }
+    })
+}
+const getNumberOfNewFriends = (userId) => {
+    return axios.get('/api/admin/newFriends', {
+        params: { userId }
+    })
+}
+const getTotalDataSizeOfUser = (userId) => {
+    return axios.get('/api/admin/totalDataSize', {
+        params: { userId }
+    })
+}
+const getAllDetailAboutChatApp = () => {
+    return axios.get("/api/admin/count")
+}
 export {
-    register, accountUser, login
+    register, accountUser, login, getAllUser,
+    getNumberOfSendMessaages, getNumberOfSendImage, getNumberOfNewFriends,
+    getTotalDataSizeOfUser, getAllDetailAboutChatApp
 }
