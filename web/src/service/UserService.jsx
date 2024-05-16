@@ -38,8 +38,24 @@ const getTotalDataSizeOfUser = (userId) => {
 const getAllDetailAboutChatApp = () => {
     return axios.get("/api/admin/count")
 }
+const getFriendsFollowMonthAndYear = (userId, month, year) => {
+    return axios.get('/api/admin/newFriends', {
+        params: { userId, month, year }
+    })
+}
+const getNewRegisterUsers = (month, year) => {
+    return axios.get('/api/admin/newUsers', {
+        params: { month, year }
+    })
+}
+const getUserById = (id) => {
+    return axios.post('/api/user', {
+        userId: id
+    })
+}
 export {
     register, accountUser, login, getAllUser,
     getNumberOfSendMessaages, getNumberOfSendImage, getNumberOfNewFriends,
-    getTotalDataSizeOfUser, getAllDetailAboutChatApp
+    getTotalDataSizeOfUser, getAllDetailAboutChatApp, getFriendsFollowMonthAndYear,
+    getNewRegisterUsers, getUserById
 }

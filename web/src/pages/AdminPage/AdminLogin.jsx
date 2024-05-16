@@ -39,7 +39,7 @@ const AdminLogin = (props) => {
             {emailError && <p style={{ color: 'red' }}>{emailError}</p>}
             {passwordError && <p style={{ color: 'red' }}>{passwordError}</p>}
             <img className="user" src="https://i.ibb.co/yVGxFPR/2.png" height="100px" width="100px" />
-            <h3>Sign in here</h3>
+            <h3>Admin </h3>
 
             <div className="inputBox">
                 <input id="uname" value={email} type="text" name="Username" placeholder="Username" onChange={changeEmail} />

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { getNumberOfSendImage, getNumberOfSendMessaages, getTotalDataSizeOfUser } from '../../service/UserService';
 
 function User(props) {
@@ -42,7 +42,7 @@ function User(props) {
             </div>
             <dl className="transfer-details">
                 <div>
-                    <a href='#' >
+                    <a href={`/admin/selectUser/${props.data._id}`} >
                         <dt>{props.data.name}</dt>
                     </a>
                 </div>
@@ -59,8 +59,8 @@ function User(props) {
                     <dt>{bytesToMB(totalDataSizeOfUser)}Mb</dt>
                 </div>
 
-            </dl>
-        </div>
+            </dl >
+        </div >
     )
 }
 

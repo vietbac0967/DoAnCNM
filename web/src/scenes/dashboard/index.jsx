@@ -9,6 +9,7 @@ import User from "./User";
 import axios from "axios";
 import { getAllUser, getAllDetailAboutChatApp } from "../../service/UserService";
 import AllDetail from "./AllDetail/AllDetail";
+import Month from "./Month/Month";
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -17,6 +18,13 @@ const Dashboard = () => {
   const [allDetail, setAllDetail] = useState({});
   const [choose, setChoose] = useState('all-detail');
   const [error, setError] = useState('');
+  const [selectUser, setSelectUser] = useState('');
+  const [dataFromChild, setDataFromChild] = useState('');
+
+  const handleDataFromChild = (data) => {
+    setDataFromChild(data);
+  };
+
   // console.log(choose);
   useEffect(() => {
 
@@ -79,9 +87,9 @@ const Dashboard = () => {
                 <i className="ph-check-square"></i>
                 <span>Danh sách người dùng</span>
               </a>
-              <a href="#">
+              <a href="#" onClick={() => setChoose('month')}>
                 <i className="ph-file-text"></i>
-                <span>Templates</span>
+                <span>Thống kê theo tháng </span>
               </a>
             </nav>
             <footer className="footer">
@@ -116,12 +124,14 @@ const Dashboard = () => {
                 </div>
                 {data.map((item) => {
                   return (
-                    <User data={item} />
+                    <User onData={setChoose} data={item} />
                   )
                 })
                 }
               </div>}
-
+              {
+                choose == 'month' && <Month />
+              }
             </section>
           </div>
 

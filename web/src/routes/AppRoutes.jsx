@@ -14,6 +14,7 @@ import AllUser from '../scenes/dashboard/AllUser';
 import { useMode } from '../theme';
 import PrivateAdminRoute from './PrivateAdminRoute';
 import UserDetail from '../scenes/dashboard/UserDetail';
+import SelectUser from '../scenes/dashboard/selectUser/SelectUser';
 
 const AppRoutes = () => {
     const [theme, colorMode] = useMode();
@@ -34,13 +35,15 @@ const AppRoutes = () => {
                     <Route path='message' element={<MessagePage />} />
                     <Route path='group' element={<GroupPage />} />
                     <Route path='/' element={<PrivateRoute component={<Home />} />} />
+
                     <Route path='/admin' element={<PrivateAdminRoute component={<Dashboard />} />} />
                     <Route path="/admin/userdetail" element={<UserDetail />} />
                     <Route path="/admin/all-user" element={<AllUser />} />
+                    <Route path="/admin/selectUser/:id" element={<SelectUser />} />
+
 
                     <Route path="*" element={<>404 not found</>} />
                 </Routes>
-
 
 
 
