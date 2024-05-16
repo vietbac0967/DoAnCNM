@@ -28,7 +28,6 @@ const AppRoutes = () => {
             <main className="content">
                 <Routes>
                     <Route path='login' element={<LocalRoutes component={<Login />} />} />
-                    <Route path='/admin/login' element={<AdminLogin />} />
                     {/* <Route path='register' element={<LocalRoutes component={<Register />} />} /> */}
                     <Route path='register' element={<Register />} />
                     <Route path='otp' element={<Otp />} />
@@ -36,10 +35,12 @@ const AppRoutes = () => {
                     <Route path='group' element={<GroupPage />} />
                     <Route path='/' element={<PrivateRoute component={<Home />} />} />
 
+                    <Route path='/admin/login' element={<AdminLogin />} />
                     <Route path='/admin' element={<PrivateAdminRoute component={<Dashboard />} />} />
-                    <Route path="/admin/userdetail" element={<UserDetail />} />
-                    <Route path="/admin/all-user" element={<AllUser />} />
                     <Route path="/admin/selectUser/:id" element={<SelectUser />} />
+
+                    {/* <Route path="/admin/userdetail" element={<UserDetail />} /> */}
+                    {/* <Route path="/admin/all-user" element={<AllUser />} /> */}
 
 
                     <Route path="*" element={<>404 not found</>} />
