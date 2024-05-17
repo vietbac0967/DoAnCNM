@@ -7,9 +7,12 @@ import PrivateRoute from './PrivateRoute';
 import LocalRoutes from './LocalRoutes';
 import Otp from '../component/OTP/Otp';
 import PhoneBook from '../component/PhoneBook/PhoneBook';
+import PrivateAdminRoute from './PrivateAdminRoute';
+import Dashboard from '../component/admin/DashBoard/Dashboard';
+import AdminLogin from '../component/admin/Login/AdminLogin';
+import SelectUser from '../component/admin/SelectUser/SelectUser';
 
 const AppRoutes = (props) => {
-
     const { user, setuser } = props;
 
     return (
@@ -27,7 +30,9 @@ const AppRoutes = (props) => {
                 setuser={setuser}
             />} />} />
 
-
+            <Route path='/admin/login' element={<AdminLogin />} />
+            <Route path='/admin' element={<PrivateAdminRoute component={<Dashboard />} />} />
+            <Route path="/admin/selectUser/:id" element={<SelectUser />} />
             <Route path="*" element={<>404 not found</>} />
         </Routes>
     );
