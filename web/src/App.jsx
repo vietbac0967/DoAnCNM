@@ -28,28 +28,47 @@ function App() {
   //     handleCusttomClient({ customId: dataredux.account.phoneNumber })
   //   }
   // }, [dataredux])
-
+  console.log(dataredux.account.email);
   return (
     <>
       {
+
         dataredux && dataredux.isAuthenticated ?
           <Grid className='app-container' container spacing={0} columns={12}>
-            <Grid className='app-header' item xs={12}>
-              <Header />
-            </Grid>
-            <Grid className='app-action' item xs={2} sm={1.3} md={0.8}>
-              <Action
-                user={user}
-                setuser={setuser}
-                dataredux={dataredux}
-              />
-            </Grid>
-            <Grid className='app-frient' item xs={10} sm={10.7} md={11.2}>
-              <AppRoutes
-                user={user}
-                setuser={setuser}
-              />
-            </Grid>
+            {
+              dataredux.account.email !== 'admin@gmail.com' ?
+                <>
+                  <Grid className='app-header' item xs={12}>
+                    <Header />
+                  </Grid>
+                  <Grid className='app-action' item xs={2} sm={1.3} md={0.8}>
+                    <Action
+                      user={user}
+                      setuser={setuser}
+                      dataredux={dataredux}
+                    />
+                  </Grid>
+                </> :
+                <>
+
+                </>
+            }
+            {
+              dataredux.account.email !== 'admin@gmail.com' ?
+                <Grid className='app-frient' item xs={10} sm={10.7} md={11.2}>
+                  <AppRoutes
+                    user={user}
+                    setuser={setuser}
+                  />
+                </Grid> :
+                <Grid className='app-frient' item xs={12} sm={12} md={12}>
+                  <AppRoutes
+                    user={user}
+                    setuser={setuser}
+                  />
+                </Grid>
+            }
+
           </Grid>
           :
           <AppRoutes
