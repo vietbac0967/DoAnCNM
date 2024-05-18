@@ -9,8 +9,6 @@ import {
   getTotalDataSizeOfUser, 
   getCountUsers
 } from "../controllers/admin.controller.js";
-import User from "../models/user.model.js";
-import logger from "../helpers/winston.log.js";
 const router = express.Router();
 
 router.get("/users", verifyAdmin, getAllUser);

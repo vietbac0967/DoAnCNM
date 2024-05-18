@@ -1,4 +1,3 @@
-import React from 'react'
 import './AllDetail.scss'
 import 'font-awesome/css/font-awesome.min.css';
 function AllDetail(props) {

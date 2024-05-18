@@ -6,18 +6,18 @@ import User from "../models/user.model.js";
 import Group from "../models/group.model.js";
 export const countTotalUser = async () => {
   try {
-    const users = await User.find({});
-    const countMessage = await Message.find({});
-    const countConversation = await Conversation.find({});
-    const countGroup = await Group.find({});
+    const users = await User.countDocuments({});
+    const countMessage = await Message.countDocuments({});
+    const countConversation = await Conversation.countDocuments({});
+    const countGroup = await Group.countDocuments({});
     return {
       EC: 0,
       EM: "Success",
       DT: {
-        countUser: users.length,
-        countMessage: countMessage.length,
-        countConversation: countConversation.length,
-        countGroup: countGroup.length,
+        countUser: users,
+        countMessage: countMessage,
+        countConversation: countConversation,
+        countGroup: countGroup,
       },
     };
   } catch (error) {
@@ -28,12 +28,11 @@ export const countTotalUser = async () => {
       DT: "",
     };
   }
-
-}
+};
 export const getAllUserService = async (admin) => {
   try {
     const users = await User.find({ _id: { $ne: admin } }).select(
-      "_id name avart phoneNumber"
+      "_id name avatar phoneNumber"
     );
     return {
       EC: 0,
