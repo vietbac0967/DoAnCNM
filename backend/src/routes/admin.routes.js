@@ -6,7 +6,8 @@ import {
   getNewRegisterUsers,
   getNumberOfSendImage,
   getNumberOfSendMessaages,
-  getTotalDataSizeOfUser,
+  getTotalDataSizeOfUser, 
+  getCountUsers
 } from "../controllers/admin.controller.js";
 import User from "../models/user.model.js";
 import logger from "../helpers/winston.log.js";
@@ -18,4 +19,5 @@ router.get("/images", verifyAdmin, getNumberOfSendImage);
 router.get("/newFriends", verifyAdmin, getFriendsFollowMonthAndYear);
 router.get("/newUsers", verifyAdmin, getNewRegisterUsers);
 router.get("/totalDataSize", verifyAdmin, getTotalDataSizeOfUser);
+router.get("/count", getCountUsers)
 export default router;

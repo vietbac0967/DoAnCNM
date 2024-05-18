@@ -3,7 +3,33 @@ import logger from "../helpers/winston.log.js";
 import Conversation from "../models/converstation.model.js";
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
+import Group from "../models/group.model.js";
+export const countTotalUser = async () => {
+  try {
+    const users = await User.find({});
+    const countMessage = await Message.find({});
+    const countConversation = await Conversation.find({});
+    const countGroup = await Group.find({});
+    return {
+      EC: 0,
+      EM: "Success",
+      DT: {
+        countUser: users.length,
+        countMessage: countMessage.length,
+        countConversation: countConversation.length,
+        countGroup: countGroup.length,
+      },
+    };
+  } catch (error) {
+    logger.error(error.message);
+    return {
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    };
+  }
 
+}
 export const getAllUserService = async (admin) => {
   try {
     const users = await User.find({ _id: { $ne: admin } }).select(

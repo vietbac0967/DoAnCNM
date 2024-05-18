@@ -6,6 +6,7 @@ import {
   getNumberOfSendImageService,
   getNumberOfSendMessaagesService,
   getTotalDataSizeOfUserService,
+  countTotalUser
 } from "../services/admin.service.js";
 
 export const getAllUser = async (req, res) => {
@@ -37,7 +38,18 @@ export const getNumberOfSendMessaages = async (req, res) => {
     });
   }
 };
-
+export const getCountUsers = async (req, res) => {
+  try {
+    const { EC, EM, DT } = await countTotalUser();
+    return res.status(200).json({ EC, EM, DT });
+  } catch (error) {
+    return res.status(500).json({
+      EC: 1,
+      EM: error.message,
+      DT: "",
+    });
+  }
+};
 export const getNumberOfSendImage = async (req, res) => {
   try {
     const userId = req.query?.userId;
