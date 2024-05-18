@@ -65,12 +65,10 @@ export const login = async (req, res) => {
       res.cookie("accessToken", DT.accessToken, {
         maxAge: 86400000,
         httpOnly: true,
-        sameSite: "none",
       });
       res.cookie("refreshToken", DT.refreshToken, {
         maxAge: 86400000,
         httpOnly: true,
-        sameSite: "none",
       });
     }
     res.status(200).json({ EC, EM, DT });
