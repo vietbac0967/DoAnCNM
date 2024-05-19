@@ -1,4 +1,4 @@
-import Conversation from "../models/converstation.model.js";
+import Conversation from "../models/conversation.model.js";
 import Group from "../models/group.model.js";
 import User from "../models/user.model.js";
 export const createGroupService = async (author, members, groupName) => {
@@ -11,7 +11,6 @@ export const createGroupService = async (author, members, groupName) => {
       };
     }
     // Check if the members list is empty
-    console.log("Length of members:::", members.length);
     if (members.length < 2) {
       return {
         EC: 1,

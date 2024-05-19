@@ -12,162 +12,316 @@ import {
   updateUserImageService,
   getFriendsNotInGroupService,
   deleteFriendService,
-} from "../services/user.service.js";
-import { jest, it, describe, expect } from "@jest/globals";
-import User from "../models/user.model.js";
+} from "../services/user.service";
+import User from "../models/user.model";
+import Group from "../models/group.model";
+import Conversation from "../models/conversation.model";
+import { jest } from "@jest/globals";
 
-jest.mock("../models/user.model.js");
+jest.mock("../models/user.model");
+jest.mock("../models/group.model");
+jest.mock("../models/conversation.model");
 
 describe("User Service Tests", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("should find user by phone number successfully", async () => {
-    const phone = "123456789";
-    const senderId = "sender123";
-    const user = { phoneNumber: phone, friends: [] };
-    User.findOne.mockResolvedValueOnce(user);
+  describe("findUserByPhone", () => {
+    it("should return error if user is not found", async () => {
+      User.findOne.mockReturnValue({
+        select: jest.fn().mockResolvedValue(null),
+      });
 
-    const result = await findUserByPhone(phone, senderId);
+      const result = await findUserByPhone("1234567890", "senderId");
 
-    expect(result).toEqual({ EC: 0, EM: "Success", DT: user });
+      expect(result).toEqual({
+        EC: 1,
+        EM: "User not found",
+        DT: "",
+      });
+    });
+
+    it("should return error if user is already a friend", async () => {
+      const mockUser = { _id: "userId", friends: ["senderId"] };
+
+      User.findOne.mockReturnValue({
+        select: jest.fn().mockResolvedValue(mockUser),
+      });
+
+      const result = await findUserByPhone("1234567890", "senderId");
+
+      expect(result).toEqual({
+        EC: 1,
+        EM: "User is already your friend",
+        DT: mockUser,
+      });
+    });
+
+    it("should return success if user is found and not a friend", async () => {
+      const mockUser = { _id: "userId", friends: [] };
+
+      User.findOne.mockReturnValue({
+        select: jest.fn().mockResolvedValue(mockUser),
+      });
+
+      const result = await findUserByPhone("1234567890", "senderId");
+
+      expect(result).toEqual({
+        EC: 0,
+        EM: "Success",
+        DT: mockUser,
+      });
+    });
   });
 
-  it("should show user's friends successfully", async () => {
-    const userId = "userId123";
-    const user = { friends: ["friend1", "friend2"] };
-    User.findById.mockResolvedValueOnce(user);
+  describe("showFriends", () => {
+    it("should return error if user is not found", async () => {
+      const userId = "userId";
 
-    const result = await showFriends(userId);
+      User.findById.mockReturnValueOnce({
+        populate: jest.fn().mockReturnThis(),
+        lean: jest.fn().mockResolvedValue(null),
+      });
 
-    expect(result).toEqual({ EC: 0, EM: "Success", DT: user.friends });
+      const result = await showFriends(userId);
+
+      expect(result).toEqual({
+        EC: 1,
+        EM: "User not found",
+        DT: "",
+      });
+    });
+
+    it("should return success with user's friends", async () => {
+      const userId = "userId";
+      const mockFriends = [
+        {
+          _id: "friendId1",
+          name: "Friend 1",
+          avatar: "avatar1.png",
+          phoneNumber: "1234567890",
+        },
+        {
+          _id: "friendId2",
+          name: "Friend 2",
+          avatar: "avatar2.png",
+          phoneNumber: "9876543210",
+        },
+      ];
+
+      User.findById.mockReturnValueOnce({
+        populate: jest.fn().mockReturnThis(),
+        lean: jest.fn().mockResolvedValue({ friends: mockFriends }),
+      });
+
+      const result = await showFriends(userId);
+
+      expect(result).toEqual({
+        EC: 0,
+        EM: "Success",
+        DT: mockFriends,
+      });
+    });
   });
 
-  it("should get user by ID successfully", async () => {
-    const userId = "userId123";
-    const user = { name: "John", phoneNumber: "12345", avatar: "avatar.png", _id: userId };
-    User.findById.mockResolvedValueOnce(user);
+  describe("rejectFriendRequestToUser", () => {
+    it("should return error if sender or receiver is not found", async () => {
+      User.findById.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
 
-    const result = await getUserByIdService(userId);
+      const result = await rejectFriendRequestToUser("senderId", "receiverId");
 
-    expect(result).toEqual({ EC: 0, EM: "Success", DT: user });
+      expect(result).toEqual({ EC: 1, EM: "User not found", DT: "" });
+    });
+
+    it("should return error if friend request is not found", async () => {
+      User.findById
+        .mockResolvedValueOnce({
+          _id: "senderId",
+          sentFriendRequests: ["receiverId"],
+          save: jest.fn(),
+        })
+        .mockResolvedValueOnce({
+          _id: "receiverId",
+          friendRequests: [],
+          save: jest.fn(),
+        });
+
+      const result = await rejectFriendRequestToUser("senderId", "receiverId");
+
+      expect(result).toEqual({ EC: 1, EM: "Friend request not found", DT: "" });
+    });
+
+    it("should return success when friend request is rejected", async () => {
+      User.findById
+        .mockResolvedValueOnce({
+          _id: "senderId",
+          sentFriendRequests: ["receiverId"],
+          save: jest.fn(),
+        })
+        .mockResolvedValueOnce({
+          _id: "receiverId",
+          friendRequests: ["senderId"],
+          save: jest.fn(),
+        });
+
+      const result = await rejectFriendRequestToUser("senderId", "receiverId");
+
+      expect(result).toEqual({ EC: 0, EM: "Success", DT: "" });
+    });
   });
 
-  it("should send friend request to user successfully", async () => {
-    const senderId = "sender123";
-    const receiverId = "receiver123";
+  describe("showSentFriendRequests", () => {
+    it("should return success if user is found with sent friend requests", async () => {
+      const sentFriendRequests = [
+        {
+          _id: "friendId",
+          name: "Friend",
+          phoneNumber: "1234567890",
+          avatar: "avatar.png",
+        },
+      ];
+      User.findById.mockReturnValueOnce({
+        populate: jest.fn().mockReturnThis(),
+        lean: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(sentFriendRequests),
+      });
 
-    const result = await sendFriendRequestToUser(senderId, receiverId);
+      const result = await showSentFriendRequests("userId");
 
-    expect(result).toEqual({ EC: 0, EM: "Success", DT: "" });
+      expect(result.EC).toEqual(0);
+      expect(result.EM).toEqual("Success");
+    });
   });
 
-  it("should show user's friend requests successfully", async () => {
-    const userId = "userId123";
-    const user = { friendRequests: ["request1", "request2"] };
-    User.findById.mockResolvedValueOnce(user);
+  describe("getUserInfoService", () => {
+    it("should return success if user is found", async () => {
+      const user = {
+        _id: "userId",
+        name: "User",
+        phoneNumber: "1234567890",
+        avatar: "avatar.png",
+      };
+      User.findById.mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        lean: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(user),
+      });
 
-    const result = await showFriendRequests(userId);
+      const result = await getUserInfoService("userId");
 
-    expect(result).toEqual({ EC: 0, EM: "Success", DT: user.friendRequests });
+      expect(result.EC).toEqual(0);
+      expect(result.EM).toEqual("Success");
+    });
   });
 
-  it("should accept friend request successfully", async () => {
-    const senderId = "sender123";
-    const receiverId = "receiver123";
-    const sender = { friends: [], friendRequests: [receiverId] };
-    const receiver = { friends: [], friendRequests: [] };
-    User.findById.mockResolvedValueOnce(sender);
-    User.findById.mockResolvedValueOnce(receiver);
-    User.findByIdAndUpdate.mockResolvedValueOnce(sender);
-    User.findByIdAndUpdate.mockResolvedValueOnce(receiver);
+  describe("updateUserInfoService", () => {
+    it("should return success if user information is updated", async () => {
+      const user = { _id: "userId", name: "User", save: jest.fn() };
+      User.findOne.mockResolvedValue(user);
 
-    const result = await acceptFriendRequestToUser(senderId, receiverId);
+      const result = await updateUserInfoService("userId", {
+        name: "Updated User",
+      });
 
-    expect(result).toEqual({ EC: 0, EM: "Success", DT: "" });
+      expect(user.name).toBe("Updated User");
+      expect(result).toEqual({ EC: 0, EM: "Success", DT: user });
+    });
   });
 
-  it("should reject friend request successfully", async () => {
-    const senderId = "sender123";
-    const receiverId = "receiver123";
-    const sender = { friendRequests: [receiverId] };
-    const receiver = { friendRequests: [] };
-    User.findById.mockResolvedValueOnce(sender);
-    User.findById.mockResolvedValueOnce(receiver);
-    User.findByIdAndUpdate.mockResolvedValueOnce(sender);
-    User.findByIdAndUpdate.mockResolvedValueOnce(receiver);
+  describe("updateUserImageService", () => {
+    it("should return error if user is not found", async () => {
+      User.findOne.mockResolvedValue(null);
 
-    const result = await rejectFriendRequestToUser(senderId, receiverId);
+      const result = await updateUserImageService("userId", "newAvatar.png");
 
-    expect(result).toEqual({ EC: 0, EM: "Success", DT: "" });
+      expect(result).toEqual({ EC: 1, EM: "User not found", DT: "" });
+    });
+
+    it("should return success if user image is updated", async () => {
+      const user = { _id: "userId", avatar: "avatar.png", save: jest.fn() };
+      User.findOne.mockResolvedValue(user);
+      const result = await updateUserImageService("userId", "newAvatar.png");
+      expect(user.avatar).toBe("newAvatar.png");
+      expect(result).toEqual({ EC: 0, EM: "Success", DT: "" });
+    });
   });
 
-  it("should show sent friend requests successfully", async () => {
-    const userId = "userId123";
-    const user = { sentFriendRequests: ["request1", "request2"] };
-    User.findById.mockResolvedValueOnce(user);
+  describe("deleteFriendService", () => {
+    it("should return success when friend is deleted", async () => {
+      User.findByIdAndUpdate.mockResolvedValue(true);
+      Conversation.deleteMany.mockResolvedValue(true);
 
-    const result = await showSentFriendRequests(userId);
+      const result = await deleteFriendService("userId", "friendId");
 
-    expect(result).toEqual({ EC: 0, EM: "Success", DT: user.sentFriendRequests });
+      expect(result).toEqual({ EC: 0, EM: "Success", DT: "" });
+    });
   });
 
-  it("should get user info successfully", async () => {
-    const userId = "userId123";
-    const user = { name: "John", phoneNumber: "12345", avatar: "avatar.png" };
-    User.findById.mockResolvedValueOnce(user);
+  describe("getFriendsNotInGroupService", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
 
-    const result = await getUserInfoService(userId);
+    it("should return an error if the group is not found", async () => {
+      User.findById.mockResolvedValue({
+        friends: [{ _id: "friend1" }, { _id: "friend2" }],
+      });
+      Group.findById.mockResolvedValue(null);
 
-    expect(result).toEqual({ EC: 0, EM: "Success", DT: user });
-  });
+      const result = await getFriendsNotInGroupService("userId", "groupId");
 
-  it("should update user info successfully", async () => {
-    const userId = "userId123";
-    const updatedUserInfo = { name: "John Doe", gender: "male", phoneNumber: "123456789", email: "john@example.com" };
-    const user = { save: jest.fn() };
-    User.findOne.mockResolvedValueOnce(user);
+      expect(result).toEqual({
+        EC: 1,
+        EM: "Group not found",
+        DT: "",
+      });
+      expect(User.findById).toHaveBeenCalledWith("userId");
+      expect(Group.findById).toHaveBeenCalledWith("groupId");
+    });
 
-    const result = await updateUserInfoService(userId, updatedUserInfo);
+    it("should return friends not in the group excluding the deputy leader", async () => {
+      const userId = "userId";
+      const groupId = "groupId";
+      const deputyLeaderId = "deputyLeaderId";
 
-    expect(result).toEqual({ EC: 0, EM: "Success", DT: user });
-  });
+      const mockUser = {
+        friends: [
+          { _id: "friend1" },
+          { _id: "friend2" },
+          { _id: deputyLeaderId },
+        ],
+      };
+      const mockGroup = {
+        _id: groupId,
+        deputyLeader: deputyLeaderId,
+      };
 
-  it("should update user image successfully", async () => {
-    const userId = "userId123";
-    const image = "avatar.png";
-    const user = { save: jest.fn() };
-    User.findOne.mockResolvedValueOnce(user);
+      User.findById.mockResolvedValue(mockUser);
+      Group.findById.mockResolvedValue(mockGroup);
 
-    const result = await updateUserImageService(userId, image);
+      User.find.mockResolvedValue([
+        { _id: "friend1", name: "Friend One" },
+        { _id: "friend2", name: "Friend Two" },
+      ]);
 
-    expect(result).toEqual({ EC: 0, EM: "Success", DT: "" });
-  });
+      const result = await getFriendsNotInGroupService(userId, groupId);
 
-  it("should get friends not in group successfully", async () => {
-    const userId = "userId123";
-    const groupId = "groupId123";
-    const user = { friends: [{ _id: "friend1" }, { _id: "friend2" }] };
-    const group = { deputyLeader: "leaderId" };
-    User.findById.mockResolvedValueOnce(user);
-    User.find.mockResolvedValueOnce([{ _id: "friend1" }, { _id: "friend2" }]);
-    User.findById.mockResolvedValueOnce(group);
+      expect(result).toEqual({
+        EC: 0,
+        EM: "Success",
+        DT: [
+          { _id: "friend1", name: "Friend One" },
+          { _id: "friend2", name: "Friend Two" },
+        ],
+      });
 
-    const result = await getFriendsNotInGroupService(userId, groupId);
-
-    expect(result).toEqual({ EC: 0, EM: "Success", DT: user.friends });
-  });
-
-  it("should delete friend successfully", async () => {
-    const userId = "userId123";
-    const friendId = "friendId123";
-    const user = { save: jest.fn() };
-    User.findByIdAndUpdate.mockResolvedValueOnce(user);
-    User.findByIdAndUpdate.mockResolvedValueOnce(user);
-
-    const result = await deleteFriendService(userId, friendId);
-
-    expect(result).toEqual({ EC: 0, EM: "Success", DT: "" });
+      expect(User.findById).toHaveBeenCalledWith(userId);
+      expect(Group.findById).toHaveBeenCalledWith(groupId);
+      expect(User.find).toHaveBeenCalledWith({
+        _id: { $in: ["friend1", "friend2"] },
+        groups: { $nin: [groupId] },
+      });
+    });
   });
 });

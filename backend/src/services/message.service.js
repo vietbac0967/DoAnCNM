@@ -1,5 +1,5 @@
 import logger from "../helpers/winston.log.js";
-import Conversation from "../models/converstation.model.js";
+import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 
 export const sendMessageService = async (

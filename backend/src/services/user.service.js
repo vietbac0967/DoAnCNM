@@ -3,12 +3,11 @@ import Group from "../models/group.model.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
-import Conversation from "../models/converstation.model.js";
+import Conversation from "../models/conversation.model.js";
 //endpoint to find a user by phone number
 export const findUserByPhone = async (phone, senderId) => {
   try {
     const user = await User.findOne({ phoneNumber: phone }).select("-password");
-    console.log(user);
     if (!user) {
       return { EC: 1, EM: "User not found", DT: "" };
     }
@@ -23,7 +22,6 @@ export const findUserByPhone = async (phone, senderId) => {
 // get all the friends of a user
 export const showFriends = async (userId) => {
   try {
-    console.log(userId);
     const user = await User.findById(userId)
       .populate("friends", "_id name avatar phoneNumber")
       .lean();
@@ -94,7 +92,6 @@ export const showFriendRequests = async (userId) => {
     if (!user) {
       return { EC: 1, EM: "User not found", DT: "" };
     }
-    console.log(user.friendRequests);
     return { EC: 0, EM: "Success", DT: user.friendRequests };
   } catch (error) {
     return { EC: 1, EM: error.message, DT: "" };
@@ -218,7 +215,6 @@ export const updateUserImageService = async (userId, image) => {
 export const getFriendsNotInGroupService = async (userId, groupId) => {
   try {
     // Find the user's friends
-    console.log("groupId backend is:::", groupId);
     const user = await User.findById(userId).populate("friends");
 
     // Get the list of friendIds
@@ -226,7 +222,6 @@ export const getFriendsNotInGroupService = async (userId, groupId) => {
 
     // Find the group
     const group = await Group.findById(groupId);
-    console.log("Group is:::", group);
     if (!group) {
       return { EC: 1, EM: "Group not found", DT: "" };
     }
@@ -248,7 +243,6 @@ export const getFriendsNotInGroupService = async (userId, groupId) => {
       DT: friendsNotInGroup,
     };
   } catch (error) {
-    console.error("Error:", error);
     return {
       EC: 0,
       EM: error.message,

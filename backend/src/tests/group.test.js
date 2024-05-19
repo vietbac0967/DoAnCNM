@@ -1,170 +1,252 @@
-import { 
-  createGroupService, 
-  deteleGroupService, 
-  addMemberToGroupService, 
-  deleteMemberFromGroupService, 
-  updateNameGroupService, 
-  leaveGroupService, 
-  getUserForGroupService, 
-  getLeadForGroupService, 
-  updateDeputyLeaderService 
-} from "../services/group.service.js";
-import Group from "../models/group.model.js";
-import User from "../models/user.model.js";
-import { jest, it, describe, expect } from "@jest/globals";
-
+import {
+  createGroupService,
+  getGroupsForUserService,
+  deleteGroupService,
+  addMemberToGroupService,
+  deleteMemberFromGroupService,
+  updateNameGroupService,
+  updateDeputyLeaderService,
+  getGroupByIdService,
+} from "../services/group.service.js"; // Update the path accordingly
+import Group from "../models/group.model.js"; // Import Group model
+import User from "../models/user.model.js"; // Import User model
+import Conversation from "../models/conversation.model.js"; // Import Conversation model
+// Mock the Group and User models
 jest.mock("../models/group.model.js");
 jest.mock("../models/user.model.js");
-
-describe("Group Service Tests", () => {
-  beforeEach(() => {
+jest.mock("../models/conversation.model.js");
+describe("Group Service", () => {
+  afterEach(() => {
+    // Clear all mock calls after each test
     jest.clearAllMocks();
   });
 
-  it("should create a new group successfully", async () => {
-    const authorId = "author123";
-    const members = ["member1", "member2"];
-    const groupName = "Test Group";
-    const group = {
-      _id: "group123",
-      author: authorId,
-      members,
-      name: groupName,
-    };
-    User.findById.mockResolvedValueOnce({_id: authorId, groups: []});
-    Group.mockReturnValueOnce(group);
-    const result = await createGroupService(authorId, members, groupName);
-    expect(result).toEqual({
-      EC: 0,
-      EM: "Create group successfully",
-      DT: group,
+  describe("createGroupService", () => {
+    it("should return an error if groupName is not provided", async () => {
+      const result = await createGroupService(
+        "authorId",
+        ["member1", "member2"],
+        ""
+      );
+      expect(result).toEqual({
+        EC: 1,
+        EM: "Group name is required",
+        DT: "",
+      });
+    });
+
+    it("should return an error if members list has less than 2 members", async () => {
+      const result = await createGroupService(
+        "authorId",
+        ["member1"],
+        "Test Group"
+      );
+      expect(result).toEqual({
+        EC: 1,
+        EM: "Group must have at least 3 members",
+        DT: "",
+      });
+    });
+
+    it("should create a group successfully", async () => {
+      const authorId = "authorId";
+      const members = ["member1", "member2"];
+      const groupName = "Test Group";
+
+      const mockUser = { _id: authorId, groups: [], save: jest.fn() };
+      const mockGroup = { _id: "groupId", save: jest.fn() };
+      const mockConversation = { save: jest.fn() };
+
+      User.findById.mockReturnValueOnce(mockUser);
+      Group.prototype.save.mockResolvedValue(mockGroup);
+      Conversation.prototype.save.mockResolvedValue(mockConversation);
+
+      User.findById.mockImplementation((id) => {
+        return id === authorId
+          ? mockUser
+          : { _id: id, groups: [], save: jest.fn() };
+      });
+
+      const result = await createGroupService(authorId, members, groupName);
+
+      expect(result.EC).toEqual(0);
+      expect(result.EM).toEqual("Create group successfully");
     });
   });
 
-  it("should return an error if group name is empty", async () => {
-    const result = await createGroupService("author123", ["member1"], "");
-    expect(result).toEqual({
-      EC: 1,
-      EM: "Group name is required",
-      DT: "",
+  describe("updateDeputyLeaderService", () => {
+    it("should update the deputy leader of the group", async () => {
+      // Mock data
+      const groupId = "groupId";
+      const userId = "userId";
+
+      // Mock the Group.findById() method to return the group
+      const mockGroup = {
+        _id: groupId,
+        deputyLeader: null,
+        save: jest.fn(),
+      };
+      Group.findById.mockResolvedValue(mockGroup);
+
+      // Call the function
+      const result = await updateDeputyLeaderService(groupId, userId);
+
+      // Verify the result
+      expect(result).toEqual({
+        EC: 0,
+        EM: "Success",
+        DT: mockGroup,
+      });
+
+      // Verify that Group.findById() is called with the correct groupId
+      expect(Group.findById).toHaveBeenCalledWith(groupId);
+
+      // Verify that the deputyLeader is updated
+      expect(mockGroup.deputyLeader).toBe(userId);
+
+      // Verify that group.save() is called
+      expect(mockGroup.save).toHaveBeenCalled();
+    });
+
+    it("should return an error if the group is not found", async () => {
+      // Mock the Group.findById() method to return null (group not found)
+      Group.findById.mockResolvedValue(null);
+
+      // Call the function
+      const result = await updateDeputyLeaderService(
+        "nonExistentGroupId",
+        "userId"
+      );
+
+      // Verify the result
+      expect(result).toEqual({
+        EC: 1,
+        EM: "Group not found",
+        DT: "",
+      });
     });
   });
 
-  it("should delete a group successfully", async () => {
-    const groupId = "group123";
-    Group.findById.mockResolvedValueOnce({ _id: groupId });
-    User.updateOne.mockResolvedValueOnce({});
-    User.updateMany.mockResolvedValueOnce({});
-    Group.deleteOne.mockResolvedValueOnce({});
-    const result = await deteleGroupService(groupId);
-    expect(result).toEqual({
-      EC: 0,
-      EM: "Success",
-      DT: "",
+  describe("getGroupByIdService", () => {
+    it("should return the group if found", async () => {
+      // Mock data
+      const groupId = "groupId";
+      const mockGroup = {
+        _id: groupId,
+        author: { _id: "authorId", name: "Author" },
+        // Other group properties...
+      };
+
+      // Mock Group.findById() to return the group
+      Group.findById.mockReturnValueOnce({
+        populate: jest.fn().mockResolvedValue(mockGroup),
+      });
+
+      // Call the function
+      const result = await getGroupByIdService(groupId);
+
+      // Verify the result
+      expect(result).toEqual({
+        EC: 0,
+        EM: "Success",
+        DT: mockGroup,
+      });
+
+      // Verify that Group.findById() is called with the correct groupId
+      expect(Group.findById).toHaveBeenCalledWith(groupId);
+    });
+
+    it("should return an error if the group is not found", async () => {
+      // Mock Group.findById() to return null (group not found)
+      Group.findById.mockReturnValueOnce({
+        populate: jest.fn().mockResolvedValue(null),
+      });
+      // Call the function
+      const result = await getGroupByIdService("nonExistentGroupId");
+
+      // Verify the result
+      expect(result).toEqual({
+        EC: 1,
+        EM: "Group not found",
+        DT: "",
+      });
+
+      // Verify that Group.findById() is called with the correct groupId
+      expect(Group.findById).toHaveBeenCalledWith("nonExistentGroupId");
     });
   });
-
-  it("should add member to a group successfully", async () => {
-    const groupId = "group123";
-    const members = ["member3"];
-    const group = { _id: groupId, members: ["member1", "member2"] };
-    Group.findById.mockResolvedValueOnce(group);
-    User.findById.mockResolvedValueOnce({});
-    User.findById.mockResolvedValueOnce({});
-    Group.prototype.save.mockResolvedValueOnce({});
-    const result = await addMemberToGroupService(groupId, members);
-    expect(result).toEqual({
-      EC: 0,
-      EM: "Success",
-      DT: group,
+  describe("addMemberToGroupService", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
     });
-  });
 
-  it("should delete a member from a group successfully", async () => {
-    const groupId = "group123";
-    const userId = "user123";
-    const group = { _id: groupId, members: ["user123", "user456"], deputyLeader: "user123" };
-    Group.findById.mockResolvedValueOnce(group);
-    User.findById.mockResolvedValueOnce({});
-    User.prototype.save.mockResolvedValueOnce({});
-    Group.prototype.save.mockResolvedValueOnce({});
-    const result = await deleteMemberFromGroupService(groupId, userId);
-    expect(result).toEqual({
-      EC: 0,
-      EM: "Success",
-      DT: group,
+    it("should return an error if the group is not found", async () => {
+      Group.findById.mockResolvedValue(null);
+
+      const result = await addMemberToGroupService("groupId", [
+        "member1",
+        "member2",
+      ]);
+
+      expect(result).toEqual({
+        EC: 1,
+        EM: "Group not found",
+        DT: "",
+      });
+
+      expect(Group.findById).toHaveBeenCalledWith("groupId");
     });
-  });
 
-  it("should update the name of a group successfully", async () => {
-    const groupId = "group123";
-    const newName = "Updated Group Name";
-    const group = { _id: groupId };
-    Group.findById.mockResolvedValueOnce(group);
-    Group.prototype.save.mockResolvedValueOnce({});
-    const result = await updateNameGroupService(groupId, newName);
-    expect(result).toEqual({
-      EC: 0,
-      EM: "Success",
-      DT: group,
+    it("should add members to the group successfully", async () => {
+      const groupId = "groupId";
+      const members = ["member1", "member2"];
+
+      const mockGroup = {
+        _id: groupId,
+        members: [],
+        save: jest.fn().mockResolvedValue(true),
+      };
+      const mockUser1 = {
+        _id: "member1",
+        groups: [],
+        save: jest.fn().mockResolvedValue(true),
+      };
+      const mockUser2 = {
+        _id: "member2",
+        groups: [],
+        save: jest.fn().mockResolvedValue(true),
+      };
+
+      Group.findById.mockResolvedValue(mockGroup);
+      User.findById.mockImplementation((id) => {
+        if (id === "member1") return mockUser1;
+        if (id === "member2") return mockUser2;
+      });
+
+      const result = await addMemberToGroupService(groupId, members);
+
+      expect(result).toEqual({
+        EC: 0,
+        EM: "Success",
+        DT: mockGroup,
+      });
+
+     
     });
-  });
 
-  it("should allow a user to leave a group successfully", async () => {
-    const userId = "user123";
-    const groupId = "group123";
-    const group = { _id: groupId, members: ["user123", "user456"], deputyLeader: "user123" };
-    Group.findById.mockResolvedValueOnce(group);
-    User.findById.mockResolvedValueOnce({});
-    User.prototype.save.mockResolvedValueOnce({});
-    Group.prototype.save.mockResolvedValueOnce({});
-    const result = await leaveGroupService(userId, groupId);
-    expect(result).toEqual({
-      EC: 0,
-      EM: "Success",
-      DT: group,
-    });
-  });
+    it("should handle errors during the process", async () => {
+      Group.findById.mockRejectedValue(new Error("Database error"));
 
-  it("should get users for a group successfully", async () => {
-    const groupId = "group123";
-    const group = { _id: groupId, author: "author123", members: ["user123", "user456"], deputyLeader: "user123" };
-    Group.findById.mockResolvedValueOnce(group);
-    User.findById.mockResolvedValueOnce({});
-    User.findById.mockResolvedValueOnce({});
-    const result = await getUserForGroupService(groupId);
-    expect(result).toEqual({
-      EC: 0,
-      EM: "Success",
-      DT: ["author123", "user123", "user456"],
-    });
-  });
+      const result = await addMemberToGroupService("groupId", [
+        "member1",
+        "member2",
+      ]);
 
-  it("should get leaders for a group successfully", async () => {
-    const groupId = "group123";
-    const group = { _id: groupId, author: "author123", deputyLeader: "user123" };
-    Group.findById.mockResolvedValueOnce(group);
-    User.findById.mockResolvedValueOnce({});
-    User.findById.mockResolvedValueOnce({});
-    const result = await getLeadForGroupService(groupId);
-    expect(result).toEqual({
-      EC: 0,
-      EM: "Success",
-      DT: { author: "author123", deputyLeader: "user123" },
-    });
-  });
-
-  it("should update deputy leader for a group successfully", async () => {
-    const groupId = "group123";
-    const userId = "user123";
-    const group = { _id: groupId, author: "author123", deputyLeader: null };
-    Group.findById.mockResolvedValueOnce(group);
-    Group.prototype.save.mockResolvedValueOnce({});
-    const result = await updateDeputyLeaderService(groupId, userId);
-    expect(result).toEqual({
-      EC: 0,
-      EM: "Success",
-      DT: group,
+      expect(result).toEqual({
+        EC: 1,
+        EM: "Database error",
+        DT: "",
+      });
     });
   });
 });

@@ -36,20 +36,20 @@ const handleTimeOutError = () => {
 
 const handleEventConnect = ({ connectionRedis }) => {
   connectionRedis.on(statusConnectRedis.CONNECT, () => {
-    console.log("Connected to Redis!");
+    logger.info("Connected to Redis!");
     clearTimeout(connectionTimeOut);
   });
   connectionRedis.on(statusConnectRedis.END, () => {
-    console.log("End to Redis!");
+    logger.info("End to Redis!");
     //connect retry
     handleTimeOutError();
   });
   connectionRedis.on(statusConnectRedis.RECONNECT, () => {
-    console.log("Reconnecting to Redis!");
+    logger.info("Reconnecting to Redis!");
     clearTimeout(connectionTimeOut);
   });
   connectionRedis.on(statusConnectRedis.ERROR, (err) => {
-    console.error("Error in the Connection:", err);
+    logger.info("Error in the Connection:", err);
     handleTimeOutError();
   });
 };
