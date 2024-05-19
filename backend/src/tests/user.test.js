@@ -266,6 +266,7 @@ describe("User Service Tests", () => {
     it("should return an error if the group is not found", async () => {
       User.findById.mockResolvedValue({
         friends: [{ _id: "friend1" }, { _id: "friend2" }],
+        populate: jest.fn().mockReturnThis(),
       });
       Group.findById.mockResolvedValue(null);
 
@@ -297,7 +298,9 @@ describe("User Service Tests", () => {
         deputyLeader: deputyLeaderId,
       };
 
-      User.findById.mockResolvedValue(mockUser);
+      User.findById.mockReturnValueOnce({
+        populate: jest.fn().mockResolvedValue(mockUser),
+      })
       Group.findById.mockResolvedValue(mockGroup);
 
       User.find.mockResolvedValue([

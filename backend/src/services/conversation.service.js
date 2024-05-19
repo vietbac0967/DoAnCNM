@@ -1,4 +1,4 @@
-import Conversation from "../models/converstation.model.js";
+import Conversation from "../models/conversation.model.js";
 import User from "../models/user.model.js";
 
 // export const getConverstationService = async (userId) => {
