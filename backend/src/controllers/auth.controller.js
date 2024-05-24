@@ -205,6 +205,7 @@ export const changePassword = async (req, res) => {
     const confirmPassword = req.body.confirmPassword;
     const response = await changePasswordService(
       email,
+      oldPassword,
       newPassword,
       confirmPassword
     );
