@@ -25,6 +25,7 @@ export default function LoginScreen({ navigation }) {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
 
+
   // get user and save info user to async storage
   const getUser = async () => {
     try {
