@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "mobile",
-    "slug": "mobile",
+    "slug": "chat-application",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -21,14 +23,17 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.thanhthang2808.mobile",
-      "softwareKeyboardLayoutMode": "pan"
+      "softwareKeyboardLayoutMode": "pan",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "1c51f60b-611e-4c65-8411-301ca25ea78c"
+        "projectId": "39df9d06-1f7e-4ad5-b318-ec4fcee4cb97"
       }
     },
     "plugins": [
@@ -44,6 +49,7 @@
           "iCloudContainerEnvironment": "Production"
         }
       ]
-    ]
+    ],
+    "owner": "devbac"
   }
 }
